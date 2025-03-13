@@ -1,0 +1,60 @@
+
+import React from 'react';
+
+interface LoadingAnimationProps {
+  progress: number;
+  stage: string;
+}
+
+const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ progress, stage }) => {
+  return (
+    <div className="flex flex-col items-center justify-center space-y-6 py-12 animate-fade-in">
+      <div className="relative w-32 h-32">
+        <div className="absolute inset-0 rounded-full border-4 border-primary/20"></div>
+        <svg 
+          className="absolute inset-0 transform -rotate-90" 
+          viewBox="0 0 100 100"
+        >
+          <circle
+            className="text-primary transition-all duration-700 ease-in-out"
+            strokeWidth="4"
+            stroke="currentColor"
+            fill="transparent"
+            r="48"
+            cx="50"
+            cy="50"
+            style={{
+              strokeDasharray: 300,
+              strokeDashoffset: 300 - (progress / 100) * 300
+            }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-2xl font-medium">{progress}%</span>
+        </div>
+      </div>
+      
+      <div className="text-center space-y-2">
+        <h3 className="text-lg font-medium">{stage}</h3>
+        <p className="text-sm text-muted-foreground max-w-sm">
+          Our AI is analyzing the video footage frame by frame to extract detailed insights about the player's performance.
+        </p>
+      </div>
+      
+      <div className="w-full max-w-md space-y-2">
+        <div className="progress-bar">
+          <div 
+            className="progress-value" 
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>Analyzing video</span>
+          <span>Generating report</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LoadingAnimation;
