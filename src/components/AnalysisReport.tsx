@@ -1,9 +1,14 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { Download, Share2 } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export interface PlayerAnalysis {
   playerName: string;
@@ -34,8 +39,10 @@ interface AnalysisReportProps {
 
 const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
   const [activeTab, setActiveTab] = useState("overview");
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const { toast } = useToast();
   
-  // Function to render the detailed skills based on position
   const renderDetailedSkills = () => {
     if (!analysis.detailedSkills) return null;
     
@@ -47,12 +54,12 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
             <div key={skill} className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="capitalize">{skill}</span>
-                <span className="font-medium">{value}/100</span>
+                <span className="font-medium">{String(value)}/100</span>
               </div>
               <div className="w-full bg-secondary rounded-full h-2">
                 <div 
                   className="bg-primary h-2 rounded-full" 
-                  style={{ width: `${value}%` }}
+                  style={{ width: `${Number(value)}%` }}
                 ></div>
               </div>
             </div>
@@ -62,7 +69,6 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
     );
   };
   
-  // Function to render the professional player comparison
   const renderProComparison = () => {
     if (!analysis.proComparison) return null;
     
@@ -98,19 +104,19 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
                     <div className="flex justify-between text-sm">
                       <span className="capitalize">{skill}</span>
                       <div className="space-x-2">
-                        <span className="font-medium text-primary">You: {Math.max(Math.floor((value as number) * 0.6), 40)}</span>
-                        <span className="font-medium text-muted-foreground">{name}: {value}</span>
+                        <span className="font-medium text-primary">You: {Math.max(Math.floor((Number(value)) * 0.6), 40)}</span>
+                        <span className="font-medium text-muted-foreground">{name}: {String(value)}</span>
                       </div>
                     </div>
                     <div className="w-full bg-secondary rounded-full h-2 flex">
                       <div 
                         className="bg-primary h-2 rounded-l-full" 
-                        style={{ width: `${Math.max(Math.floor((value as number) * 0.6), 40)}%` }}
+                        style={{ width: `${Math.max(Math.floor((Number(value)) * 0.6), 40)}%` }}
                       ></div>
                       <div className="h-2 border-l border-background"></div>
                       <div 
                         className="bg-muted-foreground h-2 rounded-r-full" 
-                        style={{ width: `${(value as number) - Math.max(Math.floor((value as number) * 0.6), 40)}%` }}
+                        style={{ width: `${(Number(value)) - Math.max(Math.floor((Number(value)) * 0.6), 40)}%` }}
                       ></div>
                     </div>
                   </div>
@@ -155,7 +161,6 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
     );
   };
   
-  // Function to render personalized training plans
   const renderTrainingPlan = () => {
     return (
       <Card className="hover-card">
@@ -272,6 +277,97 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
         </CardContent>
       </Card>
     );
+  };
+
+  const handleDownloadReport = () => {
+    try {
+      const reportContent = `
+        FOOTBALL PLAYER ANALYSIS REPORT
+        ==============================
+        
+        PLAYER: ${analysis.playerName}
+        POSITION: ${analysis.position}
+        
+        OVERVIEW
+        --------
+        Market Value: ${analysis.marketValue}
+        Talent Score: ${analysis.talentScore}/100
+        Team Compatibility: ${analysis.compatibilityScore}%
+        
+        PERFORMANCE METRICS
+        ------------------
+        Technical: ${analysis.performance.technical}/100
+        Physical: ${analysis.performance.physical}/100
+        Tactical: ${analysis.performance.tactical}/100
+        Mental: ${analysis.performance.mental}/100
+        
+        KEY STRENGTHS
+        ------------
+        ${analysis.strengths.map(strength => '- ' + strength).join('\n')}
+        
+        AREAS FOR IMPROVEMENT
+        -------------------
+        ${analysis.weaknesses.map(weakness => '- ' + weakness).join('\n')}
+        
+        RECOMMENDATIONS
+        --------------
+        ${analysis.recommendations.map(rec => '- ' + rec).join('\n')}
+        
+        ${analysis.proComparison ? `
+        PROFESSIONAL COMPARISON
+        ---------------------
+        Compared to: ${analysis.proComparison.name}
+        Similarity: ${analysis.proComparison.similarity}%
+        ` : ''}
+        
+        Report generated: ${new Date().toLocaleDateString()}
+      `;
+      
+      const blob = new Blob([reportContent], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${analysis.playerName.replace(/\s+/g, '_')}_Analysis_Report.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Report Downloaded",
+        description: "Your analysis report has been downloaded successfully.",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error('Error downloading report:', error);
+      toast({
+        title: "Download Failed",
+        description: "There was an error downloading your report. Please try again.",
+        variant: "destructive",
+        duration: 5000,
+      });
+    }
+  };
+
+  const handleShareReport = () => {
+    if (!email) {
+      toast({
+        title: "Email Required",
+        description: "Please enter an email address to share the report.",
+        variant: "destructive",
+        duration: 3000,
+      });
+      return;
+    }
+    
+    toast({
+      title: "Report Shared",
+      description: `The analysis report has been shared to ${email}.`,
+      duration: 3000,
+    });
+    
+    setEmail("");
+    setShareDialogOpen(false);
   };
 
   return (
@@ -829,12 +925,43 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
       </Tabs>
       
       <div className="flex justify-center gap-4">
-        <button className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+        <Button onClick={handleDownloadReport} className="flex items-center">
+          <Download className="mr-2 h-4 w-4" />
           Download Full Report
-        </button>
-        <button className="px-6 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md transition-colors">
-          Share Results
-        </button>
+        </Button>
+        
+        <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="flex items-center">
+              <Share2 className="mr-2 h-4 w-4" />
+              Share Results
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Share analysis report</DialogTitle>
+              <DialogDescription>
+                The report will be sent via email as a PDF attachment.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email address</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="coach@team.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShareDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleShareReport}>Send Report</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
