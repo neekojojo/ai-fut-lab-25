@@ -1,37 +1,18 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { Download, Share2 } from 'lucide-react';
+import { Download, Share2, AlertTriangle, Trophy, ArrowRight } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-export interface PlayerAnalysis {
-  playerName: string;
-  position: string;
-  marketValue: string;
-  talentScore: number;
-  strengths: string[];
-  weaknesses: string[];
-  detailedSkills?: any; // Position-specific skills
-  performance: {
-    technical: number;
-    physical: number;
-    tactical: number;
-    mental: number;
-  };
-  recommendations: string[];
-  compatibilityScore: number;
-  proComparison?: {
-    name: string;
-    similarity: number;
-    skills: any;
-  };
-}
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar } from 'recharts';
+import type { PlayerAnalysis } from './AnalysisReport.d';
 
 interface AnalysisReportProps {
   analysis: PlayerAnalysis;
@@ -42,6 +23,44 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [email, setEmail] = useState("");
   const { toast } = useToast();
+
+  const performanceData = [
+    { attribute: 'Technical', value: analysis.performance.technical },
+    { attribute: 'Physical', value: analysis.performance.physical },
+    { attribute: 'Tactical', value: analysis.performance.tactical },
+    { attribute: 'Mental', value: analysis.performance.mental },
+  ];
+
+  const detailedPerformanceData = [
+    { name: 'Ball Control', technical: Math.floor(analysis.performance.technical * 0.9), average: 60 },
+    { name: 'Passing', technical: Math.floor(analysis.performance.technical * 1.1), average: 55 },
+    { name: 'Shooting', technical: Math.floor(analysis.performance.technical * 0.95), average: 50 },
+    { name: 'First Touch', technical: Math.floor(analysis.performance.technical * 0.85), average: 58 },
+    { name: 'Dribbling', technical: Math.floor(analysis.performance.technical * 1.05), average: 52 },
+    { name: 'Heading', technical: Math.floor(analysis.performance.technical * 0.9), average: 53 },
+  ];
+
+  const physicalAttributesData = [
+    { name: 'Speed', physical: Math.floor(analysis.performance.physical * 1.1), average: 55 },
+    { name: 'Strength', physical: Math.floor(analysis.performance.physical * 0.9), average: 58 },
+    { name: 'Jumping', physical: Math.floor(analysis.performance.physical * 0.95), average: 52 },
+    { name: 'Stamina', physical: Math.floor(analysis.performance.physical * 1.05), average: 54 },
+    { name: 'Agility', physical: Math.floor(analysis.performance.physical * 0.85), average: 59 },
+    { name: 'Balance', physical: Math.floor(analysis.performance.physical * 0.9), average: 57 },
+  ];
+
+  const progressData = analysis.progress?.areas.map(area => ({
+    name: area.skill,
+    before: area.before,
+    after: area.after,
+    gain: area.after - area.before
+  })) || [];
+
+  const injuryRiskData = analysis.injuryRisk?.areas.map(area => ({
+    name: area.name,
+    risk: area.risk,
+    safeLevel: 100 - area.risk
+  })) || [];
   
   const renderDetailedSkills = () => {
     if (!analysis.detailedSkills) return null;
@@ -74,6 +93,12 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
     
     const { name, similarity, skills } = analysis.proComparison;
     
+    const proComparisonData = Object.entries(skills).map(([skill, value]) => ({
+      skill,
+      player: Math.max(Math.floor((Number(value)) * 0.6), 40),
+      pro: Number(value)
+    }));
+    
     return (
       <Card className="hover-card mt-8">
         <CardHeader>
@@ -85,42 +110,76 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
         <CardContent>
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-medium">Style Similarity</h4>
-                <p className="text-sm text-muted-foreground">
-                  Based on movement patterns and technical approach
-                </p>
+              <div className="flex items-center space-x-4">
+                <Avatar className="h-16 w-16">
+                  <AvatarImage src={`https://api.dicebear.com/7.x/bottts/svg?seed=${name.replace(/\s+/g, '')}`} alt={name} />
+                  <AvatarFallback>{name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <h4 className="font-medium">Style Similarity</h4>
+                  <div className="text-3xl font-bold text-primary">{similarity}%</div>
+                </div>
               </div>
-              <div className="text-xl font-bold">{similarity}%</div>
+              <div className="hidden md:block w-1/3">
+                <ResponsiveContainer width="100%" height={120}>
+                  <BarChart 
+                    data={proComparisonData.slice(0, 3)} 
+                    layout="vertical"
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                    <XAxis type="number" domain={[0, 100]} />
+                    <YAxis type="category" dataKey="skill" tick={{fontSize: 12}} width={80} />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="player" fill="#8884d8" name="You" />
+                    <Bar dataKey="pro" fill="#82ca9d" name={name} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
             
             <Separator />
             
             <div>
               <h4 className="font-medium mb-4">Skill Comparison</h4>
-              <div className="space-y-4">
-                {Object.entries(skills).map(([skill, value]) => (
-                  <div key={skill} className="space-y-1">
-                    <div className="flex justify-between text-sm">
-                      <span className="capitalize">{skill}</span>
-                      <div className="space-x-2">
-                        <span className="font-medium text-primary">You: {Math.max(Math.floor((Number(value)) * 0.6), 40)}</span>
-                        <span className="font-medium text-muted-foreground">{name}: {String(value)}</span>
+              <div className="md:grid md:grid-cols-2 gap-4">
+                <div className="space-y-4">
+                  {Object.entries(skills).map(([skill, value]) => (
+                    <div key={skill} className="space-y-1">
+                      <div className="flex justify-between text-sm">
+                        <span className="capitalize">{skill}</span>
+                        <div className="space-x-2">
+                          <span className="font-medium text-primary">You: {Math.max(Math.floor((Number(value)) * 0.6), 40)}</span>
+                          <span className="font-medium text-muted-foreground">{name}: {String(value)}</span>
+                        </div>
+                      </div>
+                      <div className="w-full bg-secondary rounded-full h-2 flex">
+                        <div 
+                          className="bg-primary h-2 rounded-l-full" 
+                          style={{ width: `${Math.max(Math.floor((Number(value)) * 0.6), 40)}%` }}
+                        ></div>
+                        <div className="h-2 border-l border-background"></div>
+                        <div 
+                          className="bg-muted-foreground h-2 rounded-r-full" 
+                          style={{ width: `${(Number(value)) - Math.max(Math.floor((Number(value)) * 0.6), 40)}%` }}
+                        ></div>
                       </div>
                     </div>
-                    <div className="w-full bg-secondary rounded-full h-2 flex">
-                      <div 
-                        className="bg-primary h-2 rounded-l-full" 
-                        style={{ width: `${Math.max(Math.floor((Number(value)) * 0.6), 40)}%` }}
-                      ></div>
-                      <div className="h-2 border-l border-background"></div>
-                      <div 
-                        className="bg-muted-foreground h-2 rounded-r-full" 
-                        style={{ width: `${(Number(value)) - Math.max(Math.floor((Number(value)) * 0.6), 40)}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <div className="hidden md:block mt-4 md:mt-0">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <RadarChart outerRadius={90} data={proComparisonData}>
+                      <PolarGrid />
+                      <PolarAngleAxis dataKey="skill" />
+                      <PolarRadiusAxis domain={[0, 100]} />
+                      <Radar name="You" dataKey="player" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+                      <Radar name={name} dataKey="pro" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.6} />
+                      <Legend />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
             </div>
             
@@ -154,6 +213,242 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
                     </li>
                 ))}
               </ul>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderInjuryRisk = () => {
+    if (!analysis.injuryRisk) return null;
+    
+    return (
+      <Card className="hover-card mt-6">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <AlertTriangle className="mr-2 h-5 w-5 text-amber-500" />
+            Injury Risk Assessment
+          </CardTitle>
+          <CardDescription>
+            Analysis of potential injury concerns
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-medium">Overall Risk Level</h4>
+                <p className="text-sm text-muted-foreground">
+                  Based on movement patterns and physical attributes
+                </p>
+              </div>
+              <div className="text-xl font-bold flex items-center space-x-2">
+                <span className={
+                  analysis.injuryRisk.overall < 30 ? "text-green-500" : 
+                  analysis.injuryRisk.overall < 60 ? "text-amber-500" : 
+                  "text-red-500"
+                }>
+                  {analysis.injuryRisk.overall}%
+                </span>
+                <span className="text-sm font-normal text-muted-foreground">risk</span>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-medium mb-4">Risk Breakdown</h4>
+                <div className="space-y-4">
+                  {analysis.injuryRisk.areas.map((area, index) => (
+                    <div key={index} className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>{area.name}</span>
+                        <span className={`font-medium ${
+                          area.risk < 30 ? "text-green-500" : 
+                          area.risk < 60 ? "text-amber-500" : 
+                          "text-red-500"
+                        }`}>
+                          {area.risk}% risk
+                        </span>
+                      </div>
+                      <div className="w-full bg-secondary rounded-full h-2">
+                        <div 
+                          className={`h-2 rounded-full ${
+                            area.risk < 30 ? "bg-green-500" : 
+                            area.risk < 60 ? "bg-amber-500" : 
+                            "bg-red-500"
+                          }`}
+                          style={{ width: `${area.risk}%` }}
+                        ></div>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{area.recommendation}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="hidden md:block">
+                <h4 className="font-medium mb-4">Risk Visualization</h4>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={injuryRiskData}
+                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="risk" name="Risk Level" fill="#f97316" />
+                      <Bar dataKey="safeLevel" name="Safe Level" fill="#10b981" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+            
+            <Separator />
+            
+            <div>
+              <h4 className="font-medium mb-2">Prevention Recommendations</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                {analysis.injuryRisk.areas.map((area, index) => (
+                  <div key={index} className="border rounded-lg p-3 space-y-2">
+                    <div className="text-sm font-medium flex items-center">
+                      <span className={`h-2 w-2 rounded-full mr-2 ${
+                        area.risk < 30 ? "bg-green-500" : 
+                        area.risk < 60 ? "bg-amber-500" : 
+                        "bg-red-500"
+                      }`}></span>
+                      {area.name}
+                    </div>
+                    <p className="text-sm">{area.recommendation}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderBadges = () => {
+    if (!analysis.badges || analysis.badges.length === 0) return null;
+    
+    return (
+      <Card className="hover-card mt-6">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Trophy className="mr-2 h-5 w-5 text-amber-500" />
+            Player Badges
+          </CardTitle>
+          <CardDescription>
+            Special abilities and achievements
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {analysis.badges.map((badge, index) => (
+              <div key={index} className="border rounded-lg p-4 flex flex-col items-center text-center">
+                <div className={`h-14 w-14 rounded-full mb-2 flex items-center justify-center ${
+                  badge.level === 'bronze' ? "bg-amber-100 text-amber-800" : 
+                  badge.level === 'silver' ? "bg-slate-200 text-slate-800" : 
+                  "bg-amber-200 text-amber-800"
+                }`}>
+                  <Trophy className="h-8 w-8" />
+                </div>
+                <div className="text-sm font-semibold">{badge.name}</div>
+                <div className="text-xs text-muted-foreground mt-1">{badge.description}</div>
+                <div className={`text-xs mt-2 px-2 py-0.5 rounded-full ${
+                  badge.level === 'bronze' ? "bg-amber-100 text-amber-800" : 
+                  badge.level === 'silver' ? "bg-slate-200 text-slate-800" : 
+                  "bg-amber-200 text-amber-800"
+                }`}>
+                  {badge.level.charAt(0).toUpperCase() + badge.level.slice(1)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderProgress = () => {
+    if (!analysis.progress) return null;
+    
+    return (
+      <Card className="hover-card mt-6">
+        <CardHeader>
+          <CardTitle>Performance Progress</CardTitle>
+          <CardDescription>
+            Improvement since last analysis
+            {analysis.progress.improvement && (
+              <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                +{analysis.progress.improvement}%
+              </span>
+            )}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <h4 className="font-medium">Key Improvements</h4>
+              <div className="space-y-4">
+                {analysis.progress.areas.map((area, index) => (
+                  <div key={index} className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>{area.skill}</span>
+                      <div className="space-x-1">
+                        <span className="text-muted-foreground">{area.before}</span>
+                        <ArrowRight className="inline h-3 w-3" />
+                        <span className="font-medium">{area.after}</span>
+                        <span className="text-green-500">(+{area.after - area.before})</span>
+                      </div>
+                    </div>
+                    <div className="w-full bg-secondary rounded-full h-2 flex">
+                      <div 
+                        className="bg-muted-foreground h-2 rounded-l-full" 
+                        style={{ width: `${area.before}%` }}
+                      ></div>
+                      <div 
+                        className="bg-primary h-2" 
+                        style={{ width: `${area.after - area.before}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="hidden md:block">
+              <h4 className="font-medium mb-4">Progress Visualization</h4>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart
+                  data={progressData}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient id="colorBefore" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorAfter" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#82ca9d" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="name" />
+                  <YAxis domain={[0, 100]} />
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <Tooltip />
+                  <Legend />
+                  <Area type="monotone" dataKey="before" stroke="#8884d8" fillOpacity={1} fill="url(#colorBefore)" name="Previous" />
+                  <Area type="monotone" dataKey="after" stroke="#82ca9d" fillOpacity={1} fill="url(#colorAfter)" name="Current" />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </CardContent>
@@ -249,6 +544,23 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
               </div>
             </div>
             
+            <div className="hidden md:block">
+              <h4 className="font-medium mb-4">Performance Radar</h4>
+              <div className="flex justify-center">
+                <div className="w-full max-w-md">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <RadarChart outerRadius={90} data={performanceData}>
+                      <PolarGrid />
+                      <PolarAngleAxis dataKey="attribute" />
+                      <PolarRadiusAxis domain={[0, 100]} />
+                      <Radar name="Player" dataKey="value" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+                      <Legend />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+            
             <Separator />
             
             <div>
@@ -318,6 +630,19 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
         ---------------------
         Compared to: ${analysis.proComparison.name}
         Similarity: ${analysis.proComparison.similarity}%
+        ` : ''}
+        
+        ${analysis.injuryRisk ? `
+        INJURY RISK ASSESSMENT
+        ---------------------
+        Overall Risk: ${analysis.injuryRisk.overall}%
+        Risk Areas: ${analysis.injuryRisk.areas.map(area => `- ${area.name}: ${area.risk}% (${area.recommendation})`).join('\n')}
+        ` : ''}
+        
+        ${analysis.badges ? `
+        EARNED BADGES
+        ------------
+        ${analysis.badges.map(badge => `- ${badge.name} (${badge.level}): ${badge.description}`).join('\n')}
         ` : ''}
         
         Report generated: ${new Date().toLocaleDateString()}
@@ -508,6 +833,17 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
                     </div>
                   </div>
                   
+                  <div className="hidden md:block mt-8">
+                    <ResponsiveContainer width="100%" height={250}>
+                      <RadarChart outerRadius={90} data={performanceData}>
+                        <PolarGrid />
+                        <PolarAngleAxis dataKey="attribute" />
+                        <PolarRadiusAxis domain={[0, 100]} tick={false} />
+                        <Radar name="Player" dataKey="value" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  
                   {renderDetailedSkills()}
                 </div>
                 
@@ -561,11 +897,30 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
                         ))}
                       </ul>
                     </div>
+                    
+                    <div className="mt-8">
+                      <h4 className="font-medium mb-3">Player Image</h4>
+                      <div className="rounded-lg overflow-hidden border shadow-sm">
+                        <img 
+                          src={`https://api.dicebear.com/7.x/personas/svg?seed=${analysis.playerName.replace(/\s+/g, '')}`} 
+                          alt={analysis.playerName} 
+                          className="w-full h-auto"
+                          style={{ maxHeight: "250px" }}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2 text-center">
+                        Computer generated representation
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
+          
+          {analysis.injuryRisk && renderInjuryRisk()}
+          {analysis.badges && renderBadges()}
+          {analysis.progress && renderProgress()}
         </TabsContent>
         
         <TabsContent value="detailed" className="space-y-6">
@@ -580,34 +935,55 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
               <div className="space-y-8">
                 <div>
                   <h4 className="font-medium mb-4">Technical Analysis</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Ball Control</span>
-                        <span className="text-sm font-medium">{Math.floor(analysis.performance.technical * 0.9)}/100</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Passing</span>
-                        <span className="text-sm font-medium">{Math.floor(analysis.performance.technical * 1.1)}/100</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Shooting</span>
-                        <span className="text-sm font-medium">{Math.floor(analysis.performance.technical * 0.95)}/100</span>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="md:col-span-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Ball Control</span>
+                            <span className="text-sm font-medium">{Math.floor(analysis.performance.technical * 0.9)}/100</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Passing</span>
+                            <span className="text-sm font-medium">{Math.floor(analysis.performance.technical * 1.1)}/100</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Shooting</span>
+                            <span className="text-sm font-medium">{Math.floor(analysis.performance.technical * 0.95)}/100</span>
+                          </div>
+                        </div>
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">First Touch</span>
+                            <span className="text-sm font-medium">{Math.floor(analysis.performance.technical * 0.85)}/100</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Dribbling</span>
+                            <span className="text-sm font-medium">{Math.floor(analysis.performance.technical * 1.05)}/100</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Heading</span>
+                            <span className="text-sm font-medium">{Math.floor(analysis.performance.technical * 0.9)}/100</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">First Touch</span>
-                        <span className="text-sm font-medium">{Math.floor(analysis.performance.technical * 0.85)}/100</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Dribbling</span>
-                        <span className="text-sm font-medium">{Math.floor(analysis.performance.technical * 1.05)}/100</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Heading</span>
-                        <span className="text-sm font-medium">{Math.floor(analysis.performance.technical * 0.9)}/100</span>
-                      </div>
+                    <div className="hidden md:block">
+                      <ResponsiveContainer width="100%" height={200}>
+                        <BarChart
+                          data={detailedPerformanceData}
+                          layout="vertical"
+                          margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                          <XAxis type="number" domain={[0, 100]} />
+                          <YAxis type="category" dataKey="name" tick={{fontSize: 12}} width={80} />
+                          <Tooltip />
+                          <Legend />
+                          <Bar dataKey="technical" name="Player" fill="#8884d8" />
+                          <Bar dataKey="average" name="Average" fill="#82ca9d" />
+                        </BarChart>
+                      </ResponsiveContainer>
                     </div>
                   </div>
                 </div>
@@ -616,34 +992,55 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
                 
                 <div>
                   <h4 className="font-medium mb-4">Physical Analysis</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Speed</span>
-                        <span className="text-sm font-medium">{Math.floor(analysis.performance.physical * 1.1)}/100</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Strength</span>
-                        <span className="text-sm font-medium">{Math.floor(analysis.performance.physical * 0.9)}/100</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Jumping</span>
-                        <span className="text-sm font-medium">{Math.floor(analysis.performance.physical * 0.95)}/100</span>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="md:col-span-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Speed</span>
+                            <span className="text-sm font-medium">{Math.floor(analysis.performance.physical * 1.1)}/100</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Strength</span>
+                            <span className="text-sm font-medium">{Math.floor(analysis.performance.physical * 0.9)}/100</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Jumping</span>
+                            <span className="text-sm font-medium">{Math.floor(analysis.performance.physical * 0.95)}/100</span>
+                          </div>
+                        </div>
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Stamina</span>
+                            <span className="text-sm font-medium">{Math.floor(analysis.performance.physical * 1.05)}/100</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Agility</span>
+                            <span className="text-sm font-medium">{Math.floor(analysis.performance.physical * 0.85)}/100</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Balance</span>
+                            <span className="text-sm font-medium">{Math.floor(analysis.performance.physical * 0.9)}/100</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Stamina</span>
-                        <span className="text-sm font-medium">{Math.floor(analysis.performance.physical * 1.05)}/100</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Agility</span>
-                        <span className="text-sm font-medium">{Math.floor(analysis.performance.physical * 0.85)}/100</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Balance</span>
-                        <span className="text-sm font-medium">{Math.floor(analysis.performance.physical * 0.9)}/100</span>
-                      </div>
+                    <div className="hidden md:block">
+                      <ResponsiveContainer width="100%" height={200}>
+                        <BarChart
+                          data={physicalAttributesData}
+                          layout="vertical"
+                          margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                          <XAxis type="number" domain={[0, 100]} />
+                          <YAxis type="category" dataKey="name" tick={{fontSize: 12}} width={80} />
+                          <Tooltip />
+                          <Legend />
+                          <Bar dataKey="physical" name="Player" fill="#8884d8" />
+                          <Bar dataKey="average" name="Average" fill="#82ca9d" />
+                        </BarChart>
+                      </ResponsiveContainer>
                     </div>
                   </div>
                 </div>
@@ -715,6 +1112,28 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
                       <div className="flex items-center justify-between">
                         <span className="text-sm">Teamwork</span>
                         <span className="text-sm font-medium">{Math.floor(analysis.performance.mental * 0.9)}/100</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-8">
+                  <h4 className="font-medium mb-4">Performance Snapshot</h4>
+                  <div className="aspect-video rounded-lg bg-muted overflow-hidden relative">
+                    <div className="flex items-center justify-center h-full">
+                      <img 
+                        src="https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                        alt="Football action" 
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                        <div className="text-white text-center px-4">
+                          <h3 className="text-xl font-bold">{analysis.playerName}</h3>
+                          <p className="text-sm opacity-90">{analysis.position}</p>
+                          <div className="mt-2 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-primary text-white">
+                            Talent Score: {analysis.talentScore}/100
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -915,6 +1334,33 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
                           Schedule your next assessment
                         </div>
                       </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-6">
+                  <h4 className="font-medium mb-4">Training Snapshots</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="aspect-square rounded-lg overflow-hidden">
+                      <img 
+                        src="https://images.unsplash.com/photo-1560272564-c83b66b1ad12?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"
+                        alt="Training drill 1" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="aspect-square rounded-lg overflow-hidden">
+                      <img 
+                        src="https://images.unsplash.com/photo-1526232626815-50578f4e7578?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"
+                        alt="Training drill 2" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="aspect-square rounded-lg overflow-hidden">
+                      <img 
+                        src="https://images.unsplash.com/photo-1550258987-190a2d41a8ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"
+                        alt="Training drill 3" 
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   </div>
                 </div>
