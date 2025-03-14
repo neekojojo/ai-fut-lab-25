@@ -1,8 +1,7 @@
-
 // Mock service for AI football analysis
 // In a real application, this would connect to OpenAI API
 
-import { PlayerAnalysis } from "@/components/AnalysisReport";
+import type { PlayerAnalysis } from "@/components/AnalysisReport.d.ts";
 
 // Enhanced analysis stages for more detailed feedback
 export const ANALYSIS_STAGES = [
@@ -416,7 +415,7 @@ const generateEnhancedAnalysis = (): PlayerAnalysis => {
   const selectedRecommendations = shuffledRecommendations.slice(0, Math.floor(Math.random() * 2) + 3);
   
   // Generate base analysis
-  const analysis = {
+  const analysis: PlayerAnalysis = {
     playerName: "John Doe", // In a real app, we would detect or ask for the player's name
     position,
     marketValue,
