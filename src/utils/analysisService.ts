@@ -11,7 +11,10 @@ export const ANALYSIS_STAGES = [
   "Evaluating technical skills",
   "Assessing tactical awareness",
   "Analyzing physical attributes",
+  "Predicting injury risks",
   "Calculating market value",
+  "Comparing with professionals",
+  "Generating badges and achievements",
   "Generating comprehensive report"
 ];
 
@@ -111,6 +114,111 @@ const PROFESSIONAL_PLAYERS = [
     }
   }
 ];
+
+// Possible badges that can be earned
+const AVAILABLE_BADGES = [
+  {
+    name: "Technical Genius",
+    description: "Exceptional technical skills detected",
+    level: "gold" as const,
+    unlockCondition: (analysis: PlayerAnalysis) => analysis.performance.technical > 85
+  },
+  {
+    name: "Physical Beast",
+    description: "Outstanding physical attributes",
+    level: "gold" as const,
+    unlockCondition: (analysis: PlayerAnalysis) => analysis.performance.physical > 85
+  },
+  {
+    name: "Tactical Mastermind",
+    description: "Superior tactical understanding of the game",
+    level: "gold" as const,
+    unlockCondition: (analysis: PlayerAnalysis) => analysis.performance.tactical > 85
+  },
+  {
+    name: "Mental Fortitude",
+    description: "Exceptional mental strength and focus",
+    level: "gold" as const,
+    unlockCondition: (analysis: PlayerAnalysis) => analysis.performance.mental > 85
+  },
+  {
+    name: "Rising Star",
+    description: "High potential detected in analysis",
+    level: "silver" as const,
+    unlockCondition: (analysis: PlayerAnalysis) => analysis.talentScore > 80
+  },
+  {
+    name: "Pro Potential",
+    description: "Performance comparable to professional players",
+    level: "silver" as const,
+    unlockCondition: (analysis: PlayerAnalysis) => analysis.compatibilityScore > 80
+  },
+  {
+    name: "Skillful Player",
+    description: "Good all-around playing abilities",
+    level: "bronze" as const,
+    unlockCondition: (analysis: PlayerAnalysis) => analysis.talentScore > 70
+  },
+  {
+    name: "Team Player",
+    description: "Great awareness of teammates and positioning",
+    level: "bronze" as const,
+    unlockCondition: (analysis: PlayerAnalysis) => analysis.performance.tactical > 70
+  }
+];
+
+// Function to generate injury risk assessment
+const generateInjuryRiskAssessment = (position: string, physicalScore: number): PlayerAnalysis["injuryRisk"] => {
+  // Calculate overall risk (lower physical score = higher risk)
+  const overallRisk = Math.max(10, 100 - physicalScore - Math.random() * 20);
+  
+  // Position-specific injury areas
+  const forwardAreas = [
+    { name: "Hamstrings", risk: Math.random() * 40 + 30, recommendation: "Focus on hamstring flexibility and strength exercises" },
+    { name: "Ankles", risk: Math.random() * 30 + 20, recommendation: "Incorporate balance training to strengthen ankle stability" },
+    { name: "Knees", risk: Math.random() * 30 + 20, recommendation: "Add knee stabilization exercises to your routine" }
+  ];
+  
+  const midfielderAreas = [
+    { name: "Calves", risk: Math.random() * 40 + 30, recommendation: "Regular calf stretching and strengthening" },
+    { name: "Groin", risk: Math.random() * 30 + 20, recommendation: "Include adductor stretches and strength training" },
+    { name: "Lower back", risk: Math.random() * 30 + 20, recommendation: "Core stability exercises to protect lower back" }
+  ];
+  
+  const defenderAreas = [
+    { name: "Knees", risk: Math.random() * 40 + 30, recommendation: "Focus on landing mechanics and knee stability exercises" },
+    { name: "Shoulders", risk: Math.random() * 30 + 20, recommendation: "Incorporate upper body and rotator cuff strength work" },
+    { name: "Ankles", risk: Math.random() * 30 + 20, recommendation: "Regular proprioception training for ankle stability" }
+  ];
+  
+  const goalkeeperAreas = [
+    { name: "Shoulders", risk: Math.random() * 40 + 30, recommendation: "Rotator cuff strengthening and mobility exercises" },
+    { name: "Wrists", risk: Math.random() * 30 + 20, recommendation: "Wrist strengthening and flexibility exercises" },
+    { name: "Lower back", risk: Math.random() * 30 + 20, recommendation: "Core stability to protect the lower back during dives" }
+  ];
+  
+  // Select appropriate areas based on position
+  let areas;
+  if (position === "Forward") areas = forwardAreas;
+  else if (position === "Midfielder") areas = midfielderAreas;
+  else if (position === "Defender") areas = defenderAreas;
+  else areas = goalkeeperAreas;
+  
+  // Sort areas by risk (highest first)
+  areas.sort((a, b) => b.risk - a.risk);
+  
+  return {
+    overall: overallRisk,
+    areas
+  };
+};
+
+// Function to determine earned badges based on analysis
+const determineEarnedBadges = (analysis: PlayerAnalysis) => {
+  return AVAILABLE_BADGES
+    .filter(badge => badge.unlockCondition(analysis))
+    .map(({ name, description, level }) => ({ name, description, level }));
+};
 
 // Generate mock analysis data with enhanced details
 const generateEnhancedAnalysis = (): PlayerAnalysis => {
@@ -307,7 +415,8 @@ const generateEnhancedAnalysis = (): PlayerAnalysis => {
   const selectedWeaknesses = shuffledWeaknesses.slice(0, Math.floor(Math.random() * 3) + 2);
   const selectedRecommendations = shuffledRecommendations.slice(0, Math.floor(Math.random() * 2) + 3);
   
-  return {
+  // Generate base analysis
+  const analysis = {
     playerName: "John Doe", // In a real app, we would detect or ask for the player's name
     position,
     marketValue,
@@ -328,5 +437,75 @@ const generateEnhancedAnalysis = (): PlayerAnalysis => {
       similarity: Math.floor(Math.random() * 30) + 40, // 40-70% similarity
       skills: comparablePro.skills
     }
+  };
+  
+  // Add injury risk assessment
+  const injuryRisk = generateInjuryRiskAssessment(position, physicalScore);
+  
+  // Determine earned badges
+  const badges = determineEarnedBadges(analysis);
+  
+  // Add progress tracking (simulated)
+  const progress = {
+    lastAnalysis: new Date(),
+    improvement: Math.floor(Math.random() * 15) + 1, // 1-15% improvement
+    areas: [
+      {
+        skill: "Technical",
+        before: technicalScore - Math.floor(Math.random() * 10),
+        after: technicalScore
+      },
+      {
+        skill: "Physical",
+        before: physicalScore - Math.floor(Math.random() * 10),
+        after: physicalScore
+      },
+      {
+        skill: "Tactical",
+        before: tacticalScore - Math.floor(Math.random() * 10),
+        after: tacticalScore
+      }
+    ]
+  };
+  
+  // Return the complete enhanced analysis
+  return {
+    ...analysis,
+    injuryRisk,
+    badges,
+    progress
+  };
+};
+
+// Function to compare with previous analyses
+export const compareWithPreviousAnalyses = (currentAnalysis: PlayerAnalysis, previousAnalyses: PlayerAnalysis[]): any => {
+  if (previousAnalyses.length === 0) return null;
+  
+  // Calculate average improvement
+  const improvementAreas: Record<string, number> = {};
+  
+  // Compare technical scores
+  improvementAreas.technical = currentAnalysis.performance.technical - 
+    previousAnalyses.reduce((sum, analysis) => sum + analysis.performance.technical, 0) / previousAnalyses.length;
+  
+  // Compare physical scores
+  improvementAreas.physical = currentAnalysis.performance.physical - 
+    previousAnalyses.reduce((sum, analysis) => sum + analysis.performance.physical, 0) / previousAnalyses.length;
+  
+  // Compare tactical scores
+  improvementAreas.tactical = currentAnalysis.performance.tactical - 
+    previousAnalyses.reduce((sum, analysis) => sum + analysis.performance.tactical, 0) / previousAnalyses.length;
+  
+  // Compare mental scores
+  improvementAreas.mental = currentAnalysis.performance.mental - 
+    previousAnalyses.reduce((sum, analysis) => sum + analysis.performance.mental, 0) / previousAnalyses.length;
+  
+  // Calculate overall improvement
+  const overallImprovement = (improvementAreas.technical + improvementAreas.physical + 
+    improvementAreas.tactical + improvementAreas.mental) / 4;
+  
+  return {
+    overallImprovement,
+    improvementAreas
   };
 };
