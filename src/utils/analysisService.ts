@@ -4,7 +4,7 @@
 
 import { PlayerAnalysis } from "@/components/AnalysisReport";
 
-// Mock analysis stages
+// Enhanced analysis stages for more detailed feedback
 export const ANALYSIS_STAGES = [
   "Uploading video",
   "Analyzing player movements",
@@ -22,9 +22,9 @@ export const analyzeFootballVideo = (videoFile: File): Promise<{analysis: Player
     let progress = 0;
     const progressCallbacks: ((progress: number, stage: string) => void)[] = [];
     
-    // Simulate progress updates
+    // Simulate progress updates - made slightly faster
     const interval = setInterval(() => {
-      progress += Math.floor(Math.random() * 5) + 1;
+      progress += Math.floor(Math.random() * 7) + 3; // Faster increments
       if (progress > 100) progress = 100;
       
       const stageIndex = Math.min(
@@ -42,48 +42,240 @@ export const analyzeFootballVideo = (videoFile: File): Promise<{analysis: Player
         // Add a slight delay before completing to show 100%
         setTimeout(() => {
           resolve({
-            analysis: generateMockAnalysis(),
+            analysis: generateEnhancedAnalysis(),
             progressUpdates: (callback) => {
               progressCallbacks.push(callback);
             }
           });
         }, 1000);
       }
-    }, 600);
+    }, 400); // Reduced from 600ms to 400ms for faster processing
   });
 };
 
-// Generate mock analysis data
-const generateMockAnalysis = (): PlayerAnalysis => {
+// Enhanced player comparison data
+const PROFESSIONAL_PLAYERS = [
+  {
+    name: "Lionel Messi",
+    position: "Forward",
+    skills: {
+      dribbling: 98,
+      passing: 96,
+      shooting: 94,
+      speed: 85,
+      stamina: 75
+    }
+  },
+  {
+    name: "Cristiano Ronaldo",
+    position: "Forward",
+    skills: {
+      dribbling: 89,
+      passing: 83,
+      shooting: 95,
+      speed: 89,
+      stamina: 94
+    }
+  },
+  {
+    name: "Kevin De Bruyne",
+    position: "Midfielder",
+    skills: {
+      dribbling: 88,
+      passing: 97,
+      shooting: 90,
+      speed: 76,
+      stamina: 87
+    }
+  },
+  {
+    name: "Virgil van Dijk",
+    position: "Defender",
+    skills: {
+      dribbling: 72,
+      passing: 85,
+      shooting: 60,
+      speed: 83,
+      stamina: 90
+    }
+  },
+  {
+    name: "Alisson Becker",
+    position: "Goalkeeper",
+    skills: {
+      reflexes: 93,
+      positioning: 94,
+      handling: 91,
+      passing: 87,
+      command: 92
+    }
+  }
+];
+
+// Generate mock analysis data with enhanced details
+const generateEnhancedAnalysis = (): PlayerAnalysis => {
   const positions = ["Forward", "Midfielder", "Defender", "Goalkeeper"];
-  const strengths = [
-    "Excellent ball control and dribbling ability",
-    "Strong acceleration and sprint speed",
-    "Accurate passing in tight spaces",
-    "Good spatial awareness and positioning",
-    "Effective at pressing and defensive transitions",
-    "Powerful shot with both feet",
-    "Exceptional aerial ability",
-    "Leadership qualities on the field"
+  const position = positions[Math.floor(Math.random() * positions.length)];
+  
+  // Detailed strengths based on position
+  const forwardStrengths = [
+    "Excellent finishing ability in one-on-one situations",
+    "Great movement off the ball to create space",
+    "Strong acceleration in the first 5 meters",
+    "Powerful shot with minimal backlift",
+    "Effective pressing from the front",
+    "Creative dribbling in tight spaces",
+    "Excellent aerial ability on attacking set pieces"
   ];
   
-  const weaknesses = [
-    "Needs to improve defensive workrate",
-    "Tendency to hold onto the ball too long",
-    "Limited weaker foot capabilities",
-    "Occasionally loses focus during matches",
-    "Could improve decision making under pressure",
-    "Injury prone due to playing style",
-    "Needs better stamina for full 90 minutes"
+  const midfielderStrengths = [
+    "Exceptional vision for through balls",
+    "Consistent passing accuracy over long distances",
+    "Effective at switching play to the opposite flank",
+    "Good spatial awareness in congested midfield areas",
+    "Strong at winning second balls",
+    "Intelligent positioning to receive passes between lines",
+    "Effective at delayed pressing to channel opponents"
   ];
   
-  const recommendations = [
-    "Focus on improving stamina with high-intensity interval training",
-    "Work on weaker foot finishing exercises daily",
-    "Develop better defensive positioning through tactical training sessions",
-    "Practice decision-making in pressured situations with game simulations",
-    "Add strength training to reduce injury susceptibility"
+  const defenderStrengths = [
+    "Strong in aerial duels from defensive set pieces",
+    "Excellent timing in tackles",
+    "Good positional awareness to cut passing lanes",
+    "Strong communication and organization of defensive line",
+    "Effective at stepping out to intercept passes",
+    "Good recovery pace to deal with counter-attacks",
+    "Accurate long-range passing to initiate attacks"
   ];
+  
+  const goalkeeperStrengths = [
+    "Quick reflexes for close-range shots",
+    "Excellent positioning to narrow shooting angles",
+    "Strong command of the penalty area",
+    "Good distribution with both hands and feet",
+    "Effective communication with the defense",
+    "Brave in one-on-one situations",
+    "Strong decision-making on when to leave the line"
+  ];
+  
+  // Select position-specific strengths
+  let positionStrengths;
+  if (position === "Forward") positionStrengths = forwardStrengths;
+  else if (position === "Midfielder") positionStrengths = midfielderStrengths;
+  else if (position === "Defender") positionStrengths = defenderStrengths;
+  else positionStrengths = goalkeeperStrengths;
+  
+  // Position-specific weaknesses
+  const forwardWeaknesses = [
+    "Sometimes wasteful with scoring opportunities",
+    "Needs to improve defensive work rate when team loses possession",
+    "Tendency to drift offside too frequently",
+    "Limited aerial ability when defending set pieces",
+    "Could improve link-up play with midfielders"
+  ];
+  
+  const midfielderWeaknesses = [
+    "Occasionally loses concentration during defensive transitions",
+    "Could improve decision-making in the final third",
+    "Needs to scan surroundings more frequently before receiving passes",
+    "Inconsistent in defensive duels",
+    "Stamina decreases noticeably in the final 15 minutes"
+  ];
+  
+  const defenderWeaknesses = [
+    "Occasionally gets dragged out of position",
+    "Needs to improve decision-making under pressure",
+    "Limited attacking contribution from set pieces",
+    "Sometimes struggles against highly technical dribblers",
+    "Could improve distribution under pressure"
+  ];
+  
+  const goalkeeperWeaknesses = [
+    "Sometimes hesitant when coming for crosses",
+    "Distribution under pressure needs improvement",
+    "Positioning for shots from distance could be better",
+    "Occasionally slow to get down for low shots",
+    "Command of penalty area inconsistent in crowded situations"
+  ];
+  
+  // Select position-specific weaknesses
+  let positionWeaknesses;
+  if (position === "Forward") positionWeaknesses = forwardWeaknesses;
+  else if (position === "Midfielder") positionWeaknesses = midfielderWeaknesses;
+  else if (position === "Defender") positionWeaknesses = defenderWeaknesses;
+  else positionWeaknesses = goalkeeperWeaknesses;
+  
+  // Position-specific recommendations
+  const forwardRecommendations = [
+    "Work on finishing drills from different angles and distances",
+    "Practice quick changes of direction with the ball",
+    "Develop awareness of defensive positioning when team loses possession",
+    "Improve timing of runs to avoid offside situations",
+    "Focus on link-up play in tight spaces"
+  ];
+  
+  const midfielderRecommendations = [
+    "Practice scanning before receiving passes with 'shoulder checks'",
+    "Work on quick transition from defense to attack",
+    "Develop set-piece delivery from different positions",
+    "Improve defensive positioning during opposition counter-attacks",
+    "Focus on high-intensity interval training to maintain stamina"
+  ];
+  
+  const defenderRecommendations = [
+    "Practice one-vs-one defensive situations with quick forwards",
+    "Work on building attacks from the back under pressure",
+    "Develop better communication with defensive partners",
+    "Improve timing of challenges in different situations",
+    "Focus on positional awareness during defensive transitions"
+  ];
+  
+  const goalkeeperRecommendations = [
+    "Practice claiming crosses in crowded penalty areas",
+    "Work on distribution under pressure",
+    "Develop quicker reactions for close-range shots",
+    "Improve communication with the defense for set pieces",
+    "Focus on positioning for shots from distance"
+  ];
+  
+  // Select position-specific recommendations
+  let positionRecommendations;
+  if (position === "Forward") positionRecommendations = forwardRecommendations;
+  else if (position === "Midfielder") positionRecommendations = midfielderRecommendations;
+  else if (position === "Defender") positionRecommendations = defenderRecommendations;
+  else positionRecommendations = goalkeeperRecommendations;
+  
+  // Position-specific detailed skills
+  const skillsByPosition = {
+    "Forward": {
+      finishing: Math.floor(Math.random() * 30) + 60,
+      dribbling: Math.floor(Math.random() * 30) + 60,
+      movement: Math.floor(Math.random() * 30) + 60,
+      pace: Math.floor(Math.random() * 30) + 60,
+      strength: Math.floor(Math.random() * 30) + 60
+    },
+    "Midfielder": {
+      passing: Math.floor(Math.random() * 30) + 60,
+      vision: Math.floor(Math.random() * 30) + 60,
+      technique: Math.floor(Math.random() * 30) + 60,
+      workRate: Math.floor(Math.random() * 30) + 60,
+      positioning: Math.floor(Math.random() * 30) + 60
+    },
+    "Defender": {
+      tackling: Math.floor(Math.random() * 30) + 60,
+      marking: Math.floor(Math.random() * 30) + 60,
+      aerial: Math.floor(Math.random() * 30) + 60,
+      positioning: Math.floor(Math.random() * 30) + 60,
+      strength: Math.floor(Math.random() * 30) + 60
+    },
+    "Goalkeeper": {
+      reflexes: Math.floor(Math.random() * 30) + 60,
+      handling: Math.floor(Math.random() * 30) + 60,
+      positioning: Math.floor(Math.random() * 30) + 60,
+      communication: Math.floor(Math.random() * 30) + 60,
+      distribution: Math.floor(Math.random() * 30) + 60
+    }
+  };
   
   // Randomize scores within reasonable ranges
   const technicalScore = Math.floor(Math.random() * 30) + 60; // 60-90
@@ -103,10 +295,13 @@ const generateMockAnalysis = (): PlayerAnalysis => {
     ? `€${(marketValueBase / 10).toFixed(1)}M` 
     : `€${marketValueBase}0K`;
   
+  // Find a comparable professional player
+  const comparablePro = PROFESSIONAL_PLAYERS.find(player => player.position === position) || PROFESSIONAL_PLAYERS[0];
+  
   // Randomly select 3-5 strengths and 2-4 weaknesses
-  const shuffledStrengths = [...strengths].sort(() => 0.5 - Math.random());
-  const shuffledWeaknesses = [...weaknesses].sort(() => 0.5 - Math.random());
-  const shuffledRecommendations = [...recommendations].sort(() => 0.5 - Math.random());
+  const shuffledStrengths = [...positionStrengths].sort(() => 0.5 - Math.random());
+  const shuffledWeaknesses = [...positionWeaknesses].sort(() => 0.5 - Math.random());
+  const shuffledRecommendations = [...positionRecommendations].sort(() => 0.5 - Math.random());
   
   const selectedStrengths = shuffledStrengths.slice(0, Math.floor(Math.random() * 3) + 3);
   const selectedWeaknesses = shuffledWeaknesses.slice(0, Math.floor(Math.random() * 3) + 2);
@@ -114,11 +309,12 @@ const generateMockAnalysis = (): PlayerAnalysis => {
   
   return {
     playerName: "John Doe", // In a real app, we would detect or ask for the player's name
-    position: positions[Math.floor(Math.random() * positions.length)],
+    position,
     marketValue,
     talentScore,
     strengths: selectedStrengths,
     weaknesses: selectedWeaknesses,
+    detailedSkills: skillsByPosition[position],
     performance: {
       technical: technicalScore,
       physical: physicalScore,
@@ -126,6 +322,11 @@ const generateMockAnalysis = (): PlayerAnalysis => {
       mental: mentalScore
     },
     recommendations: selectedRecommendations,
-    compatibilityScore: Math.floor(Math.random() * 30) + 65 // 65-95
+    compatibilityScore: Math.floor(Math.random() * 30) + 65, // 65-95
+    proComparison: {
+      name: comparablePro.name,
+      similarity: Math.floor(Math.random() * 30) + 40, // 40-70% similarity
+      skills: comparablePro.skills
+    }
   };
 };

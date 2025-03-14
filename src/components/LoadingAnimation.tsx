@@ -7,6 +7,25 @@ interface LoadingAnimationProps {
 }
 
 const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ progress, stage }) => {
+  // Define more detailed substages for analysis
+  const getSubstage = () => {
+    if (stage.includes("movements")) {
+      return "Tracking player positioning and movement patterns";
+    } else if (stage.includes("technical")) {
+      return "Analyzing dribbling, passing accuracy and shooting technique";
+    } else if (stage.includes("tactical")) {
+      return "Evaluating decision making and positional awareness";
+    } else if (stage.includes("physical")) {
+      return "Measuring speed, endurance and strength indicators";
+    } else if (stage.includes("market")) {
+      return "Comparing with professional player database";
+    } else if (stage.includes("report")) {
+      return "Creating personalized improvement recommendations";
+    } else {
+      return "Processing video frames using neural network analysis";
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center space-y-6 py-12 animate-fade-in">
       <div className="relative w-32 h-32">
@@ -37,20 +56,21 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ progress, stage }) 
       <div className="text-center space-y-2">
         <h3 className="text-lg font-medium">{stage}</h3>
         <p className="text-sm text-muted-foreground max-w-sm">
-          Our AI is analyzing the video footage frame by frame to extract detailed insights about the player's performance.
+          {getSubstage()}
         </p>
       </div>
       
       <div className="w-full max-w-md space-y-2">
-        <div className="progress-bar">
+        <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
           <div 
-            className="progress-value" 
+            className="h-full bg-primary rounded-full transition-all duration-500 ease-out" 
             style={{ width: `${progress}%` }}
           ></div>
         </div>
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Analyzing video</span>
-          <span>Generating report</span>
+          <span>Video processing</span>
+          <span>AI analysis</span>
+          <span>Recommendations</span>
         </div>
       </div>
     </div>
