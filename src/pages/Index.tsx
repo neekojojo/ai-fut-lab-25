@@ -4,20 +4,23 @@ import Header from '@/components/Header';
 import VideoUpload from '@/components/VideoUpload';
 import LoadingAnimation from '@/components/LoadingAnimation';
 import AnalysisReport from '@/components/AnalysisReport';
+import PlayerAnalysisView from '@/components/PlayerAnalysisView';
 import PeopleDetection from '@/components/PeopleDetection';
 import type { PlayerAnalysis } from '@/components/AnalysisReport.d';
 import { analyzeFootballVideo } from '@/utils/analysisService';
 import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
-  const [analysisState, setAnalysisState] = useState<'idle' | 'processing' | 'complete'>('idle');
+  const [analysisState, setAnalysisState] = useState<'idle' | 'processing' | 'complete' | 'detailed-analysis'>('idle');
   const [progress, setProgress] = useState(0);
   const [stage, setStage] = useState('');
   const [analysis, setAnalysis] = useState<PlayerAnalysis | null>(null);
   const [showPeopleDetection, setShowPeopleDetection] = useState(false);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const { toast } = useToast();
 
   const handleVideoUpload = async (file: File) => {
+    setVideoFile(file);
     setAnalysisState('processing');
     setProgress(0);
     
@@ -51,11 +54,18 @@ const Index = () => {
     }
   };
 
+  const handleAdvancedAnalysis = () => {
+    if (videoFile) {
+      setAnalysisState('detailed-analysis');
+    }
+  };
+
   const resetAnalysis = () => {
     setAnalysisState('idle');
     setProgress(0);
     setStage('');
     setAnalysis(null);
+    setVideoFile(null);
   };
 
   const togglePeopleDetection = () => {
@@ -189,15 +199,29 @@ const Index = () => {
           <div className="space-y-8">
             <AnalysisReport analysis={analysis} />
             
-            <div className="flex justify-center">
+            <div className="flex justify-center space-x-4">
               <button
                 onClick={resetAnalysis}
                 className="px-4 py-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
               >
                 Analyze Another Video
               </button>
+              
+              <button
+                onClick={handleAdvancedAnalysis}
+                className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:bg-primary/90 transition-colors"
+              >
+                Advanced Movement Analysis
+              </button>
             </div>
           </div>
+        )}
+        
+        {analysisState === 'detailed-analysis' && videoFile && (
+          <PlayerAnalysisView
+            videoFile={videoFile}
+            onResetAnalysis={resetAnalysis}
+          />
         )}
       </main>
       
