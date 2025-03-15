@@ -42,6 +42,12 @@ export interface PlayerAnalysis {
       after: number;
     }[];
   };
+  movements?: {
+    name: string;
+    current: number;
+    previous?: number;
+    alternative?: number;
+  }[];
 }
 
 export interface UserProfile {

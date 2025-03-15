@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import SignIn from "./components/auth/SignIn";
 import SignUp from "./components/auth/SignUp";
 import NotFound from "./pages/NotFound";
+import MovementAnalysis from "./components/MovementAnalysis";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,28 @@ const App = () => (
           <Route path="/dashboard" element={
             <PrivateRoute>
               <Dashboard />
+            </PrivateRoute>
+          } />
+          <Route path="/movement-analysis" element={
+            <PrivateRoute>
+              <MovementAnalysis 
+                analysis={{
+                  playerName: "Sample Player",
+                  position: "Forward",
+                  marketValue: "$10M",
+                  talentScore: 85,
+                  strengths: ["Speed", "Finishing"],
+                  weaknesses: ["Heading", "Defensive awareness"],
+                  performance: {
+                    technical: 80,
+                    physical: 85,
+                    tactical: 75,
+                    mental: 70
+                  },
+                  recommendations: ["Improve heading", "Work on defensive positioning"],
+                  compatibilityScore: 82
+                }}
+              />
             </PrivateRoute>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
