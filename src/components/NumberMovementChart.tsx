@@ -10,12 +10,14 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer,
   AreaChart,
   Area,
 } from "recharts";
 import { ArrowUp, ArrowDown, TrendingUp, TrendingDown } from "lucide-react";
-import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
+import { 
+  ChartContainer, 
+  ChartTooltipContent 
+} from "@/components/ui/chart";
 
 interface DataPoint {
   name: string;
@@ -76,7 +78,7 @@ const NumberMovementChart: React.FC<NumberMovementProps> = ({
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
-              <Tooltip content={<ChartTooltipContent />} />
+              <Tooltip content={(props) => <ChartTooltipContent {...props} />} />
               <Legend />
               <Line
                 type="monotone"
@@ -112,7 +114,7 @@ const NumberMovementChart: React.FC<NumberMovementProps> = ({
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
-              <Tooltip content={<ChartTooltipContent />} />
+              <Tooltip content={(props) => <ChartTooltipContent {...props} />} />
               <Legend />
               <Bar dataKey="current" name="Current" fill={colors.current} />
               {data.some((d) => d.previous !== undefined) && (
@@ -129,7 +131,7 @@ const NumberMovementChart: React.FC<NumberMovementProps> = ({
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
-              <Tooltip content={<ChartTooltipContent />} />
+              <Tooltip content={(props) => <ChartTooltipContent {...props} />} />
               <Legend />
               <Area
                 type="monotone"
