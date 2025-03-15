@@ -1,506 +1,569 @@
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Progress } from '@/components/ui/progress';
-import { useToast } from '@/components/ui/use-toast';
-import { ArrowUpRight, Bookmark, FileSpreadsheet, FileVideo, ActivitySquare, Lightbulb } from 'lucide-react';
-import NumberMovementChart from './NumberMovementChart';
-import { PlayerTracker } from '@/utils/computerVision/positionTracking';
-import { PlayerDataAnalyzer } from '@/utils/dataProcessing/playerDataAnalysis';
-import { OpenAIService, OpenAIAnalysis } from '@/utils/ai/openAiService';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Brain, ChartBar, Dumbbell, Trophy, Lightbulb, Zap, BarChart3 } from 'lucide-react';
+import AdvancedPlayerCharts from './AdvancedPlayerCharts';
+import { toast } from 'sonner';
+import { PlayerDataAnalyzer, PlayerStats } from '@/utils/dataProcessing/playerDataAnalysis';
+import { playerMLService, TrainingRecommendation, PlayerComparison } from '@/utils/ml/playerMLService';
+import { openAIService, OpenAIAnalysis } from '@/utils/ai/openAiService';
+import { googleAutoMLService, PlayerPerformancePrediction } from '@/utils/ai/googleAutoMLService';
 
-interface PlayerAnalysisViewProps {
-  videoFile: File;
-  onResetAnalysis: () => void;
-}
+// Mock player stats for demonstration
+const mockPlayerStats: PlayerStats = {
+  avgSpeed: 45.2,
+  maxSpeed: 153.7,
+  avgAcceleration: 23.8,
+  distanceCovered: 3245,
+  balanceScore: 72.5,
+  technicalScore: 68.3,
+  physicalScore: 75.9,
+  movementEfficiency: 64.7
+};
 
-const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onResetAnalysis }) => {
-  const [analysisStage, setAnalysisStage] = useState<'loading' | 'analyzing' | 'complete'>('loading');
-  const [progress, setProgress] = useState(0);
-  const [stageText, setStageText] = useState('Loading video');
-  const [playerStats, setPlayerStats] = useState<any>(null);
-  const [chartData, setChartData] = useState<any[]>([]);
+const PlayerAnalysisView: React.FC = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [playerName, setPlayerName] = useState<string>("John Doe");
+  const [position, setPosition] = useState<string>("midfielder");
+  const [playerStats, setPlayerStats] = useState<PlayerStats>(mockPlayerStats);
   const [aiAnalysis, setAiAnalysis] = useState<OpenAIAnalysis | null>(null);
-  const [apiKey, setApiKey] = useState<string>('');
-  const [showApiInput, setShowApiInput] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const { toast } = useToast();
+  const [trainingRecommendations, setTrainingRecommendations] = useState<TrainingRecommendation[] | null>(null);
+  const [playerComparison, setPlayerComparison] = useState<PlayerComparison | null>(null);
+  const [potentialPrediction, setPotentialPrediction] = useState<PlayerPerformancePrediction | null>(null);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
 
-  // Function to handle video loading and analysis
   useEffect(() => {
-    const analyzeVideo = async () => {
-      try {
-        // Create object URL for video
-        const videoUrl = URL.createObjectURL(videoFile);
-        
-        // Wait for video to load
-        setStageText('Loading video');
-        setProgress(10);
-        
-        if (videoRef.current) {
-          videoRef.current.src = videoUrl;
-          
-          // Wait for video metadata to load
-          await new Promise<void>((resolve) => {
-            const handleLoadedMetadata = () => {
-              videoRef.current?.removeEventListener('loadedmetadata', handleLoadedMetadata);
-              resolve();
-            };
-            
-            if (videoRef.current.readyState >= 2) {
-              resolve();
-            } else {
-              videoRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
-            }
-          });
-          
-          setProgress(20);
-          setStageText('Extracting video frames');
-          
-          // Start video frame extraction
-          setAnalysisStage('analyzing');
-          
-          // Wait for simulated processing time
-          await new Promise(resolve => setTimeout(resolve, 1500));
-          setProgress(40);
-          setStageText('Detecting player positions');
-          
-          // Simulate pose extraction
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          setProgress(60);
-          setStageText('Analyzing movement patterns');
-          
-          // Simulate data analysis
-          await new Promise(resolve => setTimeout(resolve, 1500));
-          setProgress(80);
-          setStageText('Generating insights');
-          
-          // Generate mock player stats
-          const mockPlayerStats = {
-            avgSpeed: 120 + Math.random() * 30,
-            maxSpeed: 180 + Math.random() * 40,
-            avgAcceleration: 15 + Math.random() * 10,
-            distanceCovered: 3000 + Math.random() * 1000,
-            balanceScore: 65 + Math.random() * 20,
-            technicalScore: 70 + Math.random() * 15,
-            physicalScore: 75 + Math.random() * 15,
-            movementEfficiency: 68 + Math.random() * 20
-          };
-          
-          setPlayerStats(mockPlayerStats);
-          
-          // Generate mock chart data
-          const mockChartData = Array.from({ length: 10 }, (_, i) => ({
-            name: `Frame ${i + 1}`,
-            current: Math.round(50 + Math.sin(i / 2) * 25 + Math.random() * 10),
-            previous: Math.round(45 + Math.sin(i / 2) * 20 + Math.random() * 5),
-          }));
-          
-          setChartData(mockChartData);
-          
-          // Generate AI analysis
-          const openAIService = new OpenAIService();
-          const analysis = await openAIService.generatePlayerAnalysis({
-            playerStats: mockPlayerStats,
-            position: 'Forward'
-          });
-          
-          setAiAnalysis(analysis);
-          
-          // Analysis complete
-          setProgress(100);
-          setAnalysisStage('complete');
-          
-          toast({
-            title: "Analysis Complete",
-            description: "Player movement analysis has been successfully completed.",
-          });
-        }
-      } catch (error) {
-        console.error('Error analyzing video:', error);
-        toast({
-          variant: "destructive",
-          title: "Analysis Failed",
-          description: "There was an error analyzing the video. Please try again.",
-        });
-      }
-    };
-    
-    analyzeVideo();
-    
-    // Cleanup function
-    return () => {
-      if (videoRef.current) {
-        videoRef.current.src = '';
-      }
-    };
-  }, [videoFile, toast]);
+    // Load analysis when component mounts
+    generateAnalysis();
+  }, []);
 
-  // Function to handle setting the OpenAI API key
-  const handleSetApiKey = () => {
-    if (apiKey) {
-      const openAIService = new OpenAIService(apiKey);
-      // Re-generate analysis with actual API
-      if (playerStats) {
-        openAIService.generatePlayerAnalysis({
-          playerStats: playerStats,
-          position: 'Forward'
-        }).then(analysis => {
-          setAiAnalysis(analysis);
-          toast({
-            title: "API Key Set",
-            description: "Using OpenAI for analysis. Results updated.",
-          });
-        });
-      }
+  const generateAnalysis = async () => {
+    setIsLoading(true);
+    toast.info("Generating comprehensive player analysis...");
+    
+    try {
+      // Generate AI Analysis
+      const analysisResult = await openAIService.generatePlayerAnalysis({
+        playerStats,
+        position
+      });
+      setAiAnalysis(analysisResult);
       
-      setShowApiInput(false);
+      // Generate Training Recommendations
+      const recommendationsResult = await playerMLService.generateTrainingRecommendations(
+        playerStats,
+        position
+      );
+      setTrainingRecommendations(recommendationsResult);
+      
+      // Generate Player Comparison
+      const comparisonResult = await playerMLService.findSimilarPlayers(
+        playerStats,
+        position
+      );
+      setPlayerComparison(comparisonResult);
+      
+      // Generate Potential Prediction
+      const predictionResult = await googleAutoMLService.predictPlayerPotential({
+        playerStats,
+        position,
+        age: 22 // Assuming a default age
+      });
+      setPotentialPrediction(predictionResult);
+      
+      // Generate visualization image
+      generateVisualization();
+      
+      toast.success("Analysis completed successfully!");
+    } catch (error) {
+      console.error("Error generating analysis:", error);
+      toast.error("Error generating analysis");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const generateVisualization = async () => {
+    try {
+      // Generate an image using DALL-E
+      const imageResult = await openAIService.generateImage({
+        prompt: `A professional sports visualization of a ${position} soccer player with technical score ${playerStats.technicalScore.toFixed(0)}, physical score ${playerStats.physicalScore.toFixed(0)}, and balance score ${playerStats.balanceScore.toFixed(0)}. Data visualization style, minimal, clean design.`,
+        size: "1024x1024",
+        style: "vivid"
+      });
+      
+      if (imageResult.length > 0) {
+        setGeneratedImage(imageResult[0].url);
+      }
+    } catch (error) {
+      console.error("Error generating visualization:", error);
+      // Not showing toast for image error since it's not critical
     }
   };
 
+  // Calculate overall score
+  const overallScore = Math.round(
+    (playerStats.technicalScore + playerStats.physicalScore + 
+     playerStats.balanceScore + playerStats.movementEfficiency) / 4
+  );
+
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6">
-      {/* Hidden video element for processing */}
-      <video ref={videoRef} className="hidden" controls />
+    <div className="container mx-auto py-6 space-y-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{playerName}'s Analysis</h1>
+          <p className="text-muted-foreground">
+            Comprehensive performance analysis powered by AI
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="capitalize">{position}</Badge>
+          <Button 
+            onClick={generateAnalysis} 
+            disabled={isLoading}
+            className="gap-2"
+          >
+            <Brain size={16} />
+            {isLoading ? "Analyzing..." : "Regenerate Analysis"}
+          </Button>
+        </div>
+      </div>
       
-      {(analysisStage === 'loading' || analysisStage === 'analyzing') && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Analyzing Player Movement</CardTitle>
-            <CardDescription>
-              Please wait while we process your video and generate insights
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Progress value={progress} className="h-2 w-full" />
-            <p className="text-center text-sm text-muted-foreground">{stageText}</p>
-          </CardContent>
-        </Card>
-      )}
-      
-      {analysisStage === 'complete' && playerStats && (
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-3xl font-bold">Player Analysis Results</h2>
-            <Button variant="outline" onClick={onResetAnalysis}>
-              Analyze Another Video
-            </Button>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Technical Score</CardTitle>
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid grid-cols-3 md:w-[500px] mb-6">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="insights">AI Insights</TabsTrigger>
+          <TabsTrigger value="charts">Analytics</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ChartBar className="h-5 w-5 text-primary" />
+                  Performance Overview
+                </CardTitle>
+                <CardDescription>
+                  Analysis of your key performance metrics
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{playerStats.technicalScore.toFixed(1)}</div>
-                <Progress value={playerStats.technicalScore} className="h-2 mt-2" />
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Physical Score</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{playerStats.physicalScore.toFixed(1)}</div>
-                <Progress value={playerStats.physicalScore} className="h-2 mt-2" />
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Balance Score</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{playerStats.balanceScore.toFixed(1)}</div>
-                <Progress value={playerStats.balanceScore} className="h-2 mt-2" />
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Movement Efficiency</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{playerStats.movementEfficiency.toFixed(1)}</div>
-                <Progress value={playerStats.movementEfficiency} className="h-2 mt-2" />
-              </CardContent>
-            </Card>
-          </div>
-          
-          <Tabs defaultValue="movement">
-            <TabsList className="grid grid-cols-4 mb-4">
-              <TabsTrigger value="movement">
-                <ActivitySquare className="h-4 w-4 mr-2" />
-                Movement
-              </TabsTrigger>
-              <TabsTrigger value="stats">
-                <FileSpreadsheet className="h-4 w-4 mr-2" />
-                Statistics
-              </TabsTrigger>
-              <TabsTrigger value="video">
-                <FileVideo className="h-4 w-4 mr-2" />
-                Video Analysis
-              </TabsTrigger>
-              <TabsTrigger value="insights">
-                <Lightbulb className="h-4 w-4 mr-2" />
-                AI Insights
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="movement">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Movement Analysis</CardTitle>
-                  <CardDescription>
-                    Visualization of player movement patterns and efficiency
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <NumberMovementChart
-                    title="Movement Efficiency Over Time"
-                    data={chartData}
-                    type="line"
-                    colors={{
-                      current: "#8B5CF6", // Purple
-                      previous: "#D1D5DB", // Gray
-                      alternative: "#F97316", // Orange
-                    }}
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="stats">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Detailed Statistics</CardTitle>
-                  <CardDescription>
-                    Comprehensive breakdown of player performance metrics
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Metric</TableHead>
-                        <TableHead>Value</TableHead>
-                        <TableHead>Rating</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell>Average Speed</TableCell>
-                        <TableCell>{playerStats.avgSpeed.toFixed(2)} px/s</TableCell>
-                        <TableCell>
-                          <Progress 
-                            value={Math.min(playerStats.avgSpeed / 2, 100)} 
-                            className="h-2 w-24"
-                          />
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Maximum Speed</TableCell>
-                        <TableCell>{playerStats.maxSpeed.toFixed(2)} px/s</TableCell>
-                        <TableCell>
-                          <Progress 
-                            value={Math.min(playerStats.maxSpeed / 3, 100)} 
-                            className="h-2 w-24"
-                          />
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Average Acceleration</TableCell>
-                        <TableCell>{playerStats.avgAcceleration.toFixed(2)} px/s²</TableCell>
-                        <TableCell>
-                          <Progress 
-                            value={Math.min(playerStats.avgAcceleration * 3, 100)} 
-                            className="h-2 w-24"
-                          />
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Distance Covered</TableCell>
-                        <TableCell>{playerStats.distanceCovered.toFixed(0)} px</TableCell>
-                        <TableCell>
-                          <Progress 
-                            value={Math.min(playerStats.distanceCovered / 50, 100)} 
-                            className="h-2 w-24"
-                          />
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Technical Score</TableCell>
-                        <TableCell>{playerStats.technicalScore.toFixed(1)}</TableCell>
-                        <TableCell>
-                          <Progress 
-                            value={playerStats.technicalScore} 
-                            className="h-2 w-24"
-                          />
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Physical Score</TableCell>
-                        <TableCell>{playerStats.physicalScore.toFixed(1)}</TableCell>
-                        <TableCell>
-                          <Progress 
-                            value={playerStats.physicalScore} 
-                            className="h-2 w-24"
-                          />
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Balance Score</TableCell>
-                        <TableCell>{playerStats.balanceScore.toFixed(1)}</TableCell>
-                        <TableCell>
-                          <Progress 
-                            value={playerStats.balanceScore} 
-                            className="h-2 w-24"
-                          />
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Movement Efficiency</TableCell>
-                        <TableCell>{playerStats.movementEfficiency.toFixed(1)}</TableCell>
-                        <TableCell>
-                          <Progress 
-                            value={playerStats.movementEfficiency} 
-                            className="h-2 w-24"
-                          />
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="video">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Video Analysis</CardTitle>
-                  <CardDescription>
-                    Frame-by-frame breakdown of player movement
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="aspect-video bg-muted rounded-md flex items-center justify-center">
-                    <p className="text-muted-foreground">
-                      Full video analysis visualization will be available in a future update
-                    </p>
-                  </div>
-                  <Alert>
-                    <AlertTitle>Feature in development</AlertTitle>
-                    <AlertDescription>
-                      Frame-by-frame pose visualization with movement tracking will be available soon.
-                    </AlertDescription>
-                  </Alert>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="insights">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                  <div>
-                    <CardTitle>AI Performance Insights</CardTitle>
-                    <CardDescription>
-                      AI-generated analysis of player performance
-                    </CardDescription>
-                  </div>
-                  {!showApiInput && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowApiInput(true)}
-                    >
-                      Use OpenAI API
-                    </Button>
-                  )}
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {showApiInput && (
-                    <div className="flex space-x-2 mb-4">
-                      <input
-                        type="text"
-                        value={apiKey}
-                        onChange={(e) => setApiKey(e.target.value)}
-                        placeholder="Enter OpenAI API Key"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                      />
-                      <Button onClick={handleSetApiKey}>Set Key</Button>
+                <div className="flex flex-col space-y-6">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">Overall Rating</span>
+                    <div className="flex items-center">
+                      <span className="text-2xl font-bold">{overallScore}</span>
+                      <span className="text-sm text-muted-foreground ml-1">/100</span>
                     </div>
-                  )}
+                  </div>
                   
-                  {aiAnalysis && (
-                    <div className="space-y-4">
-                      <div className="p-4 bg-muted rounded-lg">
-                        <h3 className="font-medium mb-2">Performance Summary</h3>
-                        <p className="text-sm">{aiAnalysis.summary}</p>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-4 bg-green-50 rounded-lg">
-                          <h3 className="font-medium mb-2 text-green-700">Strengths</h3>
-                          <ul className="space-y-1">
-                            {aiAnalysis.strengths.map((strength, index) => (
-                              <li key={index} className="text-sm flex items-start">
-                                <ArrowUpRight className="h-4 w-4 mr-2 text-green-500 shrink-0 mt-0.5" />
-                                {strength}
-                              </li>
-                            ))}
-                          </ul>
+                  <Separator />
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-sm font-medium">Technical Score</div>
+                      <div className="flex justify-between items-center mt-1">
+                        <div className="w-full bg-secondary/20 rounded-full h-2.5 mr-2">
+                          <div className="bg-secondary h-2.5 rounded-full" style={{ width: `${playerStats.technicalScore}%` }}></div>
                         </div>
-                        
-                        <div className="p-4 bg-amber-50 rounded-lg">
-                          <h3 className="font-medium mb-2 text-amber-700">Areas for Improvement</h3>
-                          <ul className="space-y-1">
-                            {aiAnalysis.weaknesses.map((weakness, index) => (
-                              <li key={index} className="text-sm flex items-start">
-                                <ArrowUpRight className="h-4 w-4 mr-2 text-amber-500 shrink-0 mt-0.5" />
-                                {weakness}
-                              </li>
-                            ))}
-                          </ul>
+                        <span className="text-sm font-medium">{playerStats.technicalScore.toFixed(1)}</span>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div className="text-sm font-medium">Physical Score</div>
+                      <div className="flex justify-between items-center mt-1">
+                        <div className="w-full bg-primary/20 rounded-full h-2.5 mr-2">
+                          <div className="bg-primary h-2.5 rounded-full" style={{ width: `${playerStats.physicalScore}%` }}></div>
+                        </div>
+                        <span className="text-sm font-medium">{playerStats.physicalScore.toFixed(1)}</span>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div className="text-sm font-medium">Balance Score</div>
+                      <div className="flex justify-between items-center mt-1">
+                        <div className="w-full bg-indigo-400/20 rounded-full h-2.5 mr-2">
+                          <div className="bg-indigo-400 h-2.5 rounded-full" style={{ width: `${playerStats.balanceScore}%` }}></div>
+                        </div>
+                        <span className="text-sm font-medium">{playerStats.balanceScore.toFixed(1)}</span>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div className="text-sm font-medium">Movement Efficiency</div>
+                      <div className="flex justify-between items-center mt-1">
+                        <div className="w-full bg-green-400/20 rounded-full h-2.5 mr-2">
+                          <div className="bg-green-400 h-2.5 rounded-full" style={{ width: `${playerStats.movementEfficiency}%` }}></div>
+                        </div>
+                        <span className="text-sm font-medium">{playerStats.movementEfficiency.toFixed(1)}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div>
+                      <div className="text-sm text-muted-foreground">Avg Speed</div>
+                      <div className="text-xl font-bold mt-1">{playerStats.avgSpeed.toFixed(1)}</div>
+                      <div className="text-xs text-muted-foreground">px/s</div>
+                    </div>
+                    
+                    <div>
+                      <div className="text-sm text-muted-foreground">Max Speed</div>
+                      <div className="text-xl font-bold mt-1">{playerStats.maxSpeed.toFixed(1)}</div>
+                      <div className="text-xs text-muted-foreground">px/s</div>
+                    </div>
+                    
+                    <div>
+                      <div className="text-sm text-muted-foreground">Acceleration</div>
+                      <div className="text-xl font-bold mt-1">{playerStats.avgAcceleration.toFixed(1)}</div>
+                      <div className="text-xs text-muted-foreground">px/s²</div>
+                    </div>
+                    
+                    <div>
+                      <div className="text-sm text-muted-foreground">Distance</div>
+                      <div className="text-xl font-bold mt-1">{(playerStats.distanceCovered / 1000).toFixed(1)}</div>
+                      <div className="text-xs text-muted-foreground">kpx</div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Lightbulb className="h-5 w-5 text-primary" />
+                  Potential
+                </CardTitle>
+                <CardDescription>
+                  AI-powered potential prediction
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {potentialPrediction ? (
+                  <div className="space-y-4">
+                    <div className="flex flex-col items-center">
+                      <div className="relative w-28 h-28 flex items-center justify-center">
+                        <svg className="w-full h-full" viewBox="0 0 100 100">
+                          <circle
+                            className="text-muted stroke-current"
+                            strokeWidth="8"
+                            stroke="currentColor"
+                            fill="transparent"
+                            r="40"
+                            cx="50"
+                            cy="50"
+                          />
+                          <circle
+                            className="text-primary stroke-current"
+                            strokeWidth="8"
+                            strokeLinecap="round"
+                            stroke="currentColor"
+                            fill="transparent"
+                            r="40"
+                            cx="50"
+                            cy="50"
+                            strokeDasharray={`${2 * Math.PI * 40}`}
+                            strokeDashoffset={`${2 * Math.PI * 40 * (1 - potentialPrediction.potentialScore / 100)}`}
+                            transform="rotate(-90 50 50)"
+                          />
+                        </svg>
+                        <div className="absolute flex flex-col items-center justify-center">
+                          <span className="text-2xl font-bold">{potentialPrediction.potentialScore.toFixed(0)}</span>
+                          <span className="text-xs">potential</span>
                         </div>
                       </div>
-                      
-                      <div className="p-4 border rounded-lg">
-                        <h3 className="font-medium mb-2">Recommendations</h3>
-                        <ul className="space-y-2">
-                          {aiAnalysis.recommendations.map((recommendation, index) => (
-                            <li key={index} className="text-sm flex items-start">
-                              <Bookmark className="h-4 w-4 mr-2 text-primary shrink-0 mt-0.5" />
-                              {recommendation}
+                    </div>
+
+                    <div>
+                      <div className="text-sm font-medium">Expected improvement</div>
+                      <div className="flex items-center mt-1">
+                        <Zap className="w-4 h-4 mr-1 text-yellow-500" />
+                        <span className="font-medium">{potentialPrediction.predictedImprovementRate.toFixed(1)}%</span>
+                        <span className="text-xs ml-1 text-muted-foreground">in {potentialPrediction.improvementTimeframe}</span>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div className="text-sm font-medium mb-1">Focus areas</div>
+                      <ul className="space-y-1 text-sm">
+                        {potentialPrediction.recommendedTrainingAreas.map((area, index) => (
+                          <li key={index} className="flex items-start">
+                            <div className="mr-2 mt-0.5 text-primary">•</div>
+                            <span>{area}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div className="text-xs text-right text-muted-foreground">
+                      Confidence: {potentialPrediction.confidenceScore.toFixed(0)}%
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex justify-center items-center h-full">
+                    <div className="text-center text-muted-foreground">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
+                      <p className="mt-2">Calculating potential...</p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-primary" />
+                  Top Comparisons
+                </CardTitle>
+                <CardDescription>
+                  Professional players with similar profiles
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {playerComparison ? (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {playerComparison.similarProfessionals.map((player, index) => (
+                      <div key={index} className="flex items-center p-3 border rounded-lg">
+                        <div className="w-12 h-12 rounded-full overflow-hidden bg-muted mr-3 flex-shrink-0">
+                          {player.imageUrl && (
+                            <img src={player.imageUrl} alt={player.name} className="w-full h-full object-cover" />
+                          )}
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-sm">{player.name}</h4>
+                          <p className="text-xs text-muted-foreground capitalize">{player.position}</p>
+                          <div className="mt-1 flex items-center">
+                            <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-primary rounded-full" 
+                                style={{ width: `${player.similarity}%` }}
+                              ></div>
+                            </div>
+                            <span className="ml-2 text-xs">{player.similarity}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex justify-center items-center h-24">
+                    <div className="text-center text-muted-foreground">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
+                      <p className="mt-2">Finding similar players...</p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Dumbbell className="h-5 w-5 text-primary" />
+                  Training Focus
+                </CardTitle>
+                <CardDescription>
+                  AI-recommended priority areas
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {trainingRecommendations ? (
+                  <div className="space-y-3">
+                    {trainingRecommendations.slice(0, 3).map((rec, index) => (
+                      <div key={index} className="flex items-start">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs mr-2 mt-0.5 flex-shrink-0">
+                          {index + 1}
+                        </div>
+                        <div>
+                          <div className="font-medium text-sm">{rec.area}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {rec.intensity} intensity • {rec.frequency}x per week
+                          </div>
+                          <div className="text-xs mt-1">
+                            <span className="text-primary font-medium">+{rec.expectedImprovement}%</span> potential improvement
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex justify-center items-center h-24">
+                    <div className="text-center text-muted-foreground">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
+                      <p className="mt-2">Generating recommendations...</p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="insights" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-primary" />
+                  AI Analysis
+                </CardTitle>
+                <CardDescription>
+                  Advanced insights powered by OpenAI
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {aiAnalysis ? (
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="font-medium mb-2">Summary</h3>
+                      <p className="text-sm">{aiAnalysis.summary}</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <h3 className="font-medium mb-2">Strengths</h3>
+                        <ul className="space-y-1 text-sm">
+                          {aiAnalysis.strengths.map((strength, index) => (
+                            <li key={index} className="flex items-start">
+                              <div className="mr-2 mt-0.5 text-green-500">•</div>
+                              <span>{strength}</span>
                             </li>
                           ))}
                         </ul>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-4 bg-muted rounded-lg">
-                          <h3 className="font-medium mb-2">Technical Insight</h3>
-                          <p className="text-sm">{aiAnalysis.technicalInsight}</p>
-                        </div>
-                        
-                        <div className="p-4 bg-muted rounded-lg">
-                          <h3 className="font-medium mb-2">Physical Insight</h3>
-                          <p className="text-sm">{aiAnalysis.physicalInsight}</p>
-                        </div>
+                      <div>
+                        <h3 className="font-medium mb-2">Areas for Improvement</h3>
+                        <ul className="space-y-1 text-sm">
+                          {aiAnalysis.weaknesses.map((weakness, index) => (
+                            <li key={index} className="flex items-start">
+                              <div className="mr-2 mt-0.5 text-red-500">•</div>
+                              <span>{weakness}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div>
+                      <h3 className="font-medium mb-2">Technical Insight</h3>
+                      <p className="text-sm">{aiAnalysis.technicalInsight}</p>
+                    </div>
+                    
+                    <div>
+                      <h3 className="font-medium mb-2">Physical Insight</h3>
+                      <p className="text-sm">{aiAnalysis.physicalInsight}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex justify-center items-center h-64">
+                    <div className="text-center text-muted-foreground">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
+                      <p className="mt-2">Generating AI analysis...</p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            
+            <div className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Lightbulb className="h-5 w-5 text-primary" />
+                    Recommendations
+                  </CardTitle>
+                  <CardDescription>
+                    Personalized improvement plan
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {aiAnalysis ? (
+                    <ul className="space-y-2 text-sm">
+                      {aiAnalysis.recommendations.map((recommendation, index) => (
+                        <li key={index} className="flex items-start">
+                          <div className="mr-2 mt-0.5 text-primary">{index + 1}.</div>
+                          <span>{recommendation}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="flex justify-center items-center h-24">
+                      <div className="text-center text-muted-foreground">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
+                        <p className="mt-2">Generating recommendations...</p>
                       </div>
                     </div>
                   )}
                 </CardContent>
               </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
-      )}
+              
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4 text-primary" />
+                    AI Visualization
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {generatedImage ? (
+                    <div className="rounded-md overflow-hidden">
+                      <img 
+                        src={generatedImage} 
+                        alt="AI generated player visualization" 
+                        className="w-full h-auto object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex justify-center items-center h-48 bg-muted/30 rounded-md">
+                      <div className="text-center text-muted-foreground">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
+                        <p className="mt-2">Generating visualization...</p>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="charts">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ChartBar className="h-5 w-5 text-primary" />
+                Advanced Analytics
+              </CardTitle>
+              <CardDescription>
+                Detailed performance visualizations and comparisons
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <AdvancedPlayerCharts 
+                playerStats={playerStats} 
+                playerName={playerName}
+                trainingRecommendations={trainingRecommendations || undefined}
+                playerComparison={playerComparison || undefined}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
