@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import VideoUpload from '@/components/VideoUpload';
 import LoadingAnimation from '@/components/LoadingAnimation';
 import AnalysisReport from '@/components/AnalysisReport';
 import PeopleDetection from '@/components/PeopleDetection';
-import { PlayerAnalysis } from '@/components/AnalysisReport.d.ts';
+import type { PlayerAnalysis } from '@/components/AnalysisReport.d';
 import { analyzeFootballVideo } from '@/utils/analysisService';
 import { useToast } from "@/components/ui/use-toast";
 

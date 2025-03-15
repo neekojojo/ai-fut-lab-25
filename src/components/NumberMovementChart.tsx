@@ -64,6 +64,11 @@ const NumberMovementChart: React.FC<NumberMovementProps> = ({
     alternative: { color: colors.alternative, label: "Alternative" },
   };
 
+  // Function to create a custom tooltip that works with the recharts types
+  const renderTooltipContent = (props: any) => {
+    return <ChartTooltipContent {...props} />;
+  };
+
   return (
     <div className="w-full p-4 bg-white rounded-lg shadow-md">
       <div className="flex items-center mb-4">
@@ -78,7 +83,7 @@ const NumberMovementChart: React.FC<NumberMovementProps> = ({
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
-              <Tooltip content={(props) => <ChartTooltipContent {...props} />} />
+              <Tooltip content={renderTooltipContent} />
               <Legend />
               <Line
                 type="monotone"
@@ -114,7 +119,7 @@ const NumberMovementChart: React.FC<NumberMovementProps> = ({
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
-              <Tooltip content={(props) => <ChartTooltipContent {...props} />} />
+              <Tooltip content={renderTooltipContent} />
               <Legend />
               <Bar dataKey="current" name="Current" fill={colors.current} />
               {data.some((d) => d.previous !== undefined) && (
@@ -131,7 +136,7 @@ const NumberMovementChart: React.FC<NumberMovementProps> = ({
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
-              <Tooltip content={(props) => <ChartTooltipContent {...props} />} />
+              <Tooltip content={renderTooltipContent} />
               <Legend />
               <Area
                 type="monotone"
