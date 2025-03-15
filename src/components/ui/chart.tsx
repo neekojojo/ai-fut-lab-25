@@ -7,7 +7,7 @@ import {
   ChartLegendContent,
   ChartStyle,
   ChartConfig,
-} from "./chart";
+} from "./chart/index";
 
 export {
   ChartContainer,

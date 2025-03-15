@@ -5,7 +5,7 @@ import Header from '@/components/Header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import type { UserProfile, PlayerAnalysis, TrainingVideo } from '@/components/AnalysisReport.d.ts';
+import { UserProfile, PlayerAnalysis, TrainingVideo } from '@/components/AnalysisReport.d';
 import { TrophyIcon, VideoIcon, BarChart3Icon, UserIcon, BadgeIcon, HeartPulseIcon, Lock, LogOut } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 

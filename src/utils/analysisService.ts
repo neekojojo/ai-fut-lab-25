@@ -1,7 +1,7 @@
 // Mock service for AI football analysis
 // In a real application, this would connect to OpenAI API
 
-import type { PlayerAnalysis } from "@/components/AnalysisReport.d.ts";
+import { PlayerAnalysis } from "@/components/AnalysisReport.d";
 
 // Enhanced analysis stages for more detailed feedback
 export const ANALYSIS_STAGES = [

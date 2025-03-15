@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import VideoUpload from '@/components/VideoUpload';
 import LoadingAnimation from '@/components/LoadingAnimation';
-import AnalysisReport, { PlayerAnalysis } from '@/components/AnalysisReport';
+import AnalysisReport from '@/components/AnalysisReport';
+import { PlayerAnalysis } from '@/components/AnalysisReport.d';
 import { analyzeFootballVideo } from '@/utils/analysisService';
 import { useToast } from "@/components/ui/use-toast";
 

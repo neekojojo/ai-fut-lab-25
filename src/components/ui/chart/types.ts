@@ -1,58 +1,40 @@
 
 import * as React from "react";
+import { CurveType } from "recharts/types/shape/Curve";
 
-// Format: { THEME_NAME: CSS_SELECTOR }
-export const THEMES = { light: "", dark: ".dark" } as const;
+export type IconType = React.ElementType;
 
-export interface ChartConfig {
-  [k in string]: {
-    label?: React.ReactNode;
-    icon?: React.ComponentType;
-  } & (
-    | { color?: string; theme?: never }
-    | { color?: never; theme: Record<keyof typeof THEMES, string> }
-  );
-}
+export type ChartConfig = Record<
+  string,
+  {
+    color?: string;
+    label?: string;
+    icon?: IconType;
+    curve?: CurveType;
+    theme?: Record<string, string>;
+  }
+>;
 
 export interface ChartContextProps {
   config: ChartConfig;
 }
 
-// Helper to extract item config from a payload.
-export const getPayloadConfigFromPayload = (
+// Helper function to get payload config from payload
+export function getPayloadConfigFromPayload(
   config: ChartConfig,
-  payload: unknown,
+  payload: any,
   key: string
-) => {
-  if (typeof payload !== "object" || payload === null) {
-    return undefined;
-  }
+) {
+  return (
+    config[key] ||
+    config[payload.dataKey || ""] ||
+    config[payload.name || ""] ||
+    config[payload.type || ""] ||
+    config.default
+  );
+}
 
-  const payloadPayload =
-    "payload" in payload &&
-    typeof payload.payload === "object" &&
-    payload.payload !== null
-      ? payload.payload
-      : undefined;
-
-  let configLabelKey: string = key;
-
-  if (
-    key in payload &&
-    typeof payload[key as keyof typeof payload] === "string"
-  ) {
-    configLabelKey = payload[key as keyof typeof payload] as string;
-  } else if (
-    payloadPayload &&
-    key in payloadPayload &&
-    typeof payloadPayload[key as keyof typeof payloadPayload] === "string"
-  ) {
-    configLabelKey = payloadPayload[
-      key as keyof typeof payloadPayload
-    ] as string;
-  }
-
-  return configLabelKey in config
-    ? config[configLabelKey]
-    : config[key as keyof typeof config];
+export const THEMES = {
+  light: "",
+  dark: ".dark",
 };
