@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import VideoUpload from '@/components/VideoUpload';
 import LoadingAnimation from '@/components/LoadingAnimation';
 import AnalysisReport from '@/components/AnalysisReport';
-import { PlayerAnalysis } from '@/components/AnalysisReport.d';
+import PeopleDetection from '@/components/PeopleDetection';
+import { PlayerAnalysis } from '@/components/AnalysisReport.d.ts';
 import { analyzeFootballVideo } from '@/utils/analysisService';
 import { useToast } from "@/components/ui/use-toast";
 
@@ -13,6 +13,7 @@ const Index = () => {
   const [progress, setProgress] = useState(0);
   const [stage, setStage] = useState('');
   const [analysis, setAnalysis] = useState<PlayerAnalysis | null>(null);
+  const [showPeopleDetection, setShowPeopleDetection] = useState(false);
   const { toast } = useToast();
 
   const handleVideoUpload = async (file: File) => {
@@ -56,12 +57,16 @@ const Index = () => {
     setAnalysis(null);
   };
 
+  const togglePeopleDetection = () => {
+    setShowPeopleDetection(!showPeopleDetection);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       
       <main className="flex-1 container mx-auto py-8 px-4 md:px-6 md:py-12">
-        {analysisState === 'idle' && (
+        {analysisState === 'idle' && !showPeopleDetection && (
           <div className="space-y-12">
             <div className="max-w-3xl mx-auto text-center space-y-4 animate-fade-in">
               <div className="inline-block px-3 py-1 text-xs font-medium bg-secondary text-secondary-foreground rounded-full">
@@ -76,7 +81,16 @@ const Index = () => {
               </p>
             </div>
             
-            <VideoUpload onUpload={handleVideoUpload} />
+            <div className="flex flex-col md:flex-row gap-4 justify-center">
+              <VideoUpload onUpload={handleVideoUpload} />
+              
+              <button 
+                onClick={togglePeopleDetection}
+                className="mt-4 px-4 py-2 text-sm font-medium text-primary border border-primary rounded-md hover:bg-primary/10 transition-colors"
+              >
+                Try People Detection
+              </button>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto animate-slide-up">
               <div className="flex flex-col items-center text-center space-y-2 p-4">
@@ -147,6 +161,22 @@ const Index = () => {
                 </p>
               </div>
             </div>
+          </div>
+        )}
+        
+        {showPeopleDetection && analysisState === 'idle' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Video People Detection</h2>
+              <button
+                onClick={togglePeopleDetection}
+                className="px-4 py-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              >
+                Back to Football Analysis
+              </button>
+            </div>
+            
+            <PeopleDetection />
           </div>
         )}
         
