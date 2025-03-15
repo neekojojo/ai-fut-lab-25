@@ -16,6 +16,11 @@ export const ChartContainer = React.forwardRef<
   const uniqueId = React.useId();
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`;
 
+  // Ensure children is a valid React element
+  const validChildren = React.isValidElement(children) 
+    ? children 
+    : <>{children}</>; // Wrap non-element children in a fragment
+
   return (
     <ChartContext.Provider value={{ config }}>
       <div
@@ -29,7 +34,7 @@ export const ChartContainer = React.forwardRef<
       >
         <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer>
-          {children}
+          {validChildren}
         </RechartsPrimitive.ResponsiveContainer>
       </div>
     </ChartContext.Provider>
