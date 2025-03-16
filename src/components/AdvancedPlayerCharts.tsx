@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -133,11 +132,19 @@ export const AdvancedPlayerCharts: React.FC<AdvancedPlayerChartsProps> = ({
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-2 border rounded shadow-sm text-xs">
-          <p>{`${payload[0].payload.attribute}: ${payload[0].value.toFixed(1)}`}</p>
+          <p>{`${payload[0].payload.attribute}: ${typeof payload[0].value === 'number' ? payload[0].value.toFixed(1) : payload[0].value}`}</p>
         </div>
       );
     }
     return null;
+  };
+
+  // Generic formatter for tooltip values to handle different types
+  const formatTooltipValue = (value: any): string => {
+    if (typeof value === 'number') {
+      return value.toFixed(1);
+    }
+    return String(value);
   };
 
   return (
@@ -214,7 +221,7 @@ export const AdvancedPlayerCharts: React.FC<AdvancedPlayerChartsProps> = ({
                           />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value) => `${value.toFixed(1)}%`} />
+                      <Tooltip formatter={(value) => formatTooltipValue(value)} />
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer>
