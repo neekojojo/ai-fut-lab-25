@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { PlayerDataAnalyzer } from '@/utils/dataProcessing/playerDataAnalysis';
 import { Card, CardContent } from './ui/card';
+import AdvancedPlayerCharts from './AdvancedPlayerCharts';
+import MovementAnalysis from './MovementAnalysis';
 
 interface PlayerAnalysisViewProps {
   videoFile: File;
@@ -10,6 +12,53 @@ interface PlayerAnalysisViewProps {
 
 const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onResetAnalysis }) => {
   const [activeTab, setActiveTab] = useState('movement');
+  
+  // Mock player stats for demonstration
+  const mockPlayerStats = {
+    avgSpeed: 15.2,
+    maxSpeed: 28.5,
+    avgAcceleration: 3.8,
+    distanceCovered: 1250,
+    balanceScore: 78,
+    technicalScore: 82,
+    physicalScore: 75,
+    movementEfficiency: 80,
+  };
+
+  // Mock analysis data
+  const mockAnalysis = {
+    playerName: "Example Player",
+    position: "Midfielder",
+    marketValue: "$2.5M",
+    talentScore: 85,
+    strengths: ["Ball Control", "Passing", "Vision"],
+    weaknesses: ["Aerial Duels", "Defensive Positioning"],
+    performance: {
+      technical: 82,
+      physical: 75,
+      tactical: 79,
+      mental: 81,
+    },
+    recommendations: [
+      "Focus on improving aerial ability",
+      "Work on defensive positioning",
+    ],
+    compatibilityScore: 80,
+    movements: [
+      { name: "Sprint", current: 85, previous: 78, alternative: 90 },
+      { name: "Agility", current: 72, previous: 70, alternative: 75 },
+      { name: "Balance", current: 68, previous: 65, alternative: 72 },
+      { name: "Coordination", current: 75, previous: 71, alternative: 80 },
+      { name: "Acceleration", current: 80, previous: 75, alternative: 85 },
+    ],
+    detailedSkills: {
+      passing: 85,
+      shooting: 72,
+      dribbling: 88,
+      tackling: 65,
+      positioning: 76
+    }
+  };
   
   return (
     <div className="space-y-6 animate-fade-in">
@@ -45,13 +94,9 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
       <Card>
         <CardContent className="p-6">
           {activeTab === 'movement' ? (
-            <div className="text-center py-12">
-              <p>Movement analysis functionality will be implemented here</p>
-            </div>
+            <MovementAnalysis analysis={mockAnalysis} />
           ) : (
-            <div className="text-center py-12">
-              <p>Performance charts will be displayed here</p>
-            </div>
+            <AdvancedPlayerCharts playerStats={mockPlayerStats} playerName={mockAnalysis.playerName} />
           )}
         </CardContent>
       </Card>

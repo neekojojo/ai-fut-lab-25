@@ -19,12 +19,12 @@ export class PlayerDataAnalyzer {
   }
   
   // Calculate player metrics from pose data
-  public static calculatePlayerMetrics(poseResults: PoseTrackingResult[]): PlayerMetrics {
+  public static calculatePlayerMetrics(poseResults: PoseTrackingResult[]): import('./playerAnalysisTypes').PlayerMetrics {
     return MetricsCalculator.calculatePlayerMetrics(poseResults);
   }
   
   // Calculate overall player statistics
-  public static calculatePlayerStats(metrics: PlayerMetrics): PlayerStats {
+  public static calculatePlayerStats(metrics: import('./playerAnalysisTypes').PlayerMetrics): import('./playerAnalysisTypes').PlayerStats {
     return StatsCalculator.calculatePlayerStats(metrics);
   }
   
