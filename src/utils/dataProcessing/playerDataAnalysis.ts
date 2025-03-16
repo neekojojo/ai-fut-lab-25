@@ -8,7 +8,8 @@ import { MetricsCalculator } from './metricsCalculator';
 import { StatsCalculator } from './statsCalculator';
 
 // Re-export all types and constants
-export type { KEYPOINT_NAMES, PlayerMetrics, PlayerStats } from './playerAnalysisTypes';
+export { KEYPOINT_NAMES } from './playerAnalysisTypes';
+export type { PlayerMetrics, PlayerStats } from './playerAnalysisTypes';
 
 // PlayerDataAnalyzer class that combines all functionality
 export class PlayerDataAnalyzer {
