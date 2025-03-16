@@ -4,12 +4,18 @@ import { Card, CardContent } from '@/components/ui/card';
 
 interface VideoUploadProps {
   onUpload: (file: File) => void;
+  selectedFile?: File | null;
+  previewUrl?: string | null;
 }
 
-const VideoUpload: React.FC<VideoUploadProps> = ({ onUpload }) => {
+const VideoUpload: React.FC<VideoUploadProps> = ({ 
+  onUpload, 
+  selectedFile: externalSelectedFile = null, 
+  previewUrl: externalPreviewUrl = null 
+}) => {
   const [isDragging, setIsDragging] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(externalSelectedFile);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(externalPreviewUrl);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {

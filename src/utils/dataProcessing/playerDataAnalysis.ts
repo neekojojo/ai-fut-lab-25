@@ -1,14 +1,14 @@
 
 import { DataFrame, Series } from 'pandas-js';
 import type { PoseTrackingResult } from '../computerVision/positionTracking';
-import { KEYPOINT_NAMES, PlayerMetrics, PlayerStats } from './playerAnalysisTypes';
+import { KEYPOINT_NAMES } from './playerAnalysisTypes';
 import { calculateAngle, calculateDistance, calculateStandardDeviation } from './mathUtils';
 import { DataFrameConverter } from './dataFrameConverter';
 import { MetricsCalculator } from './metricsCalculator';
 import { StatsCalculator } from './statsCalculator';
 
 // Re-export all types and constants
-export { KEYPOINT_NAMES, PlayerMetrics, PlayerStats } from './playerAnalysisTypes';
+export type { KEYPOINT_NAMES, PlayerMetrics, PlayerStats } from './playerAnalysisTypes';
 
 // PlayerDataAnalyzer class that combines all functionality
 export class PlayerDataAnalyzer {
