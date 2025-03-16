@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { PlayerDataAnalyzer } from '@/utils/dataProcessing/playerDataAnalysis';
 import { Card, CardContent } from './ui/card';
 import AdvancedPlayerCharts from './AdvancedPlayerCharts';
 import MovementAnalysis from './MovementAnalysis';
