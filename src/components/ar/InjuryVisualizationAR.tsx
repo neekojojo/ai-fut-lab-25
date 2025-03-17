@@ -38,7 +38,7 @@ const InjuryVisualizationAR: React.FC<InjuryVisualizationARProps> = ({
           
           // Create info panel entity
           const infoPanel = document.createElement('a-entity');
-          infoPanel.setAttribute('visible', false);
+          infoPanel.setAttribute('visible', 'false'); // Convert boolean to string
           infoPanel.setAttribute('position', '0 0.6 0');
           
           // Background panel
@@ -82,7 +82,7 @@ const InjuryVisualizationAR: React.FC<InjuryVisualizationARProps> = ({
           // Show/hide info panel on click
           const toggleInfo = function() {
             const visible = infoPanel.getAttribute('visible');
-            infoPanel.setAttribute('visible', !visible);
+            infoPanel.setAttribute('visible', visible === 'true' ? 'false' : 'true'); // Convert boolean to string
           };
           
           el.addEventListener('click', toggleInfo);
