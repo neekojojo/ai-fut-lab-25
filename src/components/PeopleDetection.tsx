@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { detectPeopleInVideo } from '@/utils/videoDetectionService';
+import { detectPeopleInVideo } from '@/utils/videoDetection';
 import { useToast } from '@/components/ui/use-toast';
+import type { DetectionResult } from '@/utils/videoDetection/types';
 
 interface DetectionResult {
   count: number;
@@ -25,7 +25,6 @@ const PeopleDetection = () => {
     
     const file = e.target.files[0];
     
-    // Validate that it's a video file
     if (!file.type.startsWith('video/')) {
       toast({
         variant: "destructive",
@@ -35,11 +34,9 @@ const PeopleDetection = () => {
       return;
     }
     
-    // Create object URL for video preview
     const objectUrl = URL.createObjectURL(file);
     setVideoSrc(objectUrl);
     
-    // Start analysis
     setIsAnalyzing(true);
     setResult(null);
     
