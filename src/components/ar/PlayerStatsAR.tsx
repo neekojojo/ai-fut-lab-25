@@ -30,6 +30,9 @@ const PlayerStatsAR: React.FC<PlayerStatsARProps> = ({
     registerCustomAframeComponents();
   }, []);
   
+  // Mock current speed for visualization
+  const currentSpeed = playerStats.avgSpeed * 0.9;
+  
   return (
     <ARScene>
       <a-assets>
@@ -38,7 +41,7 @@ const PlayerStatsAR: React.FC<PlayerStatsARProps> = ({
 
       {/* Player name label */}
       <a-text 
-        value={playerName} 
+        value={`${playerName}'s Performance Stats`}
         position="0 2.5 -3" 
         width="10"
         align="center"
@@ -83,18 +86,19 @@ const PlayerStatsAR: React.FC<PlayerStatsARProps> = ({
           animationDelay={1600}
         />
 
-        {/* Speed Metrics - New Speedometer */}
+        {/* Enhanced Speedometer with current speed */}
         <ARSpeedometer
           position="0 -1.5 0"
           maxSpeed={playerStats.maxSpeed}
           avgSpeed={playerStats.avgSpeed}
+          currentSpeed={currentSpeed}
           size={1.2}
-          title="Player Speed"
+          title="Player Speed Metrics"
         />
       </a-entity>
 
       {/* Instructions */}
-      <ARInstructionPanel text="Tap on elements to see detailed stats" />
+      <ARInstructionPanel text="Tap on elements to see detailed stats | Use WASD to move" />
     </ARScene>
   );
 };
