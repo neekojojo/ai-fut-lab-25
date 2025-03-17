@@ -1,7 +1,6 @@
-
 // Enhanced video detection service with OpenCV and pose tracking capabilities
 
-interface DetectionResult {
+export interface DetectionResult {
   count: number;
   confidence: number;
   frameResults: {
@@ -12,7 +11,7 @@ interface DetectionResult {
   playerPositions?: PlayerPosition[];
 }
 
-interface PlayerPosition {
+export interface PlayerPosition {
   frameNumber: number;
   timestamp: number;
   keypoints: {
@@ -342,3 +341,4 @@ export const extractVideoFrames = async (
     };
   });
 };
+
