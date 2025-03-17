@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from './ui/card';
 import AdvancedPlayerCharts from './AdvancedPlayerCharts';
 import MovementAnalysis from './MovementAnalysis';
+import PlayerStatsAR from './ar/PlayerStatsAR';
 
 interface PlayerAnalysisViewProps {
   videoFile: File;
@@ -88,14 +89,24 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
         >
           Performance Charts
         </button>
+        <button
+          className={`flex-1 px-4 py-2 text-sm rounded-md ${
+            activeTab === 'ar' ? 'bg-background shadow-sm' : 'text-muted-foreground'
+          }`}
+          onClick={() => setActiveTab('ar')}
+        >
+          AR Visualization
+        </button>
       </div>
       
       <Card>
         <CardContent className="p-6">
           {activeTab === 'movement' ? (
             <MovementAnalysis analysis={mockAnalysis} />
-          ) : (
+          ) : activeTab === 'charts' ? (
             <AdvancedPlayerCharts playerStats={mockPlayerStats} playerName={mockAnalysis.playerName} />
+          ) : (
+            <PlayerStatsAR playerStats={mockPlayerStats} playerName={mockAnalysis.playerName} />
           )}
         </CardContent>
       </Card>
