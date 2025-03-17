@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import 'aframe';
 import ARScene from './common/ARScene';
 import ARStatBar from './common/ARStatBar';
+import ARSpeedometer from './common/ARSpeedometer';
 import ARInstructionPanel from './common/ARInstructionPanel';
 import { registerCustomAframeComponents } from './utils/aframeUtils';
 
@@ -82,35 +83,18 @@ const PlayerStatsAR: React.FC<PlayerStatsARProps> = ({
           animationDelay={1600}
         />
 
-        {/* Speed indicators */}
-        <a-entity position="0 -1 0">
-          <a-torus 
-            position="0 0 0" 
-            radius="1.5" 
-            radius-tubular="0.05" 
-            arc="320" 
-            color="#D6BCFA" 
-            rotation="90 0 0"
-          ></a-torus>
-          <a-text 
-            value="Max Speed" 
-            position="0 0 -1.7" 
-            width="2" 
-            align="center" 
-            color="#1A1F2C"
-          ></a-text>
-          <a-text 
-            value={`${playerStats.maxSpeed.toFixed(1)} km/h`} 
-            position="0 0 -1.4" 
-            width="2" 
-            align="center" 
-            color="#1A1F2C"
-          ></a-text>
-        </a-entity>
+        {/* Speed Metrics - New Speedometer */}
+        <ARSpeedometer
+          position="0 -1.5 0"
+          maxSpeed={playerStats.maxSpeed}
+          avgSpeed={playerStats.avgSpeed}
+          size={1.2}
+          title="Player Speed"
+        />
       </a-entity>
 
       {/* Instructions */}
-      <ARInstructionPanel text="Tap on bars to see detailed stats" />
+      <ARInstructionPanel text="Tap on elements to see detailed stats" />
     </ARScene>
   );
 };
