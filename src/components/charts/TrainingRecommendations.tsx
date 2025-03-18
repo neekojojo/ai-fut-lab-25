@@ -25,7 +25,7 @@ export const TrainingRecommendations: React.FC<TrainingRecommendationsProps> = (
   const defaultRecommendations: TrainingRecommendation[] = [
     {
       area: "Passing Accuracy",
-      intensity: "High",
+      intensity: "high",
       frequency: 3,
       duration: 45,
       expectedImprovement: 15,
@@ -44,7 +44,7 @@ export const TrainingRecommendations: React.FC<TrainingRecommendationsProps> = (
     },
     {
       area: "Defensive Awareness",
-      intensity: "Medium",
+      intensity: "medium",
       frequency: 2,
       duration: 30,
       expectedImprovement: 20,
@@ -63,7 +63,7 @@ export const TrainingRecommendations: React.FC<TrainingRecommendationsProps> = (
     },
     {
       area: "Decision Making",
-      intensity: "High",
+      intensity: "high",
       frequency: 3,
       duration: 40,
       expectedImprovement: 25,

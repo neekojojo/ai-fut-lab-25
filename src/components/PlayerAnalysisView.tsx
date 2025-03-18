@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from './ui/card';
 import AdvancedPlayerCharts from './AdvancedPlayerCharts';
@@ -17,7 +16,6 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
   const [activeTab, setActiveTab] = useState('movement');
   const { toast } = useToast();
   
-  // Comprehensive player stats based on position data
   const playerStats: PlayerStats = {
     avgSpeed: 15.2,
     maxSpeed: 28.5,
@@ -29,7 +27,6 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
     movementEfficiency: 80,
   };
 
-  // Mock analysis data with expanded details
   const mockAnalysis = {
     playerName: "Alex Johnson",
     position: "Midfielder",
@@ -71,7 +68,6 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
     }
   };
 
-  // Player comparison data for Pro Comparison tab
   const playerComparison: PlayerComparison = {
     similarProfessionals: [
       {
@@ -105,11 +101,10 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
     ]
   };
 
-  // Training recommendations data for Training Impact tab
   const trainingRecommendations: TrainingRecommendation[] = [
     {
       area: "Passing Accuracy",
-      intensity: "High",
+      intensity: "high",
       frequency: 3,
       duration: 45,
       expectedImprovement: 15,
@@ -128,7 +123,7 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
     },
     {
       area: "Defensive Awareness",
-      intensity: "Medium",
+      intensity: "medium",
       frequency: 2,
       duration: 30,
       expectedImprovement: 20,
@@ -147,7 +142,7 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
     },
     {
       area: "Decision Making",
-      intensity: "High",
+      intensity: "high",
       frequency: 3,
       duration: 40,
       expectedImprovement: 25,
@@ -167,7 +162,6 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
   ];
   
   useEffect(() => {
-    // Show a toast when the component mounts to guide the user
     toast({
       title: "Advanced Analysis Ready",
       description: "Explore detailed movement patterns and performance metrics across different tabs.",
