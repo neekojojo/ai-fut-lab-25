@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import VideoUpload from '@/components/VideoUpload';
@@ -27,13 +26,11 @@ const Index = () => {
     try {
       const result = await analyzeFootballVideo(file);
       
-      // Subscribe to progress updates
       result.progressUpdates((newProgress, newStage) => {
         setProgress(newProgress);
         setStage(newStage);
       });
       
-      // Set analysis results
       setAnalysis(result.analysis);
       setAnalysisState('complete');
       
@@ -229,7 +226,7 @@ const Index = () => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-muted-foreground">
-              © 2024 FootballAnalyst. All rights reserved.
+              © 2025 FootballAnalyst. All rights reserved.
             </p>
             <div className="flex items-center space-x-4 mt-4 md:mt-0">
               <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
