@@ -13,6 +13,7 @@ import {
   AreaChart,
   Area,
   ResponsiveContainer,
+  Cell,
 } from "recharts";
 import { ArrowUp, ArrowDown, TrendingUp, TrendingDown } from "lucide-react";
 import { 
@@ -107,12 +108,28 @@ const NumberMovementChart: React.FC<NumberMovementProps> = ({
   };
 
   const improvement = calculateImprovement();
+  
+  // Calculate maximum value for Y axis with 20% padding
+  const getMaxYValue = () => {
+    let maxValue = 0;
+    
+    chartData.forEach(d => {
+      maxValue = Math.max(
+        maxValue, 
+        d.current, 
+        d.previous || 0, 
+        d.alternative || 0
+      );
+    });
+    
+    return Math.ceil(maxValue * 1.2); // 20% padding
+  };
 
   return (
     <div className="w-full p-4 bg-white rounded-lg shadow-md">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
-          <h3 className="text-lg font-semibold">{title}</h3>
+          <h3 className="text-xl font-semibold">{title}</h3>
           {chartData.length > 0 && getMovementIcon(chartData[chartData.length - 1].current, chartData[0].current)}
         </div>
         {improvement && (
@@ -131,9 +148,19 @@ const NumberMovementChart: React.FC<NumberMovementProps> = ({
           <ChartContainer config={config}>
             {type === "line" && (
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis domain={[0, 100]} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0e0e0" />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#888', fontSize: 12 }}
+                />
+                <YAxis 
+                  domain={[0, getMaxYValue()]} 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#888', fontSize: 12 }}
+                />
                 <Tooltip content={renderTooltipContent} />
                 <Legend />
                 <Line
@@ -167,26 +194,58 @@ const NumberMovementChart: React.FC<NumberMovementProps> = ({
 
             {type === "bar" && (
               <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis domain={[0, 100]} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0e0e0" />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#888', fontSize: 12 }}
+                />
+                <YAxis 
+                  domain={[0, getMaxYValue()]} 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#888', fontSize: 12 }}
+                />
                 <Tooltip content={renderTooltipContent} />
                 <Legend />
-                <Bar dataKey="current" name="Current" fill={colors.current} />
+                <Bar dataKey="current" name="Current" radius={[4, 4, 0, 0]}>
+                  {chartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={colors.current} />
+                  ))}
+                </Bar>
                 {chartData.some((d) => d.previous !== undefined) && (
-                  <Bar dataKey="previous" name="Previous" fill={colors.previous} />
+                  <Bar dataKey="previous" name="Previous" radius={[4, 4, 0, 0]}>
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={colors.previous} />
+                    ))}
+                  </Bar>
                 )}
                 {chartData.some((d) => d.alternative !== undefined) && (
-                  <Bar dataKey="alternative" name="Alternative" fill={colors.alternative} />
+                  <Bar dataKey="alternative" name="Alternative" radius={[4, 4, 0, 0]}>
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={colors.alternative} />
+                    ))}
+                  </Bar>
                 )}
               </BarChart>
             )}
 
             {type === "area" && (
               <AreaChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis domain={[0, 100]} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0e0e0" />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#888', fontSize: 12 }}
+                />
+                <YAxis 
+                  domain={[0, getMaxYValue()]} 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#888', fontSize: 12 }}
+                />
                 <Tooltip content={renderTooltipContent} />
                 <Legend />
                 <Area

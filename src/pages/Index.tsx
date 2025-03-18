@@ -5,26 +5,45 @@ import LoadingAnimation from '@/components/LoadingAnimation';
 import AnalysisReport from '@/components/AnalysisReport';
 import PlayerAnalysisView from '@/components/PlayerAnalysisView';
 import PeopleDetection from '@/components/PeopleDetection';
+import ModelSelectionCard from '@/components/ModelSelectionCard';
+import MarketValueProjection from '@/components/MarketValueProjection';
+import DevelopmentPlanList from '@/components/DevelopmentPlanList';
 import type { PlayerAnalysis } from '@/components/AnalysisReport.d';
 import { analyzeFootballVideo } from '@/utils/analysisService';
 import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
-  const [analysisState, setAnalysisState] = useState<'idle' | 'processing' | 'complete' | 'detailed-analysis'>('idle');
+  const [analysisState, setAnalysisState] = useState<'idle' | 'model-selection' | 'processing' | 'complete' | 'detailed-analysis'>('idle');
   const [progress, setProgress] = useState(0);
   const [stage, setStage] = useState('');
   const [analysis, setAnalysis] = useState<PlayerAnalysis | null>(null);
   const [showPeopleDetection, setShowPeopleDetection] = useState(false);
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [selectedAnalysisModel, setSelectedAnalysisModel] = useState<'google-automl' | 'kaggle-datasets' | null>(null);
   const { toast } = useToast();
 
   const handleVideoUpload = async (file: File) => {
     setVideoFile(file);
+    setAnalysisState('model-selection');
+  };
+
+  const handleSelectModel = (model: 'google-automl' | 'kaggle-datasets') => {
+    setSelectedAnalysisModel(model);
+    toast({
+      title: `Selected ${model === 'google-automl' ? 'Google AutoML Vision' : 'Kaggle Datasets'}`,
+      description: "Analysis model has been set.",
+      duration: 3000,
+    });
+  };
+
+  const handleAnalyzeWithAI = async () => {
+    if (!videoFile) return;
+    
     setAnalysisState('processing');
     setProgress(0);
     
     try {
-      const result = await analyzeFootballVideo(file);
+      const result = await analyzeFootballVideo(videoFile);
       
       result.progressUpdates((newProgress, newStage) => {
         setProgress(newProgress);
@@ -63,11 +82,20 @@ const Index = () => {
     setStage('');
     setAnalysis(null);
     setVideoFile(null);
+    setSelectedAnalysisModel(null);
   };
 
   const togglePeopleDetection = () => {
     setShowPeopleDetection(!showPeopleDetection);
   };
+
+  const planItems = [
+    { text: "Build the initial prototype" },
+    { text: "Integrate Google AutoML for advanced player analysis" },
+    { text: "Add Kaggle data integration for player and club information" },
+    { text: "Implement advanced ML models (Random Forest, Neural Networks)" },
+    { text: "Develop comprehensive scouting reports with player comparisons" }
+  ];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -81,11 +109,10 @@ const Index = () => {
                 AI-Powered Analysis
               </div>
               <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-                Analyze Football Talent with Precision
+                FootballAI Analyzer
               </h1>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Upload your match footage and let our AI analyze player performance, 
-                predict market value, and assess talent in minutes.
+                <span className="text-primary font-semibold">AI-powered</span> football talent assessment
               </p>
             </div>
             
@@ -172,6 +199,14 @@ const Index = () => {
           </div>
         )}
         
+        {analysisState === 'model-selection' && videoFile && (
+          <ModelSelectionCard 
+            videoFile={videoFile}
+            onSelectModel={handleSelectModel}
+            onAnalyzeWithAI={handleAnalyzeWithAI}
+          />
+        )}
+        
         {showPeopleDetection && analysisState === 'idle' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -195,6 +230,14 @@ const Index = () => {
         {analysisState === 'complete' && analysis && (
           <div className="space-y-8">
             <AnalysisReport analysis={analysis} />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <MarketValueProjection />
+              <DevelopmentPlanList 
+                items={planItems}
+                approvedBy="dtfuniquetshirt"
+              />
+            </div>
             
             <div className="flex justify-center space-x-4">
               <button
@@ -236,7 +279,7 @@ const Index = () => {
                 Terms
               </a>
               <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Contact
+                Support
               </a>
             </div>
           </div>
