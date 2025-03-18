@@ -4,16 +4,6 @@ import { detectPeopleInVideo } from '@/utils/videoDetection';
 import { useToast } from '@/components/ui/use-toast';
 import type { DetectionResult } from '@/utils/videoDetection/types';
 
-interface DetectionResult {
-  count: number;
-  confidence: number;
-  frameResults: {
-    frameNumber: number;
-    detections: number;
-    timestamp: number;
-  }[];
-}
-
 const PeopleDetection = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<DetectionResult | null>(null);
