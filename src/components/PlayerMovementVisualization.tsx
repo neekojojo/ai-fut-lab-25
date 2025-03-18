@@ -1,6 +1,7 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { PlayerPosition } from '../utils/videoDetection/types';
+import type { PlayerPosition } from '@/utils/videoDetection/types';
 
 interface PlayerMovementVisualizationProps {
   playerPositions: PlayerPosition[];
