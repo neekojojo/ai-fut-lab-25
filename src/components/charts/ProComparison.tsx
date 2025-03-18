@@ -51,10 +51,8 @@ export const ProComparison: React.FC<ProComparisonProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {playerComparison.similarProfessionals.map((player, index) => (
               <div key={index} className="flex flex-col items-center p-4 border rounded-lg bg-card">
-                <div className="w-20 h-20 rounded-full overflow-hidden mb-2 bg-muted">
-                  {player.imageUrl && (
-                    <img src={player.imageUrl} alt={player.name} className="w-full h-full object-cover" />
-                  )}
+                <div className="w-20 h-20 rounded-full flex items-center justify-center bg-primary/10 mb-2">
+                  <span className="text-xl font-bold text-primary">{player.name.charAt(0)}</span>
                 </div>
                 <h4 className="text-lg font-medium">{player.name}</h4>
                 <p className="text-sm text-muted-foreground">{player.team}</p>

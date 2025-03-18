@@ -24,7 +24,6 @@ export interface PlayerComparison {
     strengths: string[];
     team?: string;
     position?: string;
-    imageUrl?: string;
   }[];
   similarityMetrics: {
     category: string;
@@ -229,8 +228,7 @@ export class PlayerMLService {
         efficiency: 0.90,
         position: "forward",
         team: "Inter Miami CF",
-        strengths: ["Dribbling", "Vision", "Finishing"],
-        imageUrl: "https://placehold.co/100x100/png?text=Messi"
+        strengths: ["Dribbling", "Vision", "Finishing"]
       },
       {
         name: "Cristiano Ronaldo",
@@ -243,8 +241,7 @@ export class PlayerMLService {
         efficiency: 0.87,
         position: "forward",
         team: "Al Nassr",
-        strengths: ["Finishing", "Aerial ability", "Power"],
-        imageUrl: "https://placehold.co/100x100/png?text=Ronaldo"
+        strengths: ["Finishing", "Aerial ability", "Power"]
       },
       {
         name: "Kevin De Bruyne",
@@ -257,8 +254,7 @@ export class PlayerMLService {
         efficiency: 0.92,
         position: "midfielder",
         team: "Manchester City",
-        strengths: ["Passing", "Vision", "Shooting"],
-        imageUrl: "https://placehold.co/100x100/png?text=De+Bruyne"
+        strengths: ["Passing", "Vision", "Shooting"]
       },
       {
         name: "N'Golo Kanté",
@@ -271,8 +267,7 @@ export class PlayerMLService {
         efficiency: 0.96,
         position: "midfielder",
         team: "Al-Ittihad",
-        strengths: ["Interceptions", "Stamina", "Tackling"],
-        imageUrl: "https://placehold.co/100x100/png?text=Kante"
+        strengths: ["Interceptions", "Stamina", "Tackling"]
       },
       {
         name: "Virgil van Dijk",
@@ -285,8 +280,7 @@ export class PlayerMLService {
         efficiency: 0.88,
         position: "defender",
         team: "Liverpool",
-        strengths: ["Aerial ability", "Composure", "Leadership"],
-        imageUrl: "https://placehold.co/100x100/png?text=Van+Dijk"
+        strengths: ["Aerial ability", "Composure", "Leadership"]
       },
       {
         name: "Manuel Neuer",
@@ -299,8 +293,7 @@ export class PlayerMLService {
         efficiency: 0.89,
         position: "goalkeeper",
         team: "Bayern Munich",
-        strengths: ["Shot-stopping", "Distribution", "Sweeping"],
-        imageUrl: "https://placehold.co/100x100/png?text=Neuer"
+        strengths: ["Shot-stopping", "Distribution", "Sweeping"]
       }
     ];
     
@@ -402,8 +395,7 @@ export class PlayerMLService {
         similarity: player.similarity,
         strengths: player.strengths,
         team: player.team,
-        position: player.position,
-        imageUrl: player.imageUrl
+        position: player.position
       })),
       similarityMetrics: categoryComparisons
     };
