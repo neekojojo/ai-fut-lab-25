@@ -83,6 +83,11 @@ const MovementAnalysis: React.FC<MovementAnalysisProps> = ({ analysis }) => {
   const skillComparisonData = generateSkillData();
   const physicalData = generatePhysicalData();
 
+  // Descriptions for each chart
+  const movementDescription = "Analysis of player's movement efficiency including sprint speed, agility, balance, coordination, and acceleration compared to previous assessment and potential improvements.";
+  const skillDescription = "Comparison of key technical skills based on position requirements, showing progress since last assessment and projected improvement with targeted training.";
+  const physicalDescription = "Progression of physical attributes including speed, strength, stamina, jumping ability and agility, with projections for improvement.";
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -109,6 +114,7 @@ const MovementAnalysis: React.FC<MovementAnalysisProps> = ({ analysis }) => {
                 previous: "#9CA3AF", // Gray
                 alternative: "#F97316", // Orange
               }}
+              description={movementDescription}
             />
             <div className="mt-4 text-sm text-muted-foreground">
               <p className="mb-2">Movement analysis compares current performance metrics with previous assessments and potential alternatives:</p>
@@ -130,6 +136,7 @@ const MovementAnalysis: React.FC<MovementAnalysisProps> = ({ analysis }) => {
                 previous: "#9CA3AF", // Gray
                 alternative: "#10B981", // Green
               }}
+              description={skillDescription}
             />
             <div className="mt-4 text-sm text-muted-foreground">
               <p className="mb-2">Skill analysis shows progression in core football abilities:</p>
@@ -152,6 +159,7 @@ const MovementAnalysis: React.FC<MovementAnalysisProps> = ({ analysis }) => {
                 previous: "#9CA3AF", // Gray
                 alternative: "#F97316", // Orange
               }}
+              description={physicalDescription}
             />
             <div className="mt-4 text-sm text-muted-foreground">
               <p className="mb-2">Physical attributes measured through standardized performance tests:</p>
