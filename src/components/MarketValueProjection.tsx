@@ -63,7 +63,7 @@ const MarketValueProjection: React.FC<MarketValueProjectionProps> = ({
               />
               <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                 {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill="#3b82f6" />
+                  <Cell key={`cell-${index}`} fill="#4f46e5" />
                 ))}
               </Bar>
             </BarChart>

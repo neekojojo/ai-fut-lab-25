@@ -20,7 +20,7 @@ const DevelopmentPlanList: React.FC<DevelopmentPlanListProps> = ({
   approvedBy 
 }) => {
   return (
-    <Card className="w-full bg-[#1e293b] text-white border-none shadow-lg">
+    <Card className="w-full bg-[#1e293b] text-white border-none shadow-xl">
       <CardHeader className="pb-2">
         <CardTitle className="text-xl font-semibold">{title}</CardTitle>
       </CardHeader>
