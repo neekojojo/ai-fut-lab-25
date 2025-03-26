@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -898,20 +897,7 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
                       </ul>
                     </div>
                     
-                    <div className="mt-8">
-                      <h4 className="font-medium mb-3">Player Image</h4>
-                      <div className="rounded-lg overflow-hidden border shadow-sm">
-                        <img 
-                          src={`https://api.dicebear.com/7.x/personas/svg?seed=${analysis.playerName.replace(/\s+/g, '')}`} 
-                          alt={analysis.playerName} 
-                          className="w-full h-auto"
-                          style={{ maxHeight: "250px" }}
-                        />
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-2 text-center">
-                        Computer generated representation
-                      </p>
-                    </div>
+                    {/* Player image has been removed as requested */}
                   </div>
                 </div>
               </div>
@@ -1334,33 +1320,6 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ analysis }) => {
                           Schedule your next assessment
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="mt-6">
-                  <h4 className="font-medium mb-4">Training Snapshots</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="aspect-square rounded-lg overflow-hidden">
-                      <img 
-                        src="https://images.unsplash.com/photo-1560272564-c83b66b1ad12?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"
-                        alt="Training drill 1" 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="aspect-square rounded-lg overflow-hidden">
-                      <img 
-                        src="https://images.unsplash.com/photo-1526232626815-50578f4e7578?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"
-                        alt="Training drill 2" 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="aspect-square rounded-lg overflow-hidden">
-                      <img 
-                        src="https://images.unsplash.com/photo-1550258987-190a2d41a8ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"
-                        alt="Training drill 3" 
-                        className="w-full h-full object-cover"
-                      />
                     </div>
                   </div>
                 </div>
