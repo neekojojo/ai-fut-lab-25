@@ -1,7 +1,6 @@
 
 import React from 'react';
 import AnalysisReport from '@/components/AnalysisReport';
-import MarketValueProjection from '@/components/MarketValueProjection';
 import DevelopmentPlanList from '@/components/DevelopmentPlanList';
 import type { PlayerAnalysis } from '@/components/AnalysisReport.d';
 
@@ -28,8 +27,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
     <div className="space-y-8">
       <AnalysisReport analysis={analysis} />
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <MarketValueProjection />
+      <div className="w-full">
         <DevelopmentPlanList 
           items={planItems}
           approvedBy="dtfuniquetshirt"
