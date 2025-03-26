@@ -14,11 +14,14 @@ const ModelSelection: React.FC<ModelSelectionProps> = ({
   onAnalyzeWithAI
 }) => {
   return (
-    <ModelSelectionCard 
-      videoFile={videoFile}
-      onSelectModel={onSelectModel}
-      onAnalyzeWithAI={onAnalyzeWithAI}
-    />
+    <div className="max-w-3xl mx-auto">
+      <h2 className="text-2xl font-bold mb-6 text-center">Select Analysis Model</h2>
+      <ModelSelectionCard 
+        videoFile={videoFile}
+        onSelectModel={onSelectModel}
+        onAnalyzeWithAI={onAnalyzeWithAI}
+      />
+    </div>
   );
 };
 
