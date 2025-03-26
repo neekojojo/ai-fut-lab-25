@@ -20,7 +20,7 @@ const DevelopmentPlanList: React.FC<DevelopmentPlanListProps> = ({
   approvedBy 
 }) => {
   return (
-    <Card className="w-full bg-[#1e2030] text-white border-none shadow-lg">
+    <Card className="w-full bg-[#1e293b] text-white border-none shadow-lg">
       <CardHeader className="pb-2">
         <CardTitle className="text-xl font-semibold">{title}</CardTitle>
       </CardHeader>
@@ -28,14 +28,14 @@ const DevelopmentPlanList: React.FC<DevelopmentPlanListProps> = ({
         <ul className="space-y-4">
           {items.map((item, index) => (
             <li key={index} className="flex items-start gap-2">
-              <span className="text-[#a8a8b2] mr-1">•</span>
-              <span className="text-[#d1d1e2]">{item.text}</span>
+              <span className="text-[#a8b3cf] mr-1">•</span>
+              <span className="text-[#d1d8e6]">{item.text}</span>
             </li>
           ))}
         </ul>
         
         {approvedBy && (
-          <div className="mt-6 flex items-center gap-2 text-[#8ce99a]">
+          <div className="mt-6 flex items-center gap-2 text-[#84cc16]">
             <CheckCircle size={18} />
             <p className="text-sm">{approvedBy} approved the plan</p>
           </div>
