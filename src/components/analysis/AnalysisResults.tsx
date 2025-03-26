@@ -20,7 +20,9 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
     { text: "Integrate Google AutoML for advanced player analysis" },
     { text: "Add Kaggle data integration for player and club information" },
     { text: "Implement advanced ML models (Random Forest, Neural Networks)" },
-    { text: "Develop comprehensive scouting reports with player comparisons" }
+    { text: "Develop comprehensive scouting reports with player comparisons" },
+    { text: "Create training drills based on player performance data" },
+    { text: "Design personalized training program with weekly schedules" }
   ];
 
   return (
