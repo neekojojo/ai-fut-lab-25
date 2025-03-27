@@ -80,17 +80,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({
       return;
     }
 
-    // Check file size (limit to 100MB)
-    const fileSizeInMB = file.size / (1024 * 1024);
-    if (fileSizeInMB > 100) {
-      setError('حجم الملف كبير جدًا. الحد الأقصى هو 100 ميجابايت');
-      toast({
-        variant: "destructive",
-        title: "خطأ في التحميل",
-        description: "حجم الملف كبير جدًا. الحد الأقصى هو 100 ميجابايت",
-      });
-      return;
-    }
+    // Removed file size check here
 
     setSelectedFile(file);
     
@@ -197,7 +187,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({
                 className="hidden"
               />
               <p className="text-xs text-muted-foreground pt-4">
-                الحد الأقصى لحجم الملف: 100 ميجابايت
+                يمكنك تحميل ملفات فيديو بأي حجم
               </p>
             </div>
           ) : (
