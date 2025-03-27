@@ -4,6 +4,11 @@ export interface PlayerMovement {
   y: number;
   timestamp: number;
   speed: number;
+  // For chart rendering
+  name?: string;
+  current?: number;
+  previous?: number;
+  alternative?: number;
 }
 
 export interface PassAttempt {
@@ -58,6 +63,54 @@ export interface SimilarProfessional {
   strengths: string[];
 }
 
+export interface PerformanceMetrics {
+  technical: number;
+  physical: number;
+  tactical: number;
+  mental: number;
+}
+
+export interface DetailedSkills {
+  [key: string]: number;
+}
+
+export interface ProComparison {
+  name: string;
+  similarity: number;
+  skills: {
+    [key: string]: number;
+  };
+}
+
+export interface ProgressArea {
+  skill: string;
+  before: number;
+  after: number;
+}
+
+export interface ProgressData {
+  lastAnalysis: Date;
+  improvement: number;
+  areas: ProgressArea[];
+}
+
+export interface InjuryRiskArea {
+  name: string;
+  risk: number;
+  recommendation: string;
+}
+
+export interface InjuryRiskData {
+  overall: number;
+  areas: InjuryRiskArea[];
+}
+
+export interface Badge {
+  name: string;
+  description: string;
+  level: 'bronze' | 'silver' | 'gold';
+}
+
 export interface PlayerAnalysis {
   id: string;
   playerId?: string;
@@ -80,4 +133,53 @@ export interface PlayerAnalysis {
   performanceScore: number;
   similarPlayers?: SimilarProfessional[];
   marketData?: MarketData;
+  
+  // Additional fields needed by components
+  talentScore?: number;
+  marketValue?: string;
+  compatibilityScore?: number;
+  performance?: PerformanceMetrics;
+  detailedSkills?: DetailedSkills;
+  proComparison?: ProComparison;
+  progress?: ProgressData;
+  injuryRisk?: InjuryRiskData;
+  badges?: Badge[];
+}
+
+// Additional interfaces for other components
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  role: string;
+  createdAt: string;
+  lastLogin?: string;
+  teamId?: string;
+  position?: string;
+  subscription?: {
+    plan: string;
+    status: string;
+    nextBillingDate?: string;
+  };
+}
+
+export interface TrainingVideo {
+  id: string;
+  title: string;
+  description: string;
+  thumbnailUrl: string;
+  videoUrl: string;
+  duration: number;
+  category: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  targetAreas: string[];
+  createdAt: string;
+  views: number;
+  favorites: number;
+  coach?: {
+    name: string;
+    avatarUrl?: string;
+    title?: string;
+  };
 }

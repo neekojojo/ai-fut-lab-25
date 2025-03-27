@@ -1,4 +1,3 @@
-
 import { PlayerStats } from '@/utils/dataProcessing/playerAnalysisTypes';
 import { PlayerComparison, TrainingRecommendation } from '@/utils/ml/playerMLService';
 import { PlayerAnalysis } from '@/components/AnalysisReport.d';
@@ -15,10 +14,33 @@ export const getPlayerStats = (): PlayerStats => ({
 });
 
 export const getMockAnalysis = (): PlayerAnalysis => ({
+  id: "analysis-1",
   playerName: "Alex Johnson",
   position: "Midfielder",
-  marketValue: "$2.5M",
-  talentScore: 85,
+  timestamp: new Date().toISOString(),
+  duration: 120,
+  confidence: 0.85,
+  stats: {
+    pace: 82,
+    shooting: 75,
+    passing: 85,
+    dribbling: 78,
+    defending: 65,
+    physical: 75,
+    stamina: 80,
+    acceleration: 83,
+    agility: 76,
+    balance: 72,
+    ballControl: 79,
+    decision: 74,
+    anticipation: 71,
+    positioning: 76,
+    vision: 83,
+    composure: 79
+  },
+  movements: [],
+  passes: [],
+  heatmap: [],
   strengths: [
     "Exceptional vision for through balls",
     "Consistent passing accuracy over long distances",
@@ -28,24 +50,23 @@ export const getMockAnalysis = (): PlayerAnalysis => ({
     "Occasionally loses concentration during defensive transitions",
     "Could improve decision-making in the final third"
   ],
+  summary: "A technically gifted midfielder with excellent passing range and vision.",
+  advancedInsights: ["Shows great potential in central midfield role", "Excellent at creating chances"],
+  recommendations: [
+    "Practice scanning before receiving passes with 'shoulder checks'",
+    "Work on quick transition from defense to attack",
+  ],
+  performanceScore: 82,
+  // Added fields to match updated interface
+  marketValue: "$2.5M",
+  talentScore: 85,
+  compatibilityScore: 80,
   performance: {
     technical: 82,
     physical: 75,
     tactical: 79,
     mental: 81,
   },
-  recommendations: [
-    "Practice scanning before receiving passes with 'shoulder checks'",
-    "Work on quick transition from defense to attack",
-  ],
-  compatibilityScore: 80,
-  movements: [
-    { name: "Sprint", current: 85, previous: 78, alternative: 90 },
-    { name: "Agility", current: 72, previous: 70, alternative: 75 },
-    { name: "Balance", current: 68, previous: 65, alternative: 72 },
-    { name: "Coordination", current: 75, previous: 71, alternative: 80 },
-    { name: "Acceleration", current: 80, previous: 75, alternative: 85 },
-  ],
   detailedSkills: {
     passing: 85,
     shooting: 72,
@@ -90,11 +111,19 @@ export const getPlayerComparison = (): PlayerComparison => ({
 
 export const getTrainingRecommendations = (): TrainingRecommendation[] => ([
   {
+    id: "tr-001",
+    title: "Passing Precision Program",
+    description: "Comprehensive program to improve all aspects of passing",
+    category: "Technical",
+    difficulty: 3,
+    estimatedTimeInMinutes: 45,
+    targetAreas: ["Passing", "Vision"],
+    expectedImprovement: 15,
+    // Additional properties needed by components
     area: "Passing Accuracy",
     intensity: "high",
     frequency: 3,
     duration: 45,
-    expectedImprovement: 15,
     exercises: [
       {
         name: "One-touch passing circuit",
@@ -109,11 +138,19 @@ export const getTrainingRecommendations = (): TrainingRecommendation[] => ([
     ]
   },
   {
+    id: "tr-002",
+    title: "Defensive Awareness Training",
+    description: "Sessions to improve defensive positioning and awareness",
+    category: "Tactical",
+    difficulty: 4,
+    estimatedTimeInMinutes: 60,
+    targetAreas: ["Defending", "Positioning"],
+    expectedImprovement: 20,
+    // Additional properties needed by components
     area: "Defensive Awareness",
     intensity: "medium",
     frequency: 2,
     duration: 30,
-    expectedImprovement: 20,
     exercises: [
       {
         name: "Defensive positioning drill",
@@ -128,11 +165,19 @@ export const getTrainingRecommendations = (): TrainingRecommendation[] => ([
     ]
   },
   {
+    id: "tr-003",
+    title: "Decision Making Under Pressure",
+    description: "Training to improve quick decision making in game situations",
+    category: "Mental",
+    difficulty: 3,
+    estimatedTimeInMinutes: 40,
+    targetAreas: ["Decision Making", "Composure"],
+    expectedImprovement: 25,
+    // Additional properties needed by components
     area: "Decision Making",
     intensity: "high",
     frequency: 3,
     duration: 40,
-    expectedImprovement: 25,
     exercises: [
       {
         name: "Small-sided games with constraints",

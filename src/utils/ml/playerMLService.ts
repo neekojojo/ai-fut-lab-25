@@ -41,6 +41,17 @@ export interface TrainingRecommendation {
   estimatedTimeInMinutes: number;
   targetAreas: string[];
   expectedImprovement: number;
+  
+  // Additional properties needed by components
+  area?: string;
+  intensity?: string;
+  frequency?: number; 
+  duration?: number;
+  exercises?: {
+    name: string;
+    description: string;
+    difficulty: string;
+  }[];
 }
 
 /**

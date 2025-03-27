@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NumberMovementChart from "./NumberMovementChart";
 import type { PlayerAnalysis } from "./AnalysisReport.d";
+import type { DataPoint } from "./charts/DataTypes";
 
 interface MovementAnalysisProps {
   analysis: PlayerAnalysis;
@@ -11,13 +12,13 @@ interface MovementAnalysisProps {
 
 const MovementAnalysis: React.FC<MovementAnalysisProps> = ({ analysis }) => {
   // Generate realistic movement data based on player position and skills
-  const generateMovementData = () => {
+  const generateMovementData = (): DataPoint[] => {
     const baseValues = {
-      Sprint: analysis.performance.physical - 5 + Math.floor(Math.random() * 10),
-      Agility: Math.min(90, analysis.performance.technical - 10 + Math.floor(Math.random() * 15)),
-      Balance: Math.min(95, analysis.performance.physical - 15 + Math.floor(Math.random() * 12)),
-      Coordination: Math.min(88, analysis.performance.technical - 5 + Math.floor(Math.random() * 10)),
-      Acceleration: Math.min(92, analysis.performance.physical - 2 + Math.floor(Math.random() * 8))
+      Sprint: (analysis.performance?.physical || 70) - 5 + Math.floor(Math.random() * 10),
+      Agility: Math.min(90, (analysis.performance?.technical || 70) - 10 + Math.floor(Math.random() * 15)),
+      Balance: Math.min(95, (analysis.performance?.physical || 70) - 15 + Math.floor(Math.random() * 12)),
+      Coordination: Math.min(88, (analysis.performance?.technical || 70) - 5 + Math.floor(Math.random() * 10)),
+      Acceleration: Math.min(92, (analysis.performance?.physical || 70) - 2 + Math.floor(Math.random() * 8))
     };
     
     return Object.entries(baseValues).map(([name, current]) => {
@@ -29,18 +30,18 @@ const MovementAnalysis: React.FC<MovementAnalysisProps> = ({ analysis }) => {
   };
 
   // Generate physical metrics data
-  const generatePhysicalData = () => {
+  const generatePhysicalData = (): DataPoint[] => {
     return [
-      { name: "Speed", current: analysis.performance.physical, previous: analysis.performance.physical - 7, alternative: analysis.performance.physical + 5 },
-      { name: "Strength", current: Math.min(95, analysis.performance.physical - 5), previous: Math.min(95, analysis.performance.physical - 12), alternative: Math.min(95, analysis.performance.physical + 3) },
-      { name: "Stamina", current: Math.min(90, analysis.performance.physical - 3), previous: Math.min(90, analysis.performance.physical - 8), alternative: Math.min(95, analysis.performance.physical + 7) },
-      { name: "Jumping", current: Math.min(85, analysis.performance.physical - 15), previous: Math.min(85, analysis.performance.physical - 20), alternative: Math.min(90, analysis.performance.physical - 8) },
-      { name: "Agility", current: Math.min(92, analysis.performance.technical - 5), previous: Math.min(92, analysis.performance.technical - 10), alternative: Math.min(96, analysis.performance.technical + 2) },
+      { name: "Speed", current: analysis.performance?.physical || 70, previous: (analysis.performance?.physical || 70) - 7, alternative: (analysis.performance?.physical || 70) + 5 },
+      { name: "Strength", current: Math.min(95, (analysis.performance?.physical || 70) - 5), previous: Math.min(95, (analysis.performance?.physical || 70) - 12), alternative: Math.min(95, (analysis.performance?.physical || 70) + 3) },
+      { name: "Stamina", current: Math.min(90, (analysis.performance?.physical || 70) - 3), previous: Math.min(90, (analysis.performance?.physical || 70) - 8), alternative: Math.min(95, (analysis.performance?.physical || 70) + 7) },
+      { name: "Jumping", current: Math.min(85, (analysis.performance?.physical || 70) - 15), previous: Math.min(85, (analysis.performance?.physical || 70) - 20), alternative: Math.min(90, (analysis.performance?.physical || 70) - 8) },
+      { name: "Agility", current: Math.min(92, (analysis.performance?.technical || 70) - 5), previous: Math.min(92, (analysis.performance?.technical || 70) - 10), alternative: Math.min(96, (analysis.performance?.technical || 70) + 2) },
     ];
   };
 
   // Generate skill comparison data based on player position
-  const generateSkillData = () => {
+  const generateSkillData = (): DataPoint[] => {
     const detailedSkills = analysis.detailedSkills || {};
     
     let skills = [
@@ -79,9 +80,12 @@ const MovementAnalysis: React.FC<MovementAnalysisProps> = ({ analysis }) => {
   };
 
   // Generate data based on analysis
-  const movementsData = analysis.movements || generateMovementData();
-  const skillComparisonData = generateSkillData();
-  const physicalData = generatePhysicalData();
+  const movementsData: DataPoint[] = analysis.movements && analysis.movements.length > 0 && 'name' in analysis.movements[0] 
+    ? analysis.movements as unknown as DataPoint[] 
+    : generateMovementData();
+    
+  const skillComparisonData: DataPoint[] = generateSkillData();
+  const physicalData: DataPoint[] = generatePhysicalData();
 
   // Descriptions for each chart
   const movementDescription = "Analysis of player's movement efficiency including sprint speed, agility, balance, coordination, and acceleration compared to previous assessment and potential improvements.";
