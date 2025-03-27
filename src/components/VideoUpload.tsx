@@ -48,7 +48,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({
   const processFile = (file: File) => {
     // Check if file is a video
     if (!file.type.startsWith('video/')) {
-      alert('Please upload a video file');
+      alert('يرجى تحميل ملف فيديو');
       return;
     }
 
@@ -57,17 +57,14 @@ const VideoUpload: React.FC<VideoUploadProps> = ({
     // Create preview URL
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
+    
+    // Pass the file to parent
+    onUpload(file);
   };
 
   const handleUploadClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
-    }
-  };
-
-  const handleAnalyzeClick = () => {
-    if (selectedFile) {
-      onUpload(selectedFile);
     }
   };
 
@@ -100,15 +97,15 @@ const VideoUpload: React.FC<VideoUploadProps> = ({
                 </svg>
               </div>
               <div className="space-y-2">
-                <h3 className="text-lg font-medium">Upload your football video</h3>
+                <h3 className="text-lg font-medium">قم بتحميل فيديو كرة القدم الخاص بك</h3>
                 <p className="text-sm text-muted-foreground max-w-md">
-                  Drag and drop your video file here, or click to select a file. We support MP4, MOV, and AVI formats.
+                  اسحب وأفلت ملف الفيديو هنا، أو انقر لاختيار ملف. نحن ندعم تنسيقات MP4 وMOV وAVI.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={handleUploadClick}
-                className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors inline-flex items-center space-x-2"
+                className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors inline-flex items-center space-x-2 rtl:space-x-reverse"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -124,7 +121,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({
                   <polyline points="17 8 12 3 7 8" />
                   <line x1="12" y1="3" x2="12" y2="15" />
                 </svg>
-                <span>Select Video</span>
+                <span>اختر فيديو</span>
               </button>
               <input
                 type="file"
@@ -150,25 +147,6 @@ const VideoUpload: React.FC<VideoUploadProps> = ({
                     {(selectedFile?.size && (selectedFile.size / (1024 * 1024)).toFixed(2)) || 0} MB
                   </p>
                 </div>
-                <button
-                  onClick={handleAnalyzeClick}
-                  className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors inline-flex items-center space-x-2"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="w-4 h-4"
-                  >
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                    <polyline points="22 4 12 14.01 9 11.01" />
-                  </svg>
-                  <span>Analyze Performance</span>
-                </button>
               </div>
             </div>
           )}
