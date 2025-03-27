@@ -26,7 +26,6 @@ const VideoUpload: React.FC<VideoUploadProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Simulate upload progress for better UX
   useEffect(() => {
     return () => {
       if (progressIntervalRef.current) {
@@ -80,8 +79,6 @@ const VideoUpload: React.FC<VideoUploadProps> = ({
       return;
     }
 
-    // Removed file size check here
-
     setSelectedFile(file);
     
     // Create preview URL
@@ -91,7 +88,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
     
-    // Simulate upload progress
+    // Simulate a quick upload progress
     setIsUploading(true);
     setUploadProgress(0);
     
@@ -99,6 +96,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({
       clearInterval(progressIntervalRef.current);
     }
     
+    // Faster progress increment for better user experience
     progressIntervalRef.current = setInterval(() => {
       setUploadProgress(prev => {
         if (prev >= 100) {
@@ -107,13 +105,14 @@ const VideoUpload: React.FC<VideoUploadProps> = ({
             progressIntervalRef.current = null;
           }
           setIsUploading(false);
-          // Pass the file to parent
+          // Pass the file to parent immediately
           onUpload(file);
           return 100;
         }
-        return prev + 5;
+        // Increase progress faster - 10% increments
+        return prev + 10;
       });
-    }, 150);
+    }, 50); // Reduced interval time for faster progress
   };
 
   const handleRemoveFile = () => {

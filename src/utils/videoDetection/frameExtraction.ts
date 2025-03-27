@@ -1,8 +1,8 @@
 
-// Helper function to extract a specific number of frames from a video
+// Helper function to extract a specific number of frames from a video - optimized for speed
 export const extractVideoFrames = async (
   videoFile: File,
-  frameCount: number = 30
+  frameCount: number = 15 // Reduced default frame count for faster processing
 ): Promise<ImageBitmap[]> => {
   return new Promise((resolve, reject) => {
     const video = document.createElement('video');
@@ -26,16 +26,20 @@ export const extractVideoFrames = async (
       const processFrame = (currentTime: number) => {
         // Create canvas to capture video frame
         const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        // Use a lower resolution for faster processing
+        const scaleFactor = 0.75; // Reduce resolution to 75%
+        canvas.width = video.videoWidth * scaleFactor;
+        canvas.height = video.videoHeight * scaleFactor;
         const ctx = canvas.getContext('2d');
         
         if (ctx) {
-          // Draw current frame to canvas
-          ctx.drawImage(video, 0, 0);
+          // Draw current frame to canvas at reduced resolution
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           
-          // Convert canvas to ImageBitmap
-          createImageBitmap(canvas)
+          // Convert canvas to ImageBitmap with optimized settings
+          createImageBitmap(canvas, {
+            resizeQuality: 'low' // Use lower quality for faster processing
+          })
             .then(imageBitmap => {
               frames.push(imageBitmap);
               framesProcessed++;
@@ -46,7 +50,7 @@ export const extractVideoFrames = async (
                 URL.revokeObjectURL(videoURL);
                 resolve(frames);
               } else {
-                // Move to next frame
+                // Move to next frame - use larger intervals to reduce processing
                 video.currentTime = Math.min(video.duration, (framesProcessed + 1) * frameInterval);
               }
             })
