@@ -14,7 +14,7 @@ import MovementAnalysis from "./components/MovementAnalysis";
 
 const queryClient = new QueryClient();
 
-// Simple authentication guard component
+// Improved authentication guard component
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   
@@ -22,6 +22,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
     return <div className="flex items-center justify-center min-h-screen">جاري التحميل...</div>;
   }
   
+  // Use replace: true to avoid adding to history stack
   return user ? <>{children}</> : <Navigate to="/sign-in" replace />;
 };
 

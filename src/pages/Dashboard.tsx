@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UserProfile, PlayerAnalysis, TrainingVideo } from '@/components/AnalysisReport.d';
+import { UserProfile, TrainingVideo } from '@/components/AnalysisReport.d';
 import OverviewTab from '@/components/dashboard/tabs/OverviewTab';
 import AnalysesTab from '@/components/dashboard/tabs/AnalysesTab';
 import TrainingTab from '@/components/dashboard/tabs/TrainingTab';
@@ -83,19 +83,21 @@ const Dashboard: React.FC = () => {
   const [trainingVideos, setTrainingVideos] = useState<TrainingVideo[]>([]);
   const [activeTab, setActiveTab] = useState("overview");
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
 
-  // Load dashboard data only when we have a user
+  // Load dashboard data only if we have a confirmed authenticated user
   useEffect(() => {
-    if (user) {
-      // In a real app, we would fetch the user profile from an API
-      setUserProfile(mockUserProfile);
-      setTrainingVideos(mockTrainingVideos);
-    } else {
-      // If no user, redirect once to sign-in
-      navigate('/sign-in', { replace: true });
+    if (!loading) {
+      if (user) {
+        // In a real app, we would fetch the user profile from an API
+        setUserProfile(mockUserProfile);
+        setTrainingVideos(mockTrainingVideos);
+      } else {
+        // If no user and not loading, redirect to sign-in
+        navigate('/sign-in', { replace: true });
+      }
     }
-  }, [user, navigate]);
+  }, [user, navigate, loading]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -103,8 +105,8 @@ const Dashboard: React.FC = () => {
   };
 
   // Show loading state while checking authentication
-  if (!userProfile) {
-    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+  if (loading || !userProfile) {
+    return <div className="flex justify-center items-center min-h-screen">جاري التحميل...</div>;
   }
 
   return (

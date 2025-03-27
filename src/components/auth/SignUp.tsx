@@ -16,14 +16,14 @@ const SignUp: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { signUp, user } = useAuth();
+  const { signUp, user, loading } = useAuth();
 
-  // Only redirect if the user is already logged in
+  // Only check for user authentication when auth is not loading
   useEffect(() => {
-    if (user) {
+    if (!loading && user) {
       navigate('/dashboard', { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, loading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +47,15 @@ const SignUp: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  // Don't render the form if we're still loading auth state or user is already authenticated
+  if (loading) {
+    return <div className="flex justify-center items-center min-h-screen">جاري التحميل...</div>;
+  }
+
+  if (user) {
+    return null; // Will be redirected by useEffect
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
