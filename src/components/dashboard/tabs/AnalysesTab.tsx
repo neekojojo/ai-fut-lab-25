@@ -5,13 +5,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { PlayerAnalysis } from '@/components/AnalysisReport.d';
+import { Loader2 } from "lucide-react";
 
 interface AnalysesTabProps {
   analyses: PlayerAnalysis[];
+  isLoading?: boolean;
 }
 
-const AnalysesTab: React.FC<AnalysesTabProps> = ({ analyses }) => {
+const AnalysesTab: React.FC<AnalysesTabProps> = ({ analyses, isLoading = false }) => {
   const navigate = useNavigate();
+  
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-48">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2">جاري تحميل التحليلات...</span>
+      </div>
+    );
+  }
   
   return (
     <div className="space-y-6">
@@ -57,7 +68,7 @@ const AnalysesTab: React.FC<AnalysesTabProps> = ({ analyses }) => {
                     </div>
                     
                     <div className="mt-4 flex justify-end">
-                      <Button variant="outline" size="sm" onClick={() => navigate(`/analysis/${index}`)}>
+                      <Button variant="outline" size="sm" onClick={() => navigate(`/movement-analysis`)}>
                         View Full Analysis
                       </Button>
                     </div>

@@ -11,34 +11,10 @@ import TrainingTab from '@/components/dashboard/tabs/TrainingTab';
 import BadgesTab from '@/components/dashboard/tabs/BadgesTab';
 import ProfileTab from '@/components/dashboard/tabs/ProfileTab';
 import { useAuth } from '@/components/auth/AuthContext';
+import { fetchPlayerAnalyses } from '@/services/playerAnalysisService';
+import { useToast } from '@/components/ui/use-toast';
 
-// Mock data
-const mockUserProfile: UserProfile = {
-  id: "user1",
-  email: "user@example.com",
-  name: "John Doe",
-  analyses: [],
-  badges: [
-    {
-      name: "First Analysis",
-      description: "Completed your first player analysis",
-      level: "bronze",
-      earnedAt: new Date()
-    },
-    {
-      name: "Technique Master",
-      description: "Achieved high technical score in analysis",
-      level: "silver",
-      earnedAt: new Date()
-    }
-  ],
-  trainingProgress: {
-    videosWatched: 3,
-    skillsImproved: ["passing", "ball control"],
-    nextRecommendation: "Work on shooting accuracy"
-  }
-};
-
+// Mock data for training videos and base user profile
 const mockTrainingVideos: TrainingVideo[] = [
   {
     id: "1",
@@ -82,22 +58,83 @@ const Dashboard: React.FC = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [trainingVideos, setTrainingVideos] = useState<TrainingVideo[]>([]);
   const [activeTab, setActiveTab] = useState("overview");
+  const [isLoadingAnalyses, setIsLoadingAnalyses] = useState(false);
   const navigate = useNavigate();
   const { user, loading, signOut } = useAuth();
+  const { toast } = useToast();
 
   // Load dashboard data only if we have a confirmed authenticated user
   useEffect(() => {
     if (!loading) {
       if (user) {
-        // In a real app, we would fetch the user profile from an API
-        setUserProfile(mockUserProfile);
+        // Set initial user profile with mock data
+        const initialProfile: UserProfile = {
+          id: user.id,
+          email: user.email || '',
+          name: user.user_metadata?.full_name || 'User',
+          analyses: [], // Will be populated from API
+          badges: [
+            {
+              name: "First Analysis",
+              description: "Completed your first player analysis",
+              level: "bronze",
+              earnedAt: new Date()
+            },
+            {
+              name: "Technique Master",
+              description: "Achieved high technical score in analysis",
+              level: "silver",
+              earnedAt: new Date()
+            }
+          ],
+          trainingProgress: {
+            videosWatched: 3,
+            skillsImproved: ["passing", "ball control"],
+            nextRecommendation: "Work on shooting accuracy"
+          }
+        };
+        
+        setUserProfile(initialProfile);
         setTrainingVideos(mockTrainingVideos);
+        
+        // Fetch real analyses from Supabase
+        fetchUserAnalyses();
       } else {
         // If no user and not loading, redirect to sign-in
         navigate('/sign-in', { replace: true });
       }
     }
   }, [user, navigate, loading]);
+
+  const fetchUserAnalyses = async () => {
+    if (!user) return;
+    
+    setIsLoadingAnalyses(true);
+    try {
+      const analyses = await fetchPlayerAnalyses();
+      console.log('Fetched analyses:', analyses);
+      
+      // Update the user profile with the fetched analyses
+      setUserProfile(prevProfile => {
+        if (prevProfile) {
+          return {
+            ...prevProfile,
+            analyses: analyses
+          };
+        }
+        return prevProfile;
+      });
+    } catch (error) {
+      console.error('Error fetching analyses:', error);
+      toast({
+        title: "خطأ في تحميل التحليلات",
+        description: "لم نتمكن من تحميل تحليلاتك السابقة. يرجى المحاولة مرة أخرى.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingAnalyses(false);
+    }
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -132,11 +169,17 @@ const Dashboard: React.FC = () => {
           </TabsList>
           
           <TabsContent value="overview">
-            <OverviewTab userProfile={userProfile} trainingVideos={trainingVideos} />
+            <OverviewTab 
+              userProfile={userProfile} 
+              trainingVideos={trainingVideos} 
+            />
           </TabsContent>
           
           <TabsContent value="analyses">
-            <AnalysesTab analyses={userProfile.analyses} />
+            <AnalysesTab 
+              analyses={userProfile.analyses} 
+              isLoading={isLoadingAnalyses} 
+            />
           </TabsContent>
           
           <TabsContent value="training">
