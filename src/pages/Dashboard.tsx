@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -100,7 +101,7 @@ const Dashboard: React.FC = () => {
         email: user.email || '',
         name: data.full_name || user.user_metadata?.full_name || 'User',
         avatarUrl: data.avatar_url || null,
-        bio: data.bio || '',
+        bio: data.bio || '', // This now properly handles the bio field from the database
         analyses: [],
         badges: [
           {
@@ -138,7 +139,7 @@ const Dashboard: React.FC = () => {
           email: user.email || '',
           name: user.user_metadata?.full_name || 'User',
           avatarUrl: null,
-          bio: '',
+          bio: '', // Add default empty bio for the default profile as well
           analyses: [],
           badges: [],
           trainingProgress: {
