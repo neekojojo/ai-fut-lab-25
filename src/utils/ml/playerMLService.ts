@@ -30,6 +30,20 @@ export interface PlayerComparison {
 }
 
 /**
+ * واجهة توصيات التدريب
+ */
+export interface TrainingRecommendation {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  difficulty: number;
+  estimatedTimeInMinutes: number;
+  targetAreas: string[];
+  expectedImprovement: number;
+}
+
+/**
  * خدمة تحليل اللاعبين ومقارنتهم باستخدام التعلم الآلي
  */
 export const playerMLService = {
@@ -68,5 +82,45 @@ export const playerMLService = {
     return {
       result: "تحليل الفيديو غير متاح حالياً"
     };
+  },
+
+  /**
+   * الحصول على توصيات تدريبية مخصصة
+   */
+  getTrainingRecommendations: async (playerData: any): Promise<TrainingRecommendation[]> => {
+    // في المستقبل سيكون هذا متصلاً بواجهة برمجة التطبيقات
+    // حاليًا نعود بيانات نموذجية
+    return [
+      {
+        id: "tr-001",
+        title: "تمارين دقة التمرير",
+        description: "مجموعة من التمارين لتحسين دقة التمرير في مختلف المسافات",
+        category: "مهارات تقنية",
+        difficulty: 3,
+        estimatedTimeInMinutes: 45,
+        targetAreas: ["التمرير", "التحكم بالكرة"],
+        expectedImprovement: 15
+      },
+      {
+        id: "tr-002",
+        title: "تمارين القوة والتوازن",
+        description: "تدريبات لتحسين القوة الجسدية والتوازن أثناء المواجهات",
+        category: "لياقة بدنية",
+        difficulty: 4,
+        estimatedTimeInMinutes: 60,
+        targetAreas: ["القوة", "التوازن", "المواجهات"],
+        expectedImprovement: 20
+      },
+      {
+        id: "tr-003",
+        title: "تحسين التموضع الدفاعي",
+        description: "تدريبات تكتيكية لتحسين موقع اللاعب أثناء الدفاع",
+        category: "تكتيك",
+        difficulty: 3,
+        estimatedTimeInMinutes: 50,
+        targetAreas: ["التموضع", "القراءة التكتيكية"],
+        expectedImprovement: 18
+      }
+    ];
   }
 };

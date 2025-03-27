@@ -27,30 +27,18 @@ const Header = () => {
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
-              <Link to="/" legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  الصفحة الرئيسية
-                </NavigationMenuLink>
-              </Link>
+              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                <Link to="/">الصفحة الرئيسية</Link>
+              </NavigationMenuLink>
             </NavigationMenuItem>
             
             {user && (
               <NavigationMenuItem>
-                <Link to="/dashboard" legacyBehavior passHref>
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    لوحة التحكم
-                  </NavigationMenuLink>
-                </Link>
+                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                  <Link to="/dashboard">لوحة التحكم</Link>
+                </NavigationMenuLink>
               </NavigationMenuItem>
             )}
-            
-            <NavigationMenuItem>
-              <Link to="/api-test" legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  اختبار API
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
 

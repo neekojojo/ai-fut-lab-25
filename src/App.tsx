@@ -5,7 +5,6 @@ import Dashboard from './pages/Dashboard';
 import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
 import NotFound from './pages/NotFound';
-import ApiTest from './pages/ApiTest';
 import { Toaster } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/components/auth/AuthContext';
@@ -31,7 +30,6 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/sign-up" element={<SignUp />} />
-            <Route path="/api-test" element={<ApiTest />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Toaster />
