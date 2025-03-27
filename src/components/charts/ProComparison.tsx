@@ -14,7 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CHART_COLORS } from './constants';
 import { PlayerComparison } from '@/utils/ml/playerMLService';
 import { professionalPlayerService } from '@/services/professionalPlayerService';
-import { PlayerStats } from '@/utils/dataProcessing/playerMLService';
+import { PlayerStats } from '@/utils/dataProcessing/playerAnalysisTypes';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Search, RefreshCw } from 'lucide-react';
