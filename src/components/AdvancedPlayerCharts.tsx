@@ -13,6 +13,7 @@ import { ProgressCharts } from './charts/ProgressCharts';
 interface AdvancedPlayerChartsProps {
   playerStats: PlayerStats;
   playerName?: string;
+  playerPosition?: string;
   trainingRecommendations?: TrainingRecommendation[];
   playerComparison?: PlayerComparison;
 }
@@ -20,6 +21,7 @@ interface AdvancedPlayerChartsProps {
 export const AdvancedPlayerCharts: React.FC<AdvancedPlayerChartsProps> = ({
   playerStats,
   playerName = "Player",
+  playerPosition,
   trainingRecommendations,
   playerComparison,
 }) => {
@@ -42,7 +44,11 @@ export const AdvancedPlayerCharts: React.FC<AdvancedPlayerChartsProps> = ({
         </TabsContent>
         
         <TabsContent value="comparison" className="space-y-4">
-          <ProComparison playerComparison={playerComparison} />
+          <ProComparison 
+            playerComparison={playerComparison} 
+            playerStats={playerStats}
+            playerPosition={playerPosition}
+          />
         </TabsContent>
         
         <TabsContent value="training" className="space-y-4">

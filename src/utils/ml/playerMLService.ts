@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 import { PlayerStats } from "../dataProcessing/playerDataAnalysis";
 
@@ -210,9 +209,37 @@ export class PlayerMLService {
     playerStats: PlayerStats,
     position?: string
   ): Promise<PlayerComparison> {
-    console.log('Finding similar players using CNN feature extraction');
+    console.log('Finding similar players using API data and CNN feature extraction');
     
-    // Mock CNN player comparison
+    try {
+      // First try to get data from the API
+      const { professionalPlayerService } = await import('@/services/professionalPlayerService');
+      
+      // Convert player stats to attributes format expected by the API
+      const attributes = {
+        speed: playerStats.maxSpeed / 200 * 100, // normalize to 0-100
+        acceleration: playerStats.avgAcceleration / 50 * 100,
+        endurance: playerStats.distanceCovered / 5000 * 100,
+        balance: playerStats.balanceScore,
+        technical: playerStats.technicalScore,
+        physical: playerStats.physicalScore,
+        efficiency: playerStats.movementEfficiency
+      };
+      
+      const apiResult = await professionalPlayerService.getSimilarPlayers(attributes, position);
+      
+      if (apiResult) {
+        return apiResult;
+      }
+      
+      // Fallback to mock data if API call fails
+      console.log('API call failed, using mock CNN player comparison');
+    } catch (error) {
+      console.error('Error fetching professional player comparison from API:', error);
+      console.log('Falling back to mock CNN player comparison');
+    }
+    
+    // Mock CNN player comparison as fallback
     // In real-world, this would use an actual CNN model for feature extraction
     
     // Mock database of professional players with stats

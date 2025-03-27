@@ -31,7 +31,8 @@ const AnalysisContent: React.FC<AnalysisContentProps> = ({
         ) : activeTab === 'charts' ? (
           <AdvancedPlayerCharts 
             playerStats={playerStats} 
-            playerName={mockAnalysis.playerName} 
+            playerName={mockAnalysis.playerName}
+            playerPosition={mockAnalysis.position}
             trainingRecommendations={trainingRecommendations}
             playerComparison={playerComparison}
           />
