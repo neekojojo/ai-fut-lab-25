@@ -24,7 +24,9 @@ const RecommendedTraining: React.FC<RecommendedTrainingProps> = ({ trainingVideo
             <li key={video.id} className="flex justify-between items-center">
               <div>
                 <p className="font-medium">{video.title}</p>
-                <p className="text-sm text-muted-foreground">{video.skill} • {video.duration} min</p>
+                <p className="text-sm text-muted-foreground">
+                  {video.category || video.skill || video.targetAreas[0]} • {video.duration} min
+                </p>
               </div>
               <Button variant="outline" size="sm" onClick={() => navigate(`/training/${video.id}`)}>
                 Watch

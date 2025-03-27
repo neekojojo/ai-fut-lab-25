@@ -109,6 +109,7 @@ export interface Badge {
   name: string;
   description: string;
   level: 'bronze' | 'silver' | 'gold';
+  earnedAt?: Date;
 }
 
 export interface PlayerAnalysis {
@@ -152,8 +153,8 @@ export interface UserProfile {
   name: string;
   email: string;
   avatarUrl?: string;
-  role: string;
-  createdAt: string;
+  role?: string;
+  createdAt?: string;
   lastLogin?: string;
   teamId?: string;
   position?: string;
@@ -161,6 +162,15 @@ export interface UserProfile {
     plan: string;
     status: string;
     nextBillingDate?: string;
+  };
+  
+  // Properties required by dashboard components
+  analyses: PlayerAnalysis[];
+  badges: Badge[];
+  trainingProgress: {
+    videosWatched: number;
+    skillsImproved: string[];
+    nextRecommendation: string;
   };
 }
 
@@ -171,15 +181,42 @@ export interface TrainingVideo {
   thumbnailUrl: string;
   videoUrl: string;
   duration: number;
-  category: string;
+  category?: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   targetAreas: string[];
-  createdAt: string;
-  views: number;
-  favorites: number;
+  createdAt?: string;
+  views?: number;
+  favorites?: number;
+  // Properties used in dashboard components
+  skill?: string;
+  rating?: number;
   coach?: {
     name: string;
     avatarUrl?: string;
     title?: string;
   };
+}
+
+export interface TrainingExercise {
+  name: string;
+  description: string;
+  difficulty: string;
+}
+
+export interface TrainingRecommendation {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  difficulty: number;
+  estimatedTimeInMinutes: number;
+  targetAreas: string[];
+  expectedImprovement: number;
+  
+  // Additional properties needed by components
+  area?: string;
+  intensity?: string;
+  frequency?: number; 
+  duration?: number;
+  exercises?: TrainingExercise[];
 }

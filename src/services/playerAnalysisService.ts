@@ -1,12 +1,15 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { PlayerAnalysis } from '@/components/AnalysisReport.d';
 
 // تحويل تحليل اللاعب من القاعدة إلى نموذج الواجهة
 const mapToPlayerAnalysis = (dbAnalysis: any): PlayerAnalysis => {
   return {
+    id: dbAnalysis.id || '',
     playerName: dbAnalysis.player_name,
     position: dbAnalysis.position || '',
+    timestamp: dbAnalysis.created_at || new Date().toISOString(),
+    duration: dbAnalysis.duration || 0,
+    confidence: dbAnalysis.confidence || 0.8,
     marketValue: '$' + (dbAnalysis.talent_score || 0) * 100000, // مجرد مثال لتحويل درجة الموهبة إلى قيمة سوقية
     talentScore: dbAnalysis.talent_score || 0,
     strengths: dbAnalysis.strengths || [],
@@ -17,8 +20,32 @@ const mapToPlayerAnalysis = (dbAnalysis: any): PlayerAnalysis => {
       tactical: dbAnalysis.tactical_score || 0,
       mental: dbAnalysis.mental_score || 0
     },
+    stats: {
+      pace: dbAnalysis.physical_score || 70,
+      shooting: dbAnalysis.technical_score || 70,
+      passing: dbAnalysis.technical_score || 70,
+      dribbling: dbAnalysis.technical_score || 70,
+      defending: dbAnalysis.tactical_score || 70,
+      physical: dbAnalysis.physical_score || 70,
+      stamina: dbAnalysis.physical_score || 70,
+      acceleration: dbAnalysis.physical_score || 70,
+      agility: dbAnalysis.physical_score || 70,
+      balance: dbAnalysis.physical_score || 70,
+      ballControl: dbAnalysis.technical_score || 70,
+      decision: dbAnalysis.tactical_score || 70,
+      anticipation: dbAnalysis.tactical_score || 70,
+      positioning: dbAnalysis.tactical_score || 70,
+      vision: dbAnalysis.tactical_score || 70,
+      composure: dbAnalysis.mental_score || 70
+    },
     recommendations: dbAnalysis.recommendations || [],
-    compatibilityScore: dbAnalysis.compatibility_score || 0
+    compatibilityScore: dbAnalysis.compatibility_score || 0,
+    summary: dbAnalysis.summary || '',
+    advancedInsights: [],
+    movements: [],
+    passes: [],
+    heatmap: [],
+    performanceScore: dbAnalysis.technical_score || 0
   };
 };
 

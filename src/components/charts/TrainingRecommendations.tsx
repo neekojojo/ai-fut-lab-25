@@ -24,11 +24,18 @@ export const TrainingRecommendations: React.FC<TrainingRecommendationsProps> = (
   // Default training recommendations if none provided
   const defaultRecommendations: TrainingRecommendation[] = [
     {
+      id: "tr-001",
+      title: "Passing Precision Program",
+      description: "Comprehensive program to improve all aspects of passing",
+      category: "Technical",
+      difficulty: 3,
+      estimatedTimeInMinutes: 45,
+      targetAreas: ["Passing", "Vision"],
+      expectedImprovement: 15,
       area: "Passing Accuracy",
       intensity: "high",
       frequency: 3,
       duration: 45,
-      expectedImprovement: 15,
       exercises: [
         {
           name: "One-touch passing circuit",
@@ -43,11 +50,18 @@ export const TrainingRecommendations: React.FC<TrainingRecommendationsProps> = (
       ]
     },
     {
+      id: "tr-002",
+      title: "Defensive Awareness Training",
+      description: "Sessions to improve defensive positioning and awareness",
+      category: "Tactical",
+      difficulty: 4,
+      estimatedTimeInMinutes: 60,
+      targetAreas: ["Defending", "Positioning"],
+      expectedImprovement: 20,
       area: "Defensive Awareness",
       intensity: "medium",
       frequency: 2,
       duration: 30,
-      expectedImprovement: 20,
       exercises: [
         {
           name: "Defensive positioning drill",
@@ -62,11 +76,18 @@ export const TrainingRecommendations: React.FC<TrainingRecommendationsProps> = (
       ]
     },
     {
+      id: "tr-003",
+      title: "Decision Making Under Pressure",
+      description: "Training to improve quick decision making in game situations",
+      category: "Mental",
+      difficulty: 3,
+      estimatedTimeInMinutes: 40,
+      targetAreas: ["Decision Making", "Composure"],
+      expectedImprovement: 25,
       area: "Decision Making",
       intensity: "high",
       frequency: 3,
       duration: 40,
-      expectedImprovement: 25,
       exercises: [
         {
           name: "Small-sided games with constraints",
@@ -87,9 +108,9 @@ export const TrainingRecommendations: React.FC<TrainingRecommendationsProps> = (
 
   // Prepare data for the improvement potential chart
   const improvementData = recommendations.map(rec => ({
-    area: rec.area.split(' ')[0], // Get just the first word for better display
+    area: rec.area?.split(' ')[0] || 'Area', // Get just the first word for better display
     potential: rec.expectedImprovement,
-    sessions: rec.frequency,
+    sessions: rec.frequency || 0,
   }));
 
   return (
@@ -126,14 +147,16 @@ export const TrainingRecommendations: React.FC<TrainingRecommendationsProps> = (
         {recommendations.map((rec, index) => (
           <Card key={index}>
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">{rec.area}</CardTitle>
+              <CardTitle className="text-base">{rec.area || rec.title}</CardTitle>
               <CardDescription>
-                {rec.intensity} intensity, {rec.frequency}x per week, {rec.duration} min
+                {rec.intensity && rec.frequency && rec.duration ? 
+                  `${rec.intensity} intensity, ${rec.frequency}x per week, ${rec.duration} min` : 
+                  rec.description}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2 text-sm">
-                {rec.exercises.map((ex, i) => (
+                {rec.exercises?.map((ex, i) => (
                   <li key={i} className="border-l-2 border-primary pl-3 py-1">
                     <div className="font-medium">{ex.name}</div>
                     <div className="text-xs text-muted-foreground">{ex.description}</div>

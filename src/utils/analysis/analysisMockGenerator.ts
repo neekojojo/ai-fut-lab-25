@@ -201,10 +201,32 @@ export const generateEnhancedAnalysis = (): PlayerAnalysis => {
   
   // Generate base analysis
   const analysis: PlayerAnalysis = {
+    id: "mock-analysis-" + Math.random().toString(36).substring(2, 9),
     playerName: "John Doe", // In a real app, we would detect or ask for the player's name
     position,
+    timestamp: new Date().toISOString(),
+    duration: 120, // 2 minutes analysis
+    confidence: 0.85,
     marketValue,
     talentScore,
+    stats: {
+      pace: physicalScore,
+      shooting: technicalScore - 5,
+      passing: technicalScore + 5,
+      dribbling: technicalScore,
+      defending: tacticalScore,
+      physical: physicalScore,
+      stamina: physicalScore + 5,
+      acceleration: physicalScore - 5,
+      agility: physicalScore,
+      balance: physicalScore - 3,
+      ballControl: technicalScore + 2,
+      decision: mentalScore,
+      anticipation: mentalScore - 2,
+      positioning: tacticalScore + 2,
+      vision: mentalScore + 5,
+      composure: mentalScore
+    },
     strengths: selectedStrengths,
     weaknesses: selectedWeaknesses,
     detailedSkills: skillsByPosition[position],
@@ -220,7 +242,13 @@ export const generateEnhancedAnalysis = (): PlayerAnalysis => {
       name: comparablePro.name,
       similarity: Math.floor(Math.random() * 30) + 40, // 40-70% similarity
       skills: comparablePro.skills
-    }
+    },
+    summary: "Player shows promising skills and attributes for their position.",
+    advancedInsights: ["Good movement off the ball", "Strong spatial awareness"],
+    movements: [],
+    passes: [],
+    heatmap: [],
+    performanceScore: talentScore
   };
   
   // Add injury risk assessment
