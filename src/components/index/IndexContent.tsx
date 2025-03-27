@@ -15,9 +15,10 @@ import AnalysisService from '@/services/AnalysisService';
 
 interface IndexContentProps {
   navigate: NavigateFunction;
+  isMobile: boolean;
 }
 
-const IndexContent: React.FC<IndexContentProps> = ({ navigate }) => {
+const IndexContent: React.FC<IndexContentProps> = ({ navigate, isMobile }) => {
   const [analysisState, setAnalysisState] = useState<'idle' | 'model-selection' | 'processing' | 'complete' | 'detailed-analysis'>('idle');
   const [progress, setProgress] = useState(0);
   const [stage, setStage] = useState('');
@@ -89,13 +90,14 @@ const IndexContent: React.FC<IndexContentProps> = ({ navigate }) => {
   };
 
   return (
-    <main className="flex-1 container mx-auto py-8 px-4 md:px-6 md:py-12">
+    <main className={`flex-1 container mx-auto ${isMobile ? 'py-4 px-3' : 'py-8 px-4 md:px-6 md:py-12'}`}>
       {analysisState === 'idle' && !showPeopleDetection && (
         <HeroContent 
           user={user} 
           onVideoUpload={handleVideoUpload}
           onTogglePeopleDetection={togglePeopleDetection}
           onGoToDashboard={handleGoToDashboard}
+          isMobile={isMobile}
         />
       )}
       
@@ -104,12 +106,13 @@ const IndexContent: React.FC<IndexContentProps> = ({ navigate }) => {
           videoFile={videoFile}
           onSelectModel={handleSelectModel}
           onAnalyzeWithAI={handleAnalyzeWithAI}
+          isMobile={isMobile}
         />
       )}
       
       {showPeopleDetection && analysisState === 'idle' && (
         <div className="space-y-6">
-          <div className="flex justify-between items-center">
+          <div className={`flex justify-between items-center ${isMobile ? 'flex-col gap-3' : ''}`}>
             <h2 className="text-2xl font-bold">اكتشاف الأشخاص في الفيديو</h2>
             <button
               onClick={togglePeopleDetection}
@@ -124,7 +127,7 @@ const IndexContent: React.FC<IndexContentProps> = ({ navigate }) => {
       )}
       
       {analysisState === 'processing' && (
-        <AnalysisProcessing progress={progress} stage={stage} />
+        <AnalysisProcessing progress={progress} stage={stage} isMobile={isMobile} />
       )}
       
       {analysisState === 'complete' && analysis && (

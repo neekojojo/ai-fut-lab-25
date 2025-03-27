@@ -1,9 +1,13 @@
 
 import React from 'react';
 
-export const FeaturesGrid = () => {
+interface FeaturesGridProps {
+  isMobile?: boolean;
+}
+
+export const FeaturesGrid: React.FC<FeaturesGridProps> = ({ isMobile }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto animate-slide-up">
+    <div className={`grid grid-cols-1 ${isMobile ? 'gap-6' : 'md:grid-cols-3 gap-8'} max-w-4xl mx-auto animate-slide-up`}>
       <FeatureCard 
         title="Technical Analysis"
         description="Our AI evaluates passing, shooting, dribbling, and other technical skills with precision."
@@ -22,6 +26,7 @@ export const FeaturesGrid = () => {
             <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
           </svg>
         }
+        isMobile={isMobile}
       />
       
       <FeatureCard 
@@ -44,6 +49,7 @@ export const FeaturesGrid = () => {
             <path d="M2 19.5C2 21.4 3.5 22 5 22c4 0 8.5-6 9-11.5" />
           </svg>
         }
+        isMobile={isMobile}
       />
       
       <FeatureCard 
@@ -64,6 +70,7 @@ export const FeaturesGrid = () => {
             <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
           </svg>
         }
+        isMobile={isMobile}
       />
     </div>
   );
@@ -73,16 +80,17 @@ interface FeatureCardProps {
   title: string;
   description: string;
   icon: React.ReactNode;
+  isMobile?: boolean;
 }
 
-const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon }) => {
+const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, isMobile }) => {
   return (
-    <div className="flex flex-col items-center text-center space-y-2 p-4">
+    <div className={`flex flex-col items-center text-center space-y-2 ${isMobile ? 'p-3' : 'p-4'}`}>
       <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
         {icon}
       </div>
-      <h3 className="text-lg font-medium">{title}</h3>
-      <p className="text-sm text-muted-foreground">
+      <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-medium`}>{title}</h3>
+      <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
         {description}
       </p>
     </div>

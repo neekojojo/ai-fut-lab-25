@@ -6,19 +6,23 @@ interface AnalysisOptionsProps {
   videoFile: File;
   onSelectModel: (model: 'google-automl' | 'kaggle-datasets') => void;
   onAnalyzeWithAI: () => void;
+  isMobile?: boolean;
 }
 
 const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({ 
   videoFile, 
   onSelectModel, 
-  onAnalyzeWithAI 
+  onAnalyzeWithAI,
+  isMobile
 }) => {
   return (
-    <ModelSelection 
-      videoFile={videoFile}
-      onSelectModel={onSelectModel}
-      onAnalyzeWithAI={onAnalyzeWithAI}
-    />
+    <div className={isMobile ? 'px-1' : ''}>
+      <ModelSelection 
+        videoFile={videoFile}
+        onSelectModel={onSelectModel}
+        onAnalyzeWithAI={onAnalyzeWithAI}
+      />
+    </div>
   );
 };
 
