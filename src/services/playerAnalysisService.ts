@@ -1,8 +1,14 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { PlayerAnalysis } from '@/components/AnalysisReport.d';
 
 // تحويل تحليل اللاعب من القاعدة إلى نموذج الواجهة
 const mapToPlayerAnalysis = (dbAnalysis: any): PlayerAnalysis => {
+  // Calculate talent score-based market value with some randomness for variation
+  const talentScore = dbAnalysis.talent_score || Math.floor(Math.random() * 30) + 60;
+  const baseValue = (talentScore * 10000) + (Math.random() * 50000);
+  const formattedValue = '$' + Math.floor(baseValue).toLocaleString();
+  
   return {
     id: dbAnalysis.id || '',
     playerName: dbAnalysis.player_name,
@@ -10,8 +16,8 @@ const mapToPlayerAnalysis = (dbAnalysis: any): PlayerAnalysis => {
     timestamp: dbAnalysis.created_at || new Date().toISOString(),
     duration: dbAnalysis.duration || 0,
     confidence: dbAnalysis.confidence || 0.8,
-    marketValue: '$' + (dbAnalysis.talent_score || 0) * 100000, // مجرد مثال لتحويل درجة الموهبة إلى قيمة سوقية
-    talentScore: dbAnalysis.talent_score || 0,
+    marketValue: formattedValue,
+    talentScore: talentScore,
     strengths: dbAnalysis.strengths || [],
     weaknesses: dbAnalysis.weaknesses || [],
     performance: {
