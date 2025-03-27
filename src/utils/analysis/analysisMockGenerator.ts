@@ -4,10 +4,28 @@ import { PROFESSIONAL_PLAYERS } from "./constants";
 import { generateInjuryRiskAssessment } from "./injuryRiskAnalysis";
 import { determineEarnedBadges } from "./badgeService";
 
+// Create a deterministic random generator using a seed
+const getSeededRandom = (seed: number): () => number => {
+  // Simple LCG (Linear Congruential Generator) implementation
+  let m = 2**31 - 1;
+  let a = 1103515245;
+  let c = 12345;
+  let state = seed;
+
+  return function() {
+    state = (a * state + c) % m;
+    return state / m;
+  };
+};
+
 // Generate mock analysis data with enhanced details
-export const generateEnhancedAnalysis = (): PlayerAnalysis => {
+export const generateEnhancedAnalysis = (seed: number = Date.now()): PlayerAnalysis => {
+  // Create a seeded random generator to ensure deterministic results
+  const random = getSeededRandom(seed);
+  
   const positions = ["Forward", "Midfielder", "Defender", "Goalkeeper"];
-  const position = positions[Math.floor(Math.random() * positions.length)];
+  const positionIndex = Math.floor(random() * positions.length);
+  const position = positions[positionIndex];
   
   // Detailed strengths based on position
   const forwardStrengths = [
@@ -140,40 +158,40 @@ export const generateEnhancedAnalysis = (): PlayerAnalysis => {
   // Position-specific detailed skills
   const skillsByPosition = {
     "Forward": {
-      finishing: Math.floor(Math.random() * 30) + 60,
-      dribbling: Math.floor(Math.random() * 30) + 60,
-      movement: Math.floor(Math.random() * 30) + 60,
-      pace: Math.floor(Math.random() * 30) + 60,
-      strength: Math.floor(Math.random() * 30) + 60
+      finishing: Math.floor(random() * 30) + 60,
+      dribbling: Math.floor(random() * 30) + 60,
+      movement: Math.floor(random() * 30) + 60,
+      pace: Math.floor(random() * 30) + 60,
+      strength: Math.floor(random() * 30) + 60
     },
     "Midfielder": {
-      passing: Math.floor(Math.random() * 30) + 60,
-      vision: Math.floor(Math.random() * 30) + 60,
-      technique: Math.floor(Math.random() * 30) + 60,
-      workRate: Math.floor(Math.random() * 30) + 60,
-      positioning: Math.floor(Math.random() * 30) + 60
+      passing: Math.floor(random() * 30) + 60,
+      vision: Math.floor(random() * 30) + 60,
+      technique: Math.floor(random() * 30) + 60,
+      workRate: Math.floor(random() * 30) + 60,
+      positioning: Math.floor(random() * 30) + 60
     },
     "Defender": {
-      tackling: Math.floor(Math.random() * 30) + 60,
-      marking: Math.floor(Math.random() * 30) + 60,
-      aerial: Math.floor(Math.random() * 30) + 60,
-      positioning: Math.floor(Math.random() * 30) + 60,
-      strength: Math.floor(Math.random() * 30) + 60
+      tackling: Math.floor(random() * 30) + 60,
+      marking: Math.floor(random() * 30) + 60,
+      aerial: Math.floor(random() * 30) + 60,
+      positioning: Math.floor(random() * 30) + 60,
+      strength: Math.floor(random() * 30) + 60
     },
     "Goalkeeper": {
-      reflexes: Math.floor(Math.random() * 30) + 60,
-      handling: Math.floor(Math.random() * 30) + 60,
-      positioning: Math.floor(Math.random() * 30) + 60,
-      communication: Math.floor(Math.random() * 30) + 60,
-      distribution: Math.floor(Math.random() * 30) + 60
+      reflexes: Math.floor(random() * 30) + 60,
+      handling: Math.floor(random() * 30) + 60,
+      positioning: Math.floor(random() * 30) + 60,
+      communication: Math.floor(random() * 30) + 60,
+      distribution: Math.floor(random() * 30) + 60
     }
   };
   
-  // Randomize scores within reasonable ranges
-  const technicalScore = Math.floor(Math.random() * 30) + 60; // 60-90
-  const physicalScore = Math.floor(Math.random() * 30) + 60; // 60-90
-  const tacticalScore = Math.floor(Math.random() * 30) + 60; // 60-90
-  const mentalScore = Math.floor(Math.random() * 30) + 60; // 60-90
+  // Randomize scores within reasonable ranges, but using our seeded random
+  const technicalScore = Math.floor(random() * 30) + 60; // 60-90
+  const physicalScore = Math.floor(random() * 30) + 60; // 60-90
+  const tacticalScore = Math.floor(random() * 30) + 60; // 60-90
+  const mentalScore = Math.floor(random() * 30) + 60; // 60-90
   
   // Calculate overall talent score based on the averages
   const talentScore = Math.floor(
@@ -181,27 +199,41 @@ export const generateEnhancedAnalysis = (): PlayerAnalysis => {
   );
   
   // Generate random market value between €500K and €50M
-  const marketValueBase = Math.floor(Math.random() * 495) + 5; // 5-500
+  const marketValueBase = Math.floor(random() * 495) + 5; // 5-500
   const marketValueUnit = marketValueBase >= 100 ? 'M' : 'K';
   const marketValue = marketValueBase >= 100 
     ? `€${(marketValueBase / 10).toFixed(1)}M` 
     : `€${marketValueBase}0K`;
   
   // Find a comparable professional player
-  const comparablePro = PROFESSIONAL_PLAYERS.find(player => player.position === position) || PROFESSIONAL_PLAYERS[0];
+  const proPlayerIndex = Math.floor(random() * PROFESSIONAL_PLAYERS.length);
+  const comparablePro = PROFESSIONAL_PLAYERS.find(player => player.position === position) || 
+                        PROFESSIONAL_PLAYERS[proPlayerIndex % PROFESSIONAL_PLAYERS.length];
   
-  // Randomly select 3-5 strengths and 2-4 weaknesses
-  const shuffledStrengths = [...positionStrengths].sort(() => 0.5 - Math.random());
-  const shuffledWeaknesses = [...positionWeaknesses].sort(() => 0.5 - Math.random());
-  const shuffledRecommendations = [...positionRecommendations].sort(() => 0.5 - Math.random());
+  // Randomly select 3-5 strengths and 2-4 weaknesses using seeded random
+  const shuffleArray = <T>(array: T[]): T[] => {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+  };
   
-  const selectedStrengths = shuffledStrengths.slice(0, Math.floor(Math.random() * 3) + 3);
-  const selectedWeaknesses = shuffledWeaknesses.slice(0, Math.floor(Math.random() * 3) + 2);
-  const selectedRecommendations = shuffledRecommendations.slice(0, Math.floor(Math.random() * 2) + 3);
+  const shuffledStrengths = shuffleArray(positionStrengths);
+  const shuffledWeaknesses = shuffleArray(positionWeaknesses);
+  const shuffledRecommendations = shuffleArray(positionRecommendations);
+  
+  const selectedStrengths = shuffledStrengths.slice(0, Math.floor(random() * 3) + 3);
+  const selectedWeaknesses = shuffledWeaknesses.slice(0, Math.floor(random() * 3) + 2);
+  const selectedRecommendations = shuffledRecommendations.slice(0, Math.floor(random() * 2) + 3);
+  
+  // Generate deterministic ID based on seed
+  const id = `mock-analysis-${seed.toString(36).substring(0, 8)}`;
   
   // Generate base analysis
   const analysis: PlayerAnalysis = {
-    id: "mock-analysis-" + Math.random().toString(36).substring(2, 9),
+    id,
     playerName: "John Doe", // In a real app, we would detect or ask for the player's name
     position,
     timestamp: new Date().toISOString(),
@@ -237,10 +269,10 @@ export const generateEnhancedAnalysis = (): PlayerAnalysis => {
       mental: mentalScore
     },
     recommendations: selectedRecommendations,
-    compatibilityScore: Math.floor(Math.random() * 30) + 65, // 65-95
+    compatibilityScore: Math.floor(random() * 30) + 65, // 65-95
     proComparison: {
       name: comparablePro.name,
-      similarity: Math.floor(Math.random() * 30) + 40, // 40-70% similarity
+      similarity: Math.floor(random() * 30) + 40, // 40-70% similarity
       skills: comparablePro.skills
     },
     summary: "Player shows promising skills and attributes for their position.",
@@ -260,21 +292,21 @@ export const generateEnhancedAnalysis = (): PlayerAnalysis => {
   // Add progress tracking (simulated)
   const progress = {
     lastAnalysis: new Date(),
-    improvement: Math.floor(Math.random() * 15) + 1, // 1-15% improvement
+    improvement: Math.floor(random() * 15) + 1, // 1-15% improvement
     areas: [
       {
         skill: "Technical",
-        before: technicalScore - Math.floor(Math.random() * 10),
+        before: technicalScore - Math.floor(random() * 10),
         after: technicalScore
       },
       {
         skill: "Physical",
-        before: physicalScore - Math.floor(Math.random() * 10),
+        before: physicalScore - Math.floor(random() * 10),
         after: physicalScore
       },
       {
         skill: "Tactical",
-        before: tacticalScore - Math.floor(Math.random() * 10),
+        before: tacticalScore - Math.floor(random() * 10),
         after: tacticalScore
       }
     ]

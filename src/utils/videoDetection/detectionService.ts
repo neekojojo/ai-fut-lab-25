@@ -9,6 +9,22 @@ const hashVideoFile = async (file: File): Promise<string> => {
   return `${file.name}-${file.size}-${file.lastModified}`;
 };
 
+// Set a fixed seed for random number generation based on the video hash
+// This ensures deterministic "random" values for the same video
+const getSeededRandom = (seed: number): () => number => {
+  // Simple LCG (Linear Congruential Generator) implementation
+  // for deterministic pseudo-random numbers
+  let m = 2**31 - 1;
+  let a = 1103515245;
+  let c = 12345;
+  let state = seed;
+
+  return function() {
+    state = (a * state + c) % m;
+    return state / m;
+  };
+};
+
 // Cache for storing previous detection results
 const detectionCache = new Map<string, DetectionResult>();
 
@@ -29,19 +45,19 @@ export const detectPeopleInVideo = async (
   // 2. Use OpenCV/OpenPose to detect people and pose keypoints in each frame
   // 3. Count people and aggregate results
   
-  // For now, we'll generate a deterministic mock result based on the video hash
-  // This ensures that the same video always gets the same result
+  // Generate a deterministic seed based on the video hash
   const hashSum = videoHash.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const seededRandom = getSeededRandom(hashSum);
   
   // Generate deterministic frame results
-  const frameCount = (hashSum % 10) + 20; // Between 20-30 frames
+  const frameCount = Math.floor(seededRandom() * 10) + 20; // Between 20-30 frames
   const frameResults = [];
   const playerPositions = [];
   
   let totalDetections = 0;
   for (let i = 0; i < frameCount; i++) {
     // Create deterministic number of detections for each frame
-    const frameDetections = ((hashSum + i) % 7) + 1; // 1-7 people per frame
+    const frameDetections = Math.floor(seededRandom() * 7) + 1; // 1-7 people per frame
     totalDetections += frameDetections;
     
     frameResults.push({
@@ -55,8 +71,11 @@ export const detectPeopleInVideo = async (
     const timestamp = i * (1000 / 30);
     
     // Create a deterministic but varying position for the player over time
-    const centerX = 300 + Math.sin(i / 5) * 50;
-    const centerY = 200 + Math.cos(i / 3) * 30;
+    // Using trigonometric functions with seeded offsets
+    const seedOffset1 = seededRandom() * 10;
+    const seedOffset2 = seededRandom() * 10;
+    const centerX = 300 + Math.sin((i + seedOffset1) / 5) * 50;
+    const centerY = 200 + Math.cos((i + seedOffset2) / 3) * 30;
     
     // Generate keypoints for the player (17 keypoints from COCO model)
     const keypoints = [
@@ -70,18 +89,18 @@ export const detectPeopleInVideo = async (
       // Upper body
       { x: centerX - 40, y: centerY - 20, part: "left_shoulder", confidence: 0.9 },
       { x: centerX + 40, y: centerY - 20, part: "right_shoulder", confidence: 0.9 },
-      { x: centerX - 60 + Math.sin(i / 2) * 10, y: centerY, part: "left_elbow", confidence: 0.85 },
-      { x: centerX + 60 + Math.sin(i / 2) * 10, y: centerY, part: "right_elbow", confidence: 0.85 },
-      { x: centerX - 70 + Math.sin(i / 1.5) * 15, y: centerY + 20, part: "left_wrist", confidence: 0.8 },
-      { x: centerX + 70 + Math.sin(i / 1.5) * 15, y: centerY + 20, part: "right_wrist", confidence: 0.8 },
+      { x: centerX - 60 + Math.sin((i + seedOffset1) / 2) * 10, y: centerY, part: "left_elbow", confidence: 0.85 },
+      { x: centerX + 60 + Math.sin((i + seedOffset2) / 2) * 10, y: centerY, part: "right_elbow", confidence: 0.85 },
+      { x: centerX - 70 + Math.sin((i + seedOffset1) / 1.5) * 15, y: centerY + 20, part: "left_wrist", confidence: 0.8 },
+      { x: centerX + 70 + Math.sin((i + seedOffset2) / 1.5) * 15, y: centerY + 20, part: "right_wrist", confidence: 0.8 },
       
       // Lower body
       { x: centerX - 20, y: centerY + 40, part: "left_hip", confidence: 0.9 },
       { x: centerX + 20, y: centerY + 40, part: "right_hip", confidence: 0.9 },
-      { x: centerX - 25 + Math.sin(i / 3) * 5, y: centerY + 80, part: "left_knee", confidence: 0.85 },
-      { x: centerX + 25 + Math.sin(i / 3) * 5, y: centerY + 80, part: "right_knee", confidence: 0.85 },
-      { x: centerX - 30 + Math.sin(i / 4) * 10, y: centerY + 120, part: "left_ankle", confidence: 0.8 },
-      { x: centerX + 30 + Math.sin(i / 4) * 10, y: centerY + 120, part: "right_ankle", confidence: 0.8 },
+      { x: centerX - 25 + Math.sin((i + seedOffset1) / 3) * 5, y: centerY + 80, part: "left_knee", confidence: 0.85 },
+      { x: centerX + 25 + Math.sin((i + seedOffset2) / 3) * 5, y: centerY + 80, part: "right_knee", confidence: 0.85 },
+      { x: centerX - 30 + Math.sin((i + seedOffset1) / 4) * 10, y: centerY + 120, part: "left_ankle", confidence: 0.8 },
+      { x: centerX + 30 + Math.sin((i + seedOffset2) / 4) * 10, y: centerY + 120, part: "right_ankle", confidence: 0.8 },
     ];
     
     // Add player position data
@@ -98,9 +117,10 @@ export const detectPeopleInVideo = async (
     });
   }
   
-  // Calculate average count and mock confidence
+  // Calculate average count and confidence (deterministically)
   const avgCount = Math.round(totalDetections / frameCount);
-  const confidence = 0.7 + ((hashSum % 30) / 100); // Between 0.7 and 1.0
+  // Ensure confidence is deterministic but realistic (between 0.7 and 0.95)
+  const confidence = 0.7 + ((hashSum % 25) / 100);
   
   const result: DetectionResult = {
     count: avgCount,

@@ -6,6 +6,9 @@ import { compareWithPreviousAnalyses } from "./comparisonService";
 import { playerMLService } from "@/utils/ml/playerMLService";
 import { apiProxyService } from "@/services/apiProxyService";
 
+// Cache to store analysis results by video hash
+const analysisCache = new Map<string, PlayerAnalysis>();
+
 // This function simulates the video processing and AI analysis
 // In a production environment, this would call the OpenAI API
 export const analyzeFootballVideo = (videoFile: File): Promise<{analysis: PlayerAnalysis, progressUpdates: (callback: (progress: number, stage: string) => void) => void}> => {
@@ -13,7 +16,46 @@ export const analyzeFootballVideo = (videoFile: File): Promise<{analysis: Player
     let progress = 0;
     const progressCallbacks: ((progress: number, stage: string) => void)[] = [];
     
-    // Simulate progress updates - made slightly faster
+    // Generate a deterministic hash for the video file
+    const videoHash = `${videoFile.name}-${videoFile.size}-${videoFile.lastModified}`;
+    
+    // Check if we've already analyzed this video
+    if (analysisCache.has(videoHash)) {
+      console.log("Using cached analysis result for the video");
+      
+      // Simulate quick progress updates for cached results
+      const interval = setInterval(() => {
+        progress += 20; // Faster progress for cached results
+        if (progress > 100) progress = 100;
+        
+        const stageIndex = Math.min(
+          Math.floor((progress / 100) * ANALYSIS_STAGES.length),
+          ANALYSIS_STAGES.length - 1
+        );
+        
+        progressCallbacks.forEach(callback => 
+          callback(progress, ANALYSIS_STAGES[stageIndex])
+        );
+        
+        if (progress === 100) {
+          clearInterval(interval);
+          
+          // Return cached result after showing 100% progress
+          setTimeout(() => {
+            resolve({
+              analysis: analysisCache.get(videoHash)!,
+              progressUpdates: (callback) => {
+                progressCallbacks.push(callback);
+              }
+            });
+          }, 500);
+        }
+      }, 100);
+      
+      return;
+    }
+    
+    // Simulate progress updates for new analysis
     const interval = setInterval(() => {
       progress += Math.floor(Math.random() * 7) + 3; // Faster increments
       if (progress > 100) progress = 100;
@@ -32,7 +74,9 @@ export const analyzeFootballVideo = (videoFile: File): Promise<{analysis: Player
         
         // Add a slight delay before completing to show 100%
         setTimeout(async () => {
-          const analysis = generateEnhancedAnalysis();
+          // Use the video hash as seed for generateEnhancedAnalysis
+          const hashNum = videoHash.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+          const analysis = generateEnhancedAnalysis(hashNum);
           
           // 🆕 استدعاء واجهات البرمجة الخارجية لإثراء التحليل
           try {
@@ -86,6 +130,9 @@ export const analyzeFootballVideo = (videoFile: File): Promise<{analysis: Player
           } catch (error) {
             console.error("حدث خطأ أثناء استدعاء واجهات البرمجة الخارجية:", error);
           }
+          
+          // Cache the analysis result for future use
+          analysisCache.set(videoHash, analysis);
           
           resolve({
             analysis: analysis,
