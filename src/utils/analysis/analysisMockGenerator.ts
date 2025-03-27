@@ -220,9 +220,9 @@ export const generateEnhancedAnalysis = (seed: number = Date.now()): PlayerAnaly
     return newArray;
   };
   
-  const shuffledStrengths = shuffleArray(positionStrengths);
-  const shuffledWeaknesses = shuffleArray(positionWeaknesses);
-  const shuffledRecommendations = shuffleArray(positionRecommendations);
+  const shuffledStrengths = shuffleArray<string>(positionStrengths);
+  const shuffledWeaknesses = shuffleArray<string>(positionWeaknesses);
+  const shuffledRecommendations = shuffleArray<string>(positionRecommendations);
   
   const selectedStrengths = shuffledStrengths.slice(0, Math.floor(random() * 3) + 3);
   const selectedWeaknesses = shuffledWeaknesses.slice(0, Math.floor(random() * 3) + 2);
