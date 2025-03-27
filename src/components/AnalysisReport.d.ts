@@ -1,4 +1,3 @@
-
 export interface PlayerMovement {
   x: number;
   y: number;
@@ -112,6 +111,13 @@ export interface Badge {
   earnedAt?: Date;
 }
 
+export interface UserBadge {
+  name: string;
+  description: string;
+  level: 'bronze' | 'silver' | 'gold';
+  earnedAt?: Date;
+}
+
 export interface PlayerAnalysis {
   id: string;
   playerId?: string;
@@ -147,26 +153,14 @@ export interface PlayerAnalysis {
   badges?: Badge[];
 }
 
-// Additional interfaces for other components
 export interface UserProfile {
   id: string;
   name: string;
   email: string;
-  avatarUrl?: string;
-  role?: string;
-  createdAt?: string;
-  lastLogin?: string;
-  teamId?: string;
-  position?: string;
-  subscription?: {
-    plan: string;
-    status: string;
-    nextBillingDate?: string;
-  };
-  
-  // Properties required by dashboard components
+  avatarUrl?: string | null;
+  bio?: string;
   analyses: PlayerAnalysis[];
-  badges: Badge[];
+  badges: UserBadge[];
   trainingProgress: {
     videosWatched: number;
     skillsImproved: string[];

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -13,8 +12,8 @@ import ProfileTab from '@/components/dashboard/tabs/ProfileTab';
 import { useAuth } from '@/components/auth/AuthContext';
 import { fetchPlayerAnalyses } from '@/services/playerAnalysisService';
 import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
-// Mock data for training videos and base user profile
 const mockTrainingVideos: TrainingVideo[] = [
   {
     id: "1",
@@ -65,52 +64,96 @@ const Dashboard: React.FC = () => {
   const [trainingVideos, setTrainingVideos] = useState<TrainingVideo[]>([]);
   const [activeTab, setActiveTab] = useState("overview");
   const [isLoadingAnalyses, setIsLoadingAnalyses] = useState(false);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const navigate = useNavigate();
   const { user, loading, signOut } = useAuth();
   const { toast } = useToast();
 
-  // Load dashboard data only if we have a confirmed authenticated user
   useEffect(() => {
     if (!loading) {
       if (user) {
-        // Set initial user profile with mock data
-        const initialProfile: UserProfile = {
-          id: user.id,
-          email: user.email || '',
-          name: user.user_metadata?.full_name || 'User',
-          analyses: [], // Will be populated from API
-          badges: [
-            {
-              name: "First Analysis",
-              description: "Completed your first player analysis",
-              level: "bronze",
-              earnedAt: new Date()
-            },
-            {
-              name: "Technique Master",
-              description: "Achieved high technical score in analysis",
-              level: "silver",
-              earnedAt: new Date()
-            }
-          ],
-          trainingProgress: {
-            videosWatched: 3,
-            skillsImproved: ["passing", "ball control"],
-            nextRecommendation: "Work on shooting accuracy"
-          }
-        };
-        
-        setUserProfile(initialProfile);
+        fetchUserProfileData();
         setTrainingVideos(mockTrainingVideos);
         
-        // Fetch real analyses from Supabase
         fetchUserAnalyses();
       } else {
-        // If no user and not loading, redirect to sign-in
         navigate('/sign-in', { replace: true });
       }
     }
   }, [user, navigate, loading]);
+
+  const fetchUserProfileData = async () => {
+    if (!user) return;
+    
+    setIsLoadingProfile(true);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+        
+      if (error) throw error;
+      
+      const initialProfile: UserProfile = {
+        id: user.id,
+        email: user.email || '',
+        name: data.full_name || user.user_metadata?.full_name || 'User',
+        avatarUrl: data.avatar_url || null,
+        bio: data.bio || '',
+        analyses: [],
+        badges: [
+          {
+            name: "First Analysis",
+            description: "Completed your first player analysis",
+            level: "bronze",
+            earnedAt: new Date()
+          },
+          {
+            name: "Technique Master",
+            description: "Achieved high technical score in analysis",
+            level: "silver",
+            earnedAt: new Date()
+          }
+        ],
+        trainingProgress: {
+          videosWatched: 3,
+          skillsImproved: ["passing", "ball control"],
+          nextRecommendation: "Work on shooting accuracy"
+        }
+      };
+      
+      setUserProfile(initialProfile);
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      toast({
+        variant: "destructive",
+        title: "خطأ في تحميل الملف الشخصي",
+        description: "لم نتمكن من تحميل بيانات ملفك الشخصي. يرجى المحاولة مرة أخرى.",
+      });
+      
+      if (user) {
+        const defaultProfile: UserProfile = {
+          id: user.id,
+          email: user.email || '',
+          name: user.user_metadata?.full_name || 'User',
+          avatarUrl: null,
+          bio: '',
+          analyses: [],
+          badges: [],
+          trainingProgress: {
+            videosWatched: 0,
+            skillsImproved: [],
+            nextRecommendation: ""
+          }
+        };
+        
+        setUserProfile(defaultProfile);
+      }
+    } finally {
+      setIsLoadingProfile(false);
+    }
+  };
 
   const fetchUserAnalyses = async () => {
     if (!user) return;
@@ -120,7 +163,6 @@ const Dashboard: React.FC = () => {
       const analyses = await fetchPlayerAnalyses();
       console.log('Fetched analyses:', analyses);
       
-      // Update the user profile with the fetched analyses
       setUserProfile(prevProfile => {
         if (prevProfile) {
           return {
@@ -147,8 +189,7 @@ const Dashboard: React.FC = () => {
     navigate('/sign-in', { replace: true });
   };
 
-  // Show loading state while checking authentication
-  if (loading || !userProfile) {
+  if (loading || !userProfile || isLoadingProfile) {
     return <div className="flex justify-center items-center min-h-screen">جاري التحميل...</div>;
   }
 
