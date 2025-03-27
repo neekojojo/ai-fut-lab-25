@@ -20,17 +20,11 @@ const VideoUpload: React.FC<VideoUploadProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(externalSelectedFile);
   const [previewUrl, setPreviewUrl] = useState<string | null>(externalPreviewUrl);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     return () => {
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-      }
       // Clean up any preview URLs when component unmounts
       if (previewUrl && !externalPreviewUrl) {
         URL.revokeObjectURL(previewUrl);
@@ -88,31 +82,8 @@ const VideoUpload: React.FC<VideoUploadProps> = ({
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
     
-    // Simulate a quick upload progress
-    setIsUploading(true);
-    setUploadProgress(0);
-    
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
-    }
-    
-    // Faster progress increment for better user experience
-    progressIntervalRef.current = setInterval(() => {
-      setUploadProgress(prev => {
-        if (prev >= 100) {
-          if (progressIntervalRef.current) {
-            clearInterval(progressIntervalRef.current);
-            progressIntervalRef.current = null;
-          }
-          setIsUploading(false);
-          // Pass the file to parent immediately
-          onUpload(file);
-          return 100;
-        }
-        // Increase progress faster - 10% increments
-        return prev + 10;
-      });
-    }, 50); // Reduced interval time for faster progress
+    // Pass the file to parent immediately - no upload simulation
+    onUpload(file);
   };
 
   const handleRemoveFile = () => {
@@ -122,13 +93,6 @@ const VideoUpload: React.FC<VideoUploadProps> = ({
     setSelectedFile(null);
     setPreviewUrl(null);
     setError(null);
-    setUploadProgress(0);
-    setIsUploading(false);
-    
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
-      progressIntervalRef.current = null;
-    }
     
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -206,16 +170,6 @@ const VideoUpload: React.FC<VideoUploadProps> = ({
                   <X className="h-4 w-4" />
                 </Button>
               </div>
-              
-              {isUploading && (
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>جاري التحميل...</span>
-                    <span>{uploadProgress}%</span>
-                  </div>
-                  <Progress value={uploadProgress} className="h-2" />
-                </div>
-              )}
               
               <div className="flex items-center justify-between">
                 <div className="text-sm">

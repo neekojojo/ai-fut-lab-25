@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { NavigateFunction } from 'react-router-dom';
 import LoadingAnimation from '@/components/LoadingAnimation';
@@ -31,23 +30,24 @@ const IndexContent: React.FC<IndexContentProps> = ({ navigate, isMobile }) => {
 
   const handleVideoUpload = async (file: File) => {
     setVideoFile(file);
-    setAnalysisState('model-selection');
+    
+    // Bypass model selection and directly analyze the video
+    handleAnalyzeWithAI(file);
   };
 
   const handleSelectModel = (model: 'google-automl' | 'kaggle-datasets') => {
     setSelectedAnalysisModel(model);
-    toast({
-      title: `تم اختيار ${model === 'google-automl' ? 'Google AutoML Vision' : 'Kaggle Datasets'}`,
-      description: "تم تعيين نموذج التحليل.",
-      duration: 3000,
-    });
+    // Immediately analyze after selecting model
+    if (videoFile) {
+      handleAnalyzeWithAI(videoFile);
+    }
   };
 
-  const handleAnalyzeWithAI = async () => {
-    if (!videoFile) return;
+  const handleAnalyzeWithAI = async (fileToAnalyze = videoFile) => {
+    if (!fileToAnalyze) return;
     
     AnalysisService.analyzeVideo(
-      videoFile, 
+      fileToAnalyze, 
       setAnalysisState,
       setProgress,
       setStage,
@@ -101,11 +101,12 @@ const IndexContent: React.FC<IndexContentProps> = ({ navigate, isMobile }) => {
         />
       )}
       
-      {analysisState === 'model-selection' && videoFile && (
+      {/* Hide model selection UI */}
+      {false && analysisState === 'model-selection' && videoFile && (
         <AnalysisOptions 
           videoFile={videoFile}
           onSelectModel={handleSelectModel}
-          onAnalyzeWithAI={handleAnalyzeWithAI}
+          onAnalyzeWithAI={() => handleAnalyzeWithAI()}
           isMobile={isMobile}
         />
       )}
@@ -126,7 +127,8 @@ const IndexContent: React.FC<IndexContentProps> = ({ navigate, isMobile }) => {
         </div>
       )}
       
-      {analysisState === 'processing' && (
+      {/* Hide processing UI - we're going straight to results */}
+      {false && analysisState === 'processing' && (
         <AnalysisProcessing progress={progress} stage={stage} isMobile={isMobile} />
       )}
       

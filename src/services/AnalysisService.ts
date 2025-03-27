@@ -22,18 +22,18 @@ export const analyzeVideo = async (
   user: User | null,
   { toast }: ToastFunctions
 ) => {
-  setAnalysisState('processing');
-  setProgress(0);
-  
+  // Skip processing state and directly go to complete
   try {
     const result = await analyzeFootballVideo(videoFile);
     
-    result.progressUpdates((newProgress, newStage) => {
-      setProgress(newProgress);
-      setStage(newStage);
-    });
+    // Set progress to 100% right away
+    setProgress(100);
+    setStage('إنشاء تقرير التحليل النهائي');
     
+    // Set analysis result
     setAnalysis(result.analysis);
+    
+    // Directly set to complete state
     setAnalysisState('complete');
     
     // إذا كان المستخدم مسجل الدخول، قم بتخزين التحليل
