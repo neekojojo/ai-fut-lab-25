@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -18,10 +18,10 @@ const SignUp: React.FC = () => {
   const navigate = useNavigate();
   const { signUp, user } = useAuth();
 
-  // إذا كان المستخدم مسجل الدخول بالفعل، قم بتوجيهه إلى لوحة التحكم
-  React.useEffect(() => {
+  // Only redirect if the user is already logged in
+  useEffect(() => {
     if (user) {
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true });
     }
   }, [user, navigate]);
 
@@ -40,7 +40,7 @@ const SignUp: React.FC = () => {
     try {
       await signUp(email, password, username, fullName);
       setSuccessMessage('تم إنشاء حسابك بنجاح! تحقق من بريدك الإلكتروني للتأكيد.');
-      // لا نقوم بالتنقل مباشرة لأنه قد يكون هناك حاجة لتأكيد البريد الإلكتروني
+      // Don't navigate here, let the useEffect handle it if the user is logged in
     } catch (err: any) {
       setError(err.message || 'حدث خطأ أثناء إنشاء الحساب');
     } finally {

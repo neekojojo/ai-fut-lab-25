@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,10 +15,10 @@ const SignIn: React.FC = () => {
   const navigate = useNavigate();
   const { signIn, user } = useAuth();
 
-  // إذا كان المستخدم مسجل الدخول بالفعل، قم بتوجيهه إلى لوحة التحكم
-  React.useEffect(() => {
+  // Only redirect if the user is already logged in
+  useEffect(() => {
     if (user) {
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true });
     }
   }, [user, navigate]);
 
@@ -29,7 +29,7 @@ const SignIn: React.FC = () => {
 
     try {
       await signIn(email, password);
-      navigate('/dashboard');
+      // Don't navigate here, let the useEffect handle it
     } catch (err: any) {
       setError(err.message || 'حدث خطأ أثناء تسجيل الدخول');
     } finally {

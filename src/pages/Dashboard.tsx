@@ -10,6 +10,7 @@ import AnalysesTab from '@/components/dashboard/tabs/AnalysesTab';
 import TrainingTab from '@/components/dashboard/tabs/TrainingTab';
 import BadgesTab from '@/components/dashboard/tabs/BadgesTab';
 import ProfileTab from '@/components/dashboard/tabs/ProfileTab';
+import { useAuth } from '@/components/auth/AuthContext';
 
 // Mock data
 const mockUserProfile: UserProfile = {
@@ -82,25 +83,26 @@ const Dashboard: React.FC = () => {
   const [trainingVideos, setTrainingVideos] = useState<TrainingVideo[]>([]);
   const [activeTab, setActiveTab] = useState("overview");
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
+  // Load dashboard data only when we have a user
   useEffect(() => {
-    // Check if user is logged in
-    const userData = localStorage.getItem('user');
-    if (!userData) {
-      navigate('/sign-in');
-      return;
+    if (user) {
+      // In a real app, we would fetch the user profile from an API
+      setUserProfile(mockUserProfile);
+      setTrainingVideos(mockTrainingVideos);
+    } else {
+      // If no user, redirect once to sign-in
+      navigate('/sign-in', { replace: true });
     }
+  }, [user, navigate]);
 
-    // In a real app, we would fetch the user profile from an API
-    setUserProfile(mockUserProfile);
-    setTrainingVideos(mockTrainingVideos);
-  }, [navigate]);
-
-  const handleSignOut = () => {
-    localStorage.removeItem('user');
-    navigate('/sign-in');
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/sign-in', { replace: true });
   };
 
+  // Show loading state while checking authentication
   if (!userProfile) {
     return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
   }
