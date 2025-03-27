@@ -1,5 +1,5 @@
 
-uanxasigxivehhtokacb = "project_id"
+project_id = "uanxasigxivehhtokacb"
 
 [global.env]
 OPTA_FIFA_API_KEY = "env:OPTA_FIFA_API_KEY"

@@ -1,198 +1,183 @@
 
 import { apiProxyService } from './apiProxyService';
-import { PlayerComparison } from '@/utils/ml/playerMLService';
-import { toast } from '@/components/ui/use-toast';
+import type { PlayerComparison } from '@/utils/ml/playerMLService';
 
-export interface ProfessionalPlayer {
-  id: string;
-  name: string;
-  position: string;
-  team: string;
-  league: string;
-  nationality: string;
-  marketValue: string;
-  age: number;
-  stats: {
-    [key: string]: number;
-  };
-  imageUrl?: string;
-}
-
+/**
+ * خدمة للحصول على بيانات اللاعبين المحترفين ومقارنتهم
+ */
 export const professionalPlayerService = {
   /**
-   * Search for professional players
-   * @param query The search query (player name)
+   * البحث عن لاعبين محترفين بالاسم
    */
-  searchPlayers: async (query: string): Promise<ProfessionalPlayer[]> => {
+  searchPlayers: async (name: string) => {
     try {
-      // Try to get from Transfer Market API first
-      const data = await apiProxyService.callTransferMarketApi('players/search', { query });
-      return transformTransferMarketData(data);
+      return await apiProxyService.callTransferMarketApi('players/search', { name });
     } catch (error) {
-      console.error('Error searching for players:', error);
-      // Fallback to FIFA/Opta API if Transfer Market fails
-      try {
-        const data = await apiProxyService.callOptaApi('players/search', { name: query });
-        return transformOptaData(data);
-      } catch (fallbackError) {
-        console.error('Both APIs failed for player search:', fallbackError);
-        toast({
-          title: "Search Failed",
-          description: "Could not fetch professional player data",
-          variant: "destructive",
-        });
-        return [];
-      }
+      console.error('Error searching players:', error);
+      throw error;
     }
   },
   
   /**
-   * Get detailed information about a player
-   * @param playerId The ID of the player
-   * @param source The source API (transfer-market or opta-fifa)
+   * الحصول على بيانات لاعب محترف محدد
    */
-  getPlayerDetails: async (playerId: string, source: 'transfer-market' | 'opta-fifa'): Promise<ProfessionalPlayer | null> => {
+  getPlayerDetails: async (playerId: string) => {
     try {
-      if (source === 'transfer-market') {
-        const data = await apiProxyService.callTransferMarketApi('players/details', { id: playerId });
-        const players = transformTransferMarketData([data]);
-        return players[0] || null;
-      } else {
-        const data = await apiProxyService.callOptaApi('players/details', { id: playerId });
-        const players = transformOptaData([data]);
-        return players[0] || null;
-      }
+      return await apiProxyService.callTransferMarketApi(`players/${playerId}`);
     } catch (error) {
-      console.error(`Error getting player details from ${source}:`, error);
-      toast({
-        title: "Failed to Load",
-        description: "Could not fetch player details",
-        variant: "destructive",
-      });
-      return null;
+      console.error('Error getting player details:', error);
+      throw error;
     }
   },
   
   /**
-   * Get similar professional players to compare with the user's analysis
-   * @param attributes The attributes to match (speed, technical, etc.)
-   * @param position Optional position filter
+   * الحصول على لاعبين محترفين مشابهين بناءً على السمات
    */
-  getSimilarPlayers: async (
-    attributes: Record<string, number>,
-    position?: string
-  ): Promise<PlayerComparison | null> => {
+  getSimilarPlayers: async (attributes: Record<string, number>, position?: string): Promise<PlayerComparison> => {
+    // في وضع API حقيقي، سنستدعي Edge Function هنا
+    // في هذه الحالة المبسطة، سنجمع بعض البيانات الثابتة وسنعيد نتيجة
+    
     try {
-      // This would be a more advanced API call that uses machine learning on the server
-      // For now, we'll use a simplified approach
-      const players = await apiProxyService.callTransferMarketApi('players/similar', { 
-        attributes,
+      // محاولة استدعاء API للبحث عن لاعبين في الوضع الحقيقي
+      // هذا قد ينجح إذا كان لديك مفاتيح API وإلا سيتم التعامل مع الخطأ
+      const optaData = await apiProxyService.callOptaApi('players/similar', { 
+        attributes: JSON.stringify(attributes),
         position
-      });
+      }).catch(() => null);
       
-      // If there's no data or the API call failed, return null
-      if (!players || !Array.isArray(players)) return null;
-      
-      // Transform the data into the format expected by our application
-      const transformedPlayers = transformTransferMarketData(players);
-      
-      // Map to the PlayerComparison format
-      const playerComparison: PlayerComparison = {
-        similarProfessionals: transformedPlayers.map(player => ({
-          name: player.name,
-          team: player.team,
-          position: player.position.toLowerCase(),
-          similarity: Math.round(Math.random() * 30) + 70, // Mock similarity score between 70-100
-          strengths: Object.entries(player.stats)
-            .filter(([_, value]) => value > 85)
-            .map(([key]) => key.charAt(0).toUpperCase() + key.slice(1))
-            .slice(0, 3) // Take the top 3 strengths
-        })),
-        similarityMetrics: [
-          {
-            category: "Speed & Acceleration",
-            score: Math.round(attributes.speed || attributes.maxSpeed || 75),
-            description: `Your explosive speed matches professional standards.`
-          },
-          {
-            category: "Technical Ability",
-            score: Math.round(attributes.technical || 70),
-            description: `Your technical skills are developing well.`
-          },
-          {
-            category: "Physical Attributes",
-            score: Math.round(attributes.physical || 80),
-            description: `Physically, you're comparable to professionals in your position.`
-          },
-          {
-            category: "Movement Efficiency",
-            score: Math.round(attributes.efficiency || attributes.movementEfficiency || 65),
-            description: `Your movement efficiency is approaching professional standards.`
-          },
-          {
-            category: "Decision Making",
-            score: Math.round(attributes.mental || 60),
-            description: `Work on tactical awareness to improve decision making.`
-          }
-        ]
-      };
-      
-      return playerComparison;
+      if (optaData) {
+        return optaData;
+      }
     } catch (error) {
-      console.error('Error getting similar players:', error);
-      toast({
-        title: "Comparison Failed",
-        description: "Unable to compare with professional players",
-        variant: "destructive",
-      });
-      return null;
+      console.error('Error fetching similar players from API:', error);
+      // سنستمر وسنعود إلى البيانات الثابتة
+    }
+    
+    // هذه البيانات الثابتة فقط للعرض التوضيحي
+    const positionMappings = {
+      'forward': [
+        {
+          name: "Lionel Messi",
+          team: "Inter Miami",
+          position: "forward",
+          similarity: 83,
+          strengths: ["Dribbling", "Vision", "Finishing"]
+        },
+        {
+          name: "Mohamed Salah",
+          team: "Liverpool",
+          position: "forward",
+          similarity: 78,
+          strengths: ["Speed", "Finishing", "Technique"]
+        },
+        {
+          name: "Kylian Mbappé",
+          team: "Real Madrid",
+          position: "forward",
+          similarity: 75,
+          strengths: ["Acceleration", "Finishing", "Pace"]
+        }
+      ],
+      'midfielder': [
+        {
+          name: "Kevin De Bruyne",
+          team: "Manchester City",
+          position: "midfielder",
+          similarity: 81,
+          strengths: ["Vision", "Passing Range", "Set Pieces"]
+        },
+        {
+          name: "Luka Modric",
+          team: "Real Madrid",
+          position: "midfielder",
+          similarity: 79,
+          strengths: ["Game Control", "First Touch", "Positioning"]
+        },
+        {
+          name: "Bruno Fernandes",
+          team: "Manchester United",
+          position: "midfielder",
+          similarity: 76,
+          strengths: ["Creativity", "Shot Power", "Work Rate"]
+        }
+      ],
+      'defender': [
+        {
+          name: "Virgil van Dijk",
+          team: "Liverpool",
+          position: "defender",
+          similarity: 82,
+          strengths: ["Aerial Ability", "Tackling", "Leadership"]
+        },
+        {
+          name: "Rúben Dias",
+          team: "Manchester City",
+          position: "defender",
+          similarity: 77,
+          strengths: ["Positioning", "Tackling", "Physicality"]
+        },
+        {
+          name: "Marquinhos",
+          team: "Paris Saint-Germain",
+          position: "defender",
+          similarity: 75,
+          strengths: ["Speed", "Positioning", "Tackles"]
+        }
+      ],
+      'goalkeeper': [
+        {
+          name: "Alisson Becker",
+          team: "Liverpool",
+          position: "goalkeeper",
+          similarity: 80,
+          strengths: ["Reflexes", "One-on-one", "Distribution"]
+        },
+        {
+          name: "Éderson",
+          team: "Manchester City",
+          position: "goalkeeper",
+          similarity: 78,
+          strengths: ["Distribution", "Sweeping", "Shot-stopping"]
+        },
+        {
+          name: "Jan Oblak",
+          team: "Atlético Madrid",
+          position: "goalkeeper",
+          similarity: 76,
+          strengths: ["Positioning", "Reflexes", "Consistency"]
+        }
+      ]
+    };
+
+    // استخدام وضع اللاعب إذا تم تحديده، وإلا استخدام وضع افتراضي
+    const players = positionMappings[position as keyof typeof positionMappings] || positionMappings.midfielder;
+    
+    // حساب مقاييس التشابه بناءً على السمات
+    const technicalScore = attributes.technical || 70;
+    const speedScore = attributes.speed || 65;
+    const enduranceScore = attributes.endurance || 60;
+    
+    return {
+      similarProfessionals: players,
+      similarityMetrics: [
+        { category: "Technical Ability", score: technicalScore, description: "Ball control and first touch capabilities." },
+        { category: "Speed", score: speedScore, description: "Pace and acceleration on the field." },
+        { category: "Endurance", score: enduranceScore, description: "Stamina and ability to maintain performance." },
+        { category: "Positioning", score: attributes.balance || 68, description: "Understanding of spatial awareness on the pitch." },
+        { category: "Decision Making", score: (attributes.efficiency || 60) + 5, description: "Speed and quality of decisions during play." }
+      ]
+    };
+  },
+  
+  /**
+   * الحصول على إحصائيات المنافسة لفريق أو لاعب
+   */
+  getCompetitionStats: async (competitionId: string, season: number) => {
+    try {
+      return await apiProxyService.callOptaApi(`competitions/${competitionId}/seasons/${season}/statistics`);
+    } catch (error) {
+      console.error('Error getting competition stats:', error);
+      throw error;
     }
   }
 };
-
-// Helper functions to transform API data
-function transformTransferMarketData(data: any[]): ProfessionalPlayer[] {
-  // In a real implementation, this would properly map the Transfer Market API response
-  return data.map(player => ({
-    id: player.id || String(Math.random()),
-    name: player.name || 'Unknown Player',
-    position: player.position || 'Unknown',
-    team: player.team || player.club || 'Unknown Team',
-    league: player.league || 'Unknown League',
-    nationality: player.nationality || 'Unknown',
-    marketValue: player.marketValue || player.value || '€0',
-    age: player.age || 0,
-    stats: player.stats || {
-      pace: Math.round(Math.random() * 20) + 80,
-      shooting: Math.round(Math.random() * 20) + 80,
-      passing: Math.round(Math.random() * 20) + 80,
-      dribbling: Math.round(Math.random() * 20) + 80,
-      defending: Math.round(Math.random() * 20) + 80,
-      physical: Math.round(Math.random() * 20) + 80
-    },
-    imageUrl: player.imageUrl || `https://via.placeholder.com/150?text=${encodeURIComponent(player.name || 'Player')}`
-  }));
-}
-
-function transformOptaData(data: any[]): ProfessionalPlayer[] {
-  // In a real implementation, this would properly map the Opta/FIFA API response
-  return data.map(player => ({
-    id: player.id || String(Math.random()),
-    name: player.name || player.fullName || 'Unknown Player',
-    position: player.position || 'Unknown',
-    team: player.team || player.club || 'Unknown Team',
-    league: player.league || player.competition || 'Unknown League',
-    nationality: player.nationality || player.country || 'Unknown',
-    marketValue: player.marketValue || '€0',
-    age: player.age || 0,
-    stats: player.stats || player.attributes || {
-      pace: Math.round(Math.random() * 20) + 80,
-      shooting: Math.round(Math.random() * 20) + 80,
-      passing: Math.round(Math.random() * 20) + 80,
-      dribbling: Math.round(Math.random() * 20) + 80,
-      defending: Math.round(Math.random() * 20) + 80,
-      physical: Math.round(Math.random() * 20) + 80
-    },
-    imageUrl: player.imageUrl || player.image || `https://via.placeholder.com/150?text=${encodeURIComponent(player.name || 'Player')}`
-  }));
-}
