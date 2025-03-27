@@ -100,6 +100,90 @@ export type Database = {
           },
         ]
       }
+      player_analyses: {
+        Row: {
+          compatibility_score: number | null
+          created_at: string
+          id: string
+          mental_score: number | null
+          physical_score: number | null
+          player_name: string
+          position: string | null
+          recommendations: string[] | null
+          strengths: string[] | null
+          tactical_score: number | null
+          talent_score: number | null
+          technical_score: number | null
+          updated_at: string
+          user_id: string
+          video_url: string | null
+          weaknesses: string[] | null
+        }
+        Insert: {
+          compatibility_score?: number | null
+          created_at?: string
+          id?: string
+          mental_score?: number | null
+          physical_score?: number | null
+          player_name: string
+          position?: string | null
+          recommendations?: string[] | null
+          strengths?: string[] | null
+          tactical_score?: number | null
+          talent_score?: number | null
+          technical_score?: number | null
+          updated_at?: string
+          user_id: string
+          video_url?: string | null
+          weaknesses?: string[] | null
+        }
+        Update: {
+          compatibility_score?: number | null
+          created_at?: string
+          id?: string
+          mental_score?: number | null
+          physical_score?: number | null
+          player_name?: string
+          position?: string | null
+          recommendations?: string[] | null
+          strengths?: string[] | null
+          tactical_score?: number | null
+          talent_score?: number | null
+          technical_score?: number | null
+          updated_at?: string
+          user_id?: string
+          video_url?: string | null
+          weaknesses?: string[] | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
       table_name: {
         Row: {
           data: Json | null
