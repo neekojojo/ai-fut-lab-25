@@ -1,12 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Activity, Zap, TrendingUp, Timer, Dumbbell } from "lucide-react";
-import { ChartContainer } from '@/components/ui/chart';
-import { Line, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import MovementAnalysisChart from '../player-movement/MovementAnalysisChart';
+import { Line, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { ChartContainer } from '@/components/ui/chart';
+import { useToast } from '@/hooks/use-toast';
 
 interface AdvancedAnalysisViewProps {
   analysis: any;
@@ -15,6 +16,17 @@ interface AdvancedAnalysisViewProps {
 
 const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, onBack }) => {
   const [activeTab, setActiveTab] = useState('patterns');
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    // Display toast when the component mounts to confirm loading
+    toast({
+      title: "تحليل الحركة المتقدم",
+      description: "تم تحميل بيانات تحليل الحركة المتقدم بنجاح",
+    });
+    
+    console.log("Advanced analysis view mounted with data:", analysis);
+  }, [toast]);
   
   // مثال لبيانات الحركة للرسوم البيانية
   const speedData = [
@@ -100,29 +112,17 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
                   <h3 className="text-sm font-medium">منحنى السرعة</h3>
                   <div className="bg-muted/20 p-4 rounded-lg">
                     <ChartContainer className="h-[250px]">
-                      <Line 
-                        data={speedData} 
-                        type="monotone" 
-                        dataKey="current" 
-                        name="الحالي"
-                        stroke="#8B5CF6" 
-                        strokeWidth={2}
-                        activeDot={{ r: 6 }}
-                      />
-                      <Line 
-                        data={speedData} 
-                        type="monotone" 
-                        dataKey="previous" 
-                        name="السابق"
-                        stroke="#D1D5DB" 
-                        strokeWidth={2}
-                        strokeDasharray="5 5"
-                      />
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
+                      <ResponsiveContainer width="100%" height="100%">
+                        <Line 
+                          data={speedData} 
+                          type="monotone" 
+                          dataKey="current" 
+                          name="الحالي"
+                          stroke="#8B5CF6" 
+                          strokeWidth={2}
+                          activeDot={{ r: 6 }}
+                        />
+                      </ResponsiveContainer>
                     </ChartContainer>
                   </div>
                   <p className="text-xs text-muted-foreground">تحليل سرعة اللاعب خلال مسافات مختلفة مقارنة بالأداء السابق</p>
@@ -132,30 +132,17 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
                   <h3 className="text-sm font-medium">معدل التسارع</h3>
                   <div className="bg-muted/20 p-4 rounded-lg">
                     <ChartContainer className="h-[250px]">
-                      <Area 
-                        data={accelerationData} 
-                        type="monotone" 
-                        dataKey="current" 
-                        name="الحالي"
-                        stroke="#10B981" 
-                        fill="#10B98120"
-                        strokeWidth={2}
-                      />
-                      <Area 
-                        data={accelerationData} 
-                        type="monotone" 
-                        dataKey="previous" 
-                        name="السابق"
-                        stroke="#D1D5DB" 
-                        fill="#D1D5DB20"
-                        strokeWidth={2}
-                        strokeDasharray="5 5"
-                      />
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
+                      <ResponsiveContainer width="100%" height="100%">
+                        <Area 
+                          data={accelerationData} 
+                          type="monotone" 
+                          dataKey="current" 
+                          name="الحالي"
+                          stroke="#10B981" 
+                          fill="#10B98120"
+                          strokeWidth={2}
+                        />
+                      </ResponsiveContainer>
                     </ChartContainer>
                   </div>
                   <p className="text-xs text-muted-foreground">تحليل معدل التسارع للاعب خلال فترات زمنية مختلفة</p>
@@ -172,25 +159,15 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
                   <h3 className="text-sm font-medium">نمط الحركة</h3>
                   <div className="bg-muted/20 p-4 rounded-lg">
                     <ChartContainer className="h-[250px]">
-                      <Bar 
-                        data={movementPatternData} 
-                        dataKey="current" 
-                        name="الحالي"
-                        fill="#3B82F6" 
-                        radius={[4, 4, 0, 0]}
-                      />
-                      <Bar 
-                        data={movementPatternData} 
-                        dataKey="previous" 
-                        name="السابق"
-                        fill="#D1D5DB" 
-                        radius={[4, 4, 0, 0]}
-                      />
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
+                      <ResponsiveContainer width="100%" height="100%">
+                        <Bar 
+                          data={movementPatternData} 
+                          dataKey="current" 
+                          name="الحالي"
+                          fill="#3B82F6" 
+                          radius={[4, 4, 0, 0]}
+                        />
+                      </ResponsiveContainer>
                     </ChartContainer>
                   </div>
                   <p className="text-xs text-muted-foreground">تحليل أنماط حركة اللاعب ومقارنتها بالأداء السابق</p>
@@ -200,30 +177,18 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
                   <h3 className="text-sm font-medium">كفاءة الطاقة</h3>
                   <div className="bg-muted/20 p-4 rounded-lg">
                     <ChartContainer className="h-[250px]">
-                      <Line 
-                        data={energyEfficiencyData} 
-                        type="monotone" 
-                        dataKey="current" 
-                        name="الحالي"
-                        stroke="#F59E0B" 
-                        strokeWidth={2}
-                        dot={{ r: 4 }}
-                        activeDot={{ r: 6 }}
-                      />
-                      <Line 
-                        data={energyEfficiencyData} 
-                        type="monotone" 
-                        dataKey="previous" 
-                        name="السابق"
-                        stroke="#D1D5DB" 
-                        strokeWidth={2}
-                        strokeDasharray="5 5"
-                      />
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
+                      <ResponsiveContainer width="100%" height="100%">
+                        <Line 
+                          data={energyEfficiencyData} 
+                          type="monotone" 
+                          dataKey="current" 
+                          name="الحالي"
+                          stroke="#F59E0B" 
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                      </ResponsiveContainer>
                     </ChartContainer>
                   </div>
                   <p className="text-xs text-muted-foreground">تحليل كفاءة استهلاك الطاقة خلال المباراة</p>
