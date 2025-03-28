@@ -82,7 +82,7 @@ const MovementAnalysisChart: React.FC<MovementAnalysisChartProps> = ({
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip 
-                    formatter={(value, name) => {
+                    formatter={(value: number | string, name: string) => {
                       return [value, name === 'speed' ? 'السرعة' : 'التسارع'];
                     }}
                     labelFormatter={(label) => `الوقت: ${label}`}
@@ -107,7 +107,7 @@ const MovementAnalysisChart: React.FC<MovementAnalysisChartProps> = ({
                       cx="50%"
                       cy="50%"
                       labelLine={true}
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      label={({ name, percent }) => `${name}: ${(Number(percent) * 100).toFixed(0)}%`}
                       outerRadius={100}
                       fill="#8884d8"
                       dataKey="value"
@@ -117,7 +117,7 @@ const MovementAnalysisChart: React.FC<MovementAnalysisChartProps> = ({
                       ))}
                     </Pie>
                     <Tooltip 
-                      formatter={(value) => [(value * 100).toFixed(0) + '%']}
+                      formatter={(value: number) => [(value * 100).toFixed(0) + '%']}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -169,7 +169,7 @@ const MovementAnalysisChart: React.FC<MovementAnalysisChartProps> = ({
                   {[...Array(10)].map((_, i) => (
                     <div 
                       key={i}
-                      className={`w-full h-${Math.min(10, Math.max(1, Math.ceil(sprintCount / 2)))} ${i < sprintCount / 2 ? 'bg-amber-500' : 'bg-gray-200 dark:bg-gray-700'} rounded-sm`}
+                      className={`w-full h-${Math.min(10, Math.max(1, Math.ceil(Number(sprintCount) / 2)))} ${i < Number(sprintCount) / 2 ? 'bg-amber-500' : 'bg-gray-200 dark:bg-gray-700'} rounded-sm`}
                     ></div>
                   ))}
                 </div>
@@ -184,7 +184,7 @@ const MovementAnalysisChart: React.FC<MovementAnalysisChartProps> = ({
                 <BarChart
                   data={[
                     { name: 'سرعة', value: averageSpeed / maxSpeed * 100 },
-                    { name: 'تسارع', value: (sprintCount / 10) * 100 },
+                    { name: 'تسارع', value: (Number(sprintCount) / 10) * 100 },
                     { name: 'كفاءة', value: efficiencyScore },
                     { name: 'ثبات', value: 100 - (Math.abs(formattedData.reduce((sum, entry, i, arr) => {
                       if (i === 0) return 0;
@@ -195,7 +195,7 @@ const MovementAnalysisChart: React.FC<MovementAnalysisChartProps> = ({
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis label={{ value: 'النسبة المئوية %', angle: -90, position: 'insideLeft' }} />
-                  <Tooltip formatter={(value) => [`${value.toFixed(0)}%`]} />
+                  <Tooltip formatter={(value: number) => [`${value.toFixed(0)}%`]} />
                   <Bar dataKey="value" fill="#8884d8">
                     {[
                       <Cell key="cell-0" fill="#3b82f6" />,

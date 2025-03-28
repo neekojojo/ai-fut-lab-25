@@ -1,7 +1,7 @@
 
 import { PlayerPosition } from './types';
 
-interface MovementAnalysisResult {
+export interface MovementAnalysisResult {
   averageSpeed: number;
   maxSpeed: number;
   totalDistance: number;

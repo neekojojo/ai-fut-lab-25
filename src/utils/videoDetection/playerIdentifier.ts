@@ -1,4 +1,3 @@
-
 import { DetectionResult } from './types';
 import { IdentifiedPlayer, IdentifiedTeam } from './playerIdentification';
 import { getCombinedPlayerIdentification, getCombinedTeamIdentification } from './kaggle';
@@ -15,7 +14,7 @@ export const identifyPlayersInDetectionResult = async (
 }> => {
   // 1. استخراج إطار من الفيديو لتحليل الصور واستخدام التعرف على الوجه
   const frames = await extractFramesAtTimestamps(videoFile, [5]); // Extract frame at 5 seconds
-  const frameData = frames.length > 0 ? frames[0].data.buffer : new ArrayBuffer(0);
+  const frameData = frames.length > 0 ? new Uint8Array(frames[0].data.data.buffer) : new Uint8Array();
   
   console.log(`استخراج إطار من الفيديو للتعرف على اللاعبين: ${frameData.byteLength} بايت`);
   
@@ -29,7 +28,7 @@ export const identifyPlayersInDetectionResult = async (
   try {
     if (frameData.byteLength > 0) {
       const enhancedResults = await enhanceIdentificationWithFaceRecognition(
-        frameData, 
+        frameData.buffer, 
         identifiedPlayers,
         detectionResult
       );
