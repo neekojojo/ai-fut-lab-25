@@ -5,7 +5,9 @@ import { analyzeEyeMovement, type EyeTrackingAnalysis } from './eyeballTracking'
 import type { DetectionResult } from './types';
 import { identifyPlayersInDetectionResult } from './playerIdentifier';
 import { IdentifiedPlayer, IdentifiedTeam } from './playerIdentification';
-import { analyzePlayerMovements } from './movementAnalysis';
+import { analyzePlayerMovements, MovementAnalysisResult } from './movementAnalysis';
+import { analyzeEnhancedPlayerMovements, EnhancedMovementAnalysis } from './movementAnalysisEnhanced';
+import { predictPlayerTrajectory, TrajectoryPrediction } from './trajectoryPrediction';
 import { extractFrameSequence } from './frameExtraction';
 import { PerformanceAnalyzer, PerformanceMetrics } from '../performance/PerformanceAnalyzer';
 
@@ -61,22 +63,24 @@ export const analyzePlayerPerformance = async (
   progressCallback?: (progress: number) => void
 ): Promise<{
   detection: DetectionResult;
-  movementAnalysis: Awaited<ReturnType<typeof analyzePlayerMovements>>;
+  movementAnalysis: MovementAnalysisResult;
+  enhancedMovement: EnhancedMovementAnalysis;
+  trajectoryPrediction: TrajectoryPrediction;
   performanceMetrics: PerformanceMetrics;
   eyeTracking: EyeTrackingAnalysis;
 }> => {
   // Update progress
-  progressCallback?.(10);
+  progressCallback?.(5);
   
   // 1. Detect players if results not provided
   const detection = detectionResult || await detectPeopleInVideo(
     videoFile,
     'yolo',
     'm',
-    (progress) => progressCallback?.(10 + progress * 0.3)
+    (progress) => progressCallback?.(5 + progress * 0.2)
   );
   
-  progressCallback?.(40);
+  progressCallback?.(25);
   
   // 2. Extract a high-resolution frame sequence for detailed analysis
   // Extract 10 seconds of video at 10fps starting at 5 seconds in
@@ -87,21 +91,31 @@ export const analyzePlayerPerformance = async (
     10    // frames per second
   ).catch(() => []);
   
-  progressCallback?.(60);
+  progressCallback?.(40);
   
-  // 3. Analyze player movements
+  // 3. Analyze basic player movements
   const movementAnalysis = await analyzePlayerMovements(detection.playerPositions);
   
-  progressCallback?.(75);
+  progressCallback?.(50);
   
-  // 4. Analyze eye tracking
+  // 4. Perform enhanced movement analysis
+  const enhancedMovement = await analyzeEnhancedPlayerMovements(detection.playerPositions);
+  
+  progressCallback?.(60);
+  
+  // 5. Predict player trajectory
+  const trajectoryPrediction = predictPlayerTrajectory(detection.playerPositions);
+  
+  progressCallback?.(70);
+  
+  // 6. Analyze eye tracking
   const eyeTracking = await analyzeEyeMovement(videoFile, detection);
   
   progressCallback?.(85);
   
-  // 5. Calculate performance metrics
+  // 7. Calculate performance metrics
   const performanceMetrics = PerformanceAnalyzer.analyzeTechnicalPerformance(
-    movementAnalysis,
+    enhancedMovement,
     detection.playerPositions
   );
   
@@ -110,6 +124,8 @@ export const analyzePlayerPerformance = async (
   return {
     detection,
     movementAnalysis,
+    enhancedMovement,
+    trajectoryPrediction,
     performanceMetrics,
     eyeTracking
   };
@@ -121,10 +137,15 @@ export {
   detectPlayersWithYOLO, 
   analyzeEyeMovement,
   analyzePlayerMovements,
+  analyzeEnhancedPlayerMovements,
+  predictPlayerTrajectory,
   PerformanceAnalyzer
 };
 
 // Re-export types
 export * from './types';
 export type { EyeTrackingAnalysis, EyeTrackingData } from './eyeballTracking';
+export type { MovementAnalysisResult } from './movementAnalysis';
+export type { EnhancedMovementAnalysis } from './movementAnalysisEnhanced';
+export type { TrajectoryPrediction } from './trajectoryPrediction';
 export type { PerformanceMetrics } from '../performance/PerformanceAnalyzer';

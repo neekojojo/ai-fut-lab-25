@@ -1,0 +1,302 @@
+
+import React from 'react';
+import { EnhancedMovementChart } from './EnhancedMovementChart';
+import { MovementAnalysisChart } from './MovementAnalysisChart';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { EnhancedMovementAnalysis } from '@/utils/videoDetection/movementAnalysisEnhanced';
+import { TrajectoryPrediction } from '@/utils/videoDetection/trajectoryPrediction';
+import { PerformanceMetrics } from '@/utils/performance/PerformanceAnalyzer';
+import { Badge } from '@/components/ui/badge';
+
+interface AdvancedAnalysisPanelProps {
+  enhancedMovement: EnhancedMovementAnalysis;
+  trajectoryData: TrajectoryPrediction;
+  performanceMetrics: PerformanceMetrics;
+}
+
+const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
+  enhancedMovement,
+  trajectoryData,
+  performanceMetrics
+}) => {
+  // تحضير بيانات الحركة للمخطط
+  const movementData = enhancedMovement.positionalHeatmap.map((entry, i) => ({
+    timestamp: i * 1000, // محاكاة طوابع زمنية
+    speed: enhancedMovement.maxSpeed * Math.random() * 0.8,
+    acceleration: enhancedMovement.maxAcceleration * Math.random() * 0.7
+  }));
+  
+  return (
+    <div className="space-y-6">
+      <Tabs defaultValue="movement" className="w-full">
+        <TabsList className="grid grid-cols-3 mb-4">
+          <TabsTrigger value="movement">الحركة المتقدمة</TabsTrigger>
+          <TabsTrigger value="performance">الأداء الفني</TabsTrigger>
+          <TabsTrigger value="recommendations">التوصيات</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="movement" className="space-y-4">
+          <EnhancedMovementChart
+            enhancedMovement={enhancedMovement}
+            trajectoryData={trajectoryData}
+          />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">تحليل المسار</CardTitle>
+                <CardDescription>تنبؤ بحركة اللاعب المستقبلية</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">احتمالية تغيير الاتجاه</span>
+                    <span className="font-medium">
+                      {(trajectoryData.nextDirectionChange.likelihood * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">الإطار الزمني المتوقع</span>
+                    <span className="font-medium">
+                      {(trajectoryData.nextDirectionChange.timeframe / 1000).toFixed(1)} ثانية
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">عدد النقاط الساخنة</span>
+                    <span className="font-medium">
+                      {trajectoryData.potentialHotspots.length}
+                    </span>
+                  </div>
+                  
+                  <div className="border-t pt-3 mt-3">
+                    <div className="text-sm font-medium mb-2">المناطق الأكثر تواجداً</div>
+                    <div className="flex flex-wrap gap-2">
+                      {trajectoryData.potentialHotspots.map((spot, index) => (
+                        <Badge key={index} variant="outline" className="bg-primary/5">
+                          {spot.x.toFixed(0)}×{spot.y.toFixed(0)} ({(spot.intensity * 100).toFixed(0)}%)
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">مؤشرات متقدمة</CardTitle>
+                <CardDescription>قياسات حركية متقدمة للاعب</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">الوعي التكتيكي</div>
+                    <div className="w-full bg-gray-100 dark:bg-gray-800 h-2 rounded-full">
+                      <div 
+                        className="bg-blue-500 h-2 rounded-full" 
+                        style={{ width: `${enhancedMovement.tacticaAwareness}%` }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between text-xs mt-1">
+                      <span>0</span>
+                      <span>{enhancedMovement.tacticaAwareness}</span>
+                      <span>100</span>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">ملف اتجاهات الحركة</div>
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                      <div className="p-2 bg-primary/5 rounded text-center">
+                        <div className="text-xs text-muted-foreground">للأمام</div>
+                        <div className="font-medium">
+                          {(enhancedMovement.directionalData.forward * 100).toFixed(0)}%
+                        </div>
+                      </div>
+                      <div className="p-2 bg-primary/5 rounded text-center">
+                        <div className="text-xs text-muted-foreground">للخلف</div>
+                        <div className="font-medium">
+                          {(enhancedMovement.directionalData.backward * 100).toFixed(0)}%
+                        </div>
+                      </div>
+                      <div className="p-2 bg-primary/5 rounded text-center">
+                        <div className="text-xs text-muted-foreground">جانبي</div>
+                        <div className="font-medium">
+                          {(enhancedMovement.directionalData.sideways * 100).toFixed(0)}%
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-2 border-t">
+                    <div className="text-sm flex justify-between mb-1">
+                      <span className="text-muted-foreground">سرعة الاستشفاء</span>
+                      <span className="font-medium">{enhancedMovement.recoverySpeed.toFixed(1)}</span>
+                    </div>
+                    <div className="text-sm flex justify-between mb-1">
+                      <span className="text-muted-foreground">الثبات</span>
+                      <span className="font-medium">{enhancedMovement.consistency}/100</span>
+                    </div>
+                    <div className="text-sm flex justify-between mb-1">
+                      <span className="text-muted-foreground">التحمل</span>
+                      <span className="font-medium">{enhancedMovement.stamina}/100</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="performance" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>التقييم الفني</CardTitle>
+              <CardDescription>تحليل مفصل للأداء الفني للاعب</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="text-center p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg">
+                  <div className="text-xs text-muted-foreground">التقييم العام</div>
+                  <div className="text-3xl font-bold mt-1">{performanceMetrics.overallScore}</div>
+                </div>
+                <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                  <div className="text-xs text-muted-foreground">الأداء الفني</div>
+                  <div className="text-3xl font-bold mt-1">{performanceMetrics.technicalScore}</div>
+                </div>
+                <div className="text-center p-4 bg-amber-50 dark:bg-amber-950/30 rounded-lg">
+                  <div className="text-xs text-muted-foreground">الأداء البدني</div>
+                  <div className="text-3xl font-bold mt-1">{performanceMetrics.physicalScore}</div>
+                </div>
+                <div className="text-center p-4 bg-green-50 dark:bg-green-950/30 rounded-lg">
+                  <div className="text-xs text-muted-foreground">الأداء التكتيكي</div>
+                  <div className="text-3xl font-bold mt-1">{performanceMetrics.tacticalScore}</div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-medium mb-2">تفاصيل المهارات</h3>
+                  <div className="space-y-3">
+                    {Object.entries(performanceMetrics.breakdown).map(([key, value]) => (
+                      <div key={key} className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span>{AdvancedAnalysisPanel.getMetricDisplayName(key)}</span>
+                          <span className="font-medium">{value.toFixed(0)}/100</span>
+                        </div>
+                        <div className="w-full bg-gray-100 dark:bg-gray-800 h-1.5 rounded-full">
+                          <div 
+                            className="bg-primary h-1.5 rounded-full" 
+                            style={{ width: `${value}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="recommendations" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>نقاط القوة ومجالات التحسين</CardTitle>
+              <CardDescription>تحليل وتوصيات لتطوير الأداء</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="text-lg font-medium mb-3">نقاط القوة</h3>
+                  <ul className="space-y-2">
+                    {performanceMetrics.strengths.map((strength, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <div className="mt-1 rounded-full bg-green-500 w-2 h-2"></div>
+                        <div>
+                          <div className="font-medium">{strength}</div>
+                          <p className="text-sm text-muted-foreground">
+                            {AdvancedAnalysisPanel.getStrengthDescription(strength)}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-medium mb-3">مجالات التحسين</h3>
+                  <ul className="space-y-2">
+                    {performanceMetrics.improvementAreas.map((area, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <div className="mt-1 rounded-full bg-amber-500 w-2 h-2"></div>
+                        <div>
+                          <div className="font-medium">{area}</div>
+                          <p className="text-sm text-muted-foreground">
+                            {performanceMetrics.recommendations[index]}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="mt-6 p-4 bg-muted rounded-lg">
+                <h3 className="text-md font-medium mb-2">خطة التطوير المقترحة</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  بناءً على تحليل الأداء، نوصي بالتركيز على المجالات التالية لتحقيق أقصى تطور:
+                </p>
+                <ol className="list-decimal list-inside space-y-1 text-sm">
+                  {performanceMetrics.recommendations.map((rec, i) => (
+                    <li key={i}>{rec}</li>
+                  ))}
+                </ol>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+// وظائف مساعدة للعرض
+AdvancedAnalysisPanel.getMetricDisplayName = (metricKey: string): string => {
+  const displayNames: Record<string, string> = {
+    speed: 'السرعة',
+    endurance: 'التحمل',
+    agility: 'الرشاقة',
+    control: 'التحكم',
+    positioning: 'التمركز',
+    decisionMaking: 'اتخاذ القرار',
+    explosiveness: 'القوة الانفجارية',
+    recoveryRate: 'معدل الاستشفاء',
+    tacticalAwareness: 'الوعي التكتيكي',
+    pressureResistance: 'مقاومة الضغط',
+    consistency: 'الثبات'
+  };
+  
+  return displayNames[metricKey] || metricKey;
+};
+
+AdvancedAnalysisPanel.getStrengthDescription = (strength: string): string => {
+  const descriptions: Record<string, string> = {
+    'السرعة': 'قدرة فائقة على الحركة بسرعة عالية وتنفيذ انطلاقات سريعة',
+    'التحمل': 'قدرة ممتازة على الاستمرار بنفس المستوى طوال المباراة',
+    'الرشاقة': 'قدرة متميزة على تغيير الاتجاه بسرعة والمناورة',
+    'التحكم': 'مستوى عالٍ من السيطرة والتحكم في الحركة',
+    'التمركز': 'ذكاء تكتيكي عالٍ في اختيار المواقع المناسبة',
+    'اتخاذ القرار': 'قدرة متميزة على اتخاذ القرارات السريعة والصحيحة',
+    'القوة الانفجارية': 'قدرة عالية على الانطلاق السريع والتسارع المفاجئ',
+    'معدل الاستشفاء': 'قدرة ممتازة على استعادة اللياقة بسرعة بعد المجهود',
+    'الوعي التكتيكي': 'فهم ممتاز للمواقف التكتيكية وقراءة اللعب',
+    'مقاومة الضغط': 'أداء ثابت ومتميز تحت الضغط',
+    'الثبات': 'مستوى أداء ثابت ومتوازن طوال المباراة'
+  };
+  
+  return descriptions[strength] || 'نقطة قوة متميزة تساهم في الأداء العام';
+};
+
+export default AdvancedAnalysisPanel;
