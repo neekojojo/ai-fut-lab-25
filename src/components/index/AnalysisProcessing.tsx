@@ -180,7 +180,7 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
       
       {/* Display warning and reset button if analysis appears stuck */}
       {isStuck && (
-        <Alert variant="warning" className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
+        <Alert variant="default" className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
           <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-500" />
           <AlertTitle className="text-yellow-800 dark:text-yellow-500">
             يبدو أن عملية التحليل تستغرق وقتًا أطول من المتوقع
