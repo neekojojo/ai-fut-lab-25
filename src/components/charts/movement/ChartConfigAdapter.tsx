@@ -21,7 +21,12 @@ const ChartConfigAdapter: React.FC<ChartConfigAdapterProps> = ({
       // Only include other properties if they exist
       ...(value.icon && { icon: value.icon }),
       ...(value.curve && { curve: value.curve }),
-      ...(value.theme && { theme: value.theme }),
+      // Convert theme string to object format if it exists
+      ...(value.theme && { 
+        theme: typeof value.theme === 'string' 
+          ? { light: value.theme, dark: value.theme } 
+          : value.theme 
+      }),
     };
     return acc;
   }, {} as ChartConfig);

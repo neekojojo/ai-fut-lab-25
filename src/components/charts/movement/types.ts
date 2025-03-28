@@ -6,7 +6,10 @@ export interface ChartConfigValue {
   label: string;
   icon?: React.FC<React.SVGProps<SVGSVGElement>>;
   curve?: string;
-  theme?: string;
+  theme?: string | {
+    light?: string;
+    dark?: string;
+  };
 }
 
 export interface ChartConfigType {
