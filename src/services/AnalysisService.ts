@@ -93,7 +93,7 @@ export const analyzeVideo = async (
       const totalElapsed = now - analysisStartTime;
       if (totalElapsed > (maxAnalysisTime * 0.7) && currentProgress < 95) {
         console.log("Analysis approaching timeout, accelerating progress");
-        currentProgress = Math.min(96, currentProgress + 7); // تسريع أكبر للتقدم
+        currentProgress = Math.min(96, currentProgress + 7); // تسريع ��كبر للتقدم
         setProgress(currentProgress);
       }
       
@@ -194,7 +194,6 @@ const createPlaceholderAnalysis = (): PlayerAnalysis => {
     playerId: 'auto-generated',
     playerName: "John Doe",
     position: "Forward",
-    date: new Date().toISOString(),
     timestamp: new Date().toISOString(),
     duration: 120,
     confidence: 0.7,
@@ -254,7 +253,9 @@ const createPlaceholderAnalysis = (): PlayerAnalysis => {
     advancedInsights: ["يُظهر حركة جيدة خارج الكرة", "وعي مكاني قوي"],
     strengths: ["سرعة عالية", "تمركز جيد"],
     weaknesses: ["يحتاج لتحسين التسديد", "القوة البدنية متوسطة"],
-    recommendations: ["تمارين تحسين دقة التسديد", "تمارين لزيادة القوة البدنية"]
+    recommendations: ["تمارين تحسين دقة التسديد", "تمارين لزيادة القوة البدنية"],
+    passes: [],
+    heatmap: []
   };
 };
 
