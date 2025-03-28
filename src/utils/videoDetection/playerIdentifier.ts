@@ -2,7 +2,7 @@
 import { DetectionResult } from './types';
 import { IdentifiedPlayer, IdentifiedTeam } from './playerIdentification';
 import { getCombinedPlayerIdentification, getCombinedTeamIdentification } from './kaggle';
-import { extractFrameFromVideo } from './frameExtraction';
+import { extractFramesAtTimestamps } from './frameExtraction';
 import * as faceapi from 'face-api.js';
 
 // وظيفة تحويل البيانات من نتيجة الكشف إلى قائمة اللاعبين المحددين
@@ -14,9 +14,10 @@ export const identifyPlayersInDetectionResult = async (
   teams: IdentifiedTeam[]
 }> => {
   // 1. استخراج إطار من الفيديو لتحليل الصور واستخدام التعرف على الوجه
-  const frameData = await extractFrameFromVideo(videoFile, 5);
+  const frames = await extractFramesAtTimestamps(videoFile, [5]); // Extract frame at 5 seconds
+  const frameData = frames.length > 0 ? frames[0].data.buffer : new ArrayBuffer(0);
   
-  console.log(`استخراج إطار من الفيديو للتعرف على اللاعبين: ${frameData.length} بايت`);
+  console.log(`استخراج إطار من الفيديو للتعرف على اللاعبين: ${frameData.byteLength} بايت`);
   
   // 2. الحصول على اللاعبين المحددين من مصادر بيانات مختلفة
   let identifiedPlayers = await getCombinedPlayerIdentification(detectionResult);
@@ -26,7 +27,7 @@ export const identifyPlayersInDetectionResult = async (
   
   // 3. محاولة تعزيز دقة التعرف باستخدام تقنيات التعرف على الوجه إذا أمكن
   try {
-    if (frameData.length > 0) {
+    if (frameData.byteLength > 0) {
       const enhancedResults = await enhanceIdentificationWithFaceRecognition(
         frameData, 
         identifiedPlayers,
