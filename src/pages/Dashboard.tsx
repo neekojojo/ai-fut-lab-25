@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -101,7 +100,14 @@ const Dashboard: React.FC = () => {
         email: user.email || '',
         name: data.full_name || user.user_metadata?.full_name || 'User',
         avatarUrl: data.avatar_url || null,
-        bio: data.bio || '', // This now properly handles the bio field from the database
+        bio: data.bio || '',
+        age: data.age,
+        country: data.country,
+        city: data.city,
+        height: data.height,
+        weight: data.weight,
+        preferredFoot: data.preferred_foot,
+        position: data.position,
         analyses: [],
         badges: [
           {
@@ -129,8 +135,8 @@ const Dashboard: React.FC = () => {
       console.error('Error fetching user profile:', error);
       toast({
         variant: "destructive",
-        title: "خطأ في تحميل الملف الشخصي",
-        description: "لم نتمكن من تحميل بيانات ملفك الشخصي. يرجى المحاولة مرة أخرى.",
+        title: "Error Loading Profile",
+        description: "We couldn't load your profile data. Please try again.",
       });
       
       if (user) {
@@ -139,7 +145,7 @@ const Dashboard: React.FC = () => {
           email: user.email || '',
           name: user.user_metadata?.full_name || 'User',
           avatarUrl: null,
-          bio: '', // Add default empty bio for the default profile as well
+          bio: '',
           analyses: [],
           badges: [],
           trainingProgress: {
@@ -176,8 +182,8 @@ const Dashboard: React.FC = () => {
     } catch (error) {
       console.error('Error fetching analyses:', error);
       toast({
-        title: "خطأ في تحميل التحليلات",
-        description: "لم نتمكن من تحميل تحليلاتك السابقة. يرجى المحاولة مرة أخرى.",
+        title: "Error Loading Analyses",
+        description: "We couldn't load your previous analyses. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -191,7 +197,7 @@ const Dashboard: React.FC = () => {
   };
 
   if (loading || !userProfile || isLoadingProfile) {
-    return <div className="flex justify-center items-center min-h-screen">جاري التحميل...</div>;
+    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
   }
 
   return (

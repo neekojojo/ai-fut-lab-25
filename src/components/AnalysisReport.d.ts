@@ -1,4 +1,3 @@
-
 export interface PlayerMovement {
   x: number;
   y: number;
@@ -175,6 +174,15 @@ export interface UserProfile {
     skillsImproved: string[];
     nextRecommendation: string;
   };
+  
+  // New user profile fields
+  age?: number;
+  country?: string;
+  city?: string;
+  height?: string;
+  weight?: string;
+  preferredFoot?: 'Left' | 'Right' | 'Both';
+  position?: string;
 }
 
 export interface TrainingVideo {
