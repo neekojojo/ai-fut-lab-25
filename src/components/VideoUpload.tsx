@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { toast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { X, Upload, Video, AlertCircle } from 'lucide-react';
 
 interface VideoUploadProps {
@@ -22,6 +22,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({
   const [previewUrl, setPreviewUrl] = useState<string | null>(externalPreviewUrl);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     return () => {
