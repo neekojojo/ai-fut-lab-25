@@ -28,17 +28,22 @@ export const analyzeVideo = async (
     setProgress(0);
     setStage('بدء تحليل الفيديو');
     
+    console.log("Starting video analysis...");
+    
     // Start real video analysis
     const result = await analyzeFootballVideo(videoFile);
     
     // Set up progress updates to track real analysis progress
     result.progressUpdates((progress, stage) => {
+      console.log(`Progress update: ${progress}%, stage: ${stage}`);
       setProgress(progress);
       setStage(stage);
     });
     
     // Set analysis result
     setAnalysis(result.analysis);
+    
+    console.log("Analysis completed, setting state to complete");
     
     // Set to complete state when done
     setTimeout(() => {
