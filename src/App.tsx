@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Index from './pages/Index';
 import Dashboard from './pages/Dashboard';
@@ -10,6 +11,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/components/auth/AuthContext';
 import { Suspense } from 'react';
+import AdvancedAnalysis from './pages/AdvancedAnalysis';
 
 // إنشاء عميل الاستعلام لإدارة حالة البيانات
 const queryClient = new QueryClient({

@@ -11,6 +11,13 @@ export const CHART_COLORS = {
   highlight: '#D946EF',   // Pink
   background: '#F1F0FB',  // Light purple/gray
   text: '#1A1F2C',        // Dark purple/blue
+  
+  // إضافة الألوان المفقودة
+  blue: '#0EA5E9',        // نفس لون tertiary
+  green: '#10B981',       // نفس لون quaternary
+  orange: '#F97316',      // نفس لون secondary
+  purple: '#8B5CF6',      // نفس لون primary
+  red: '#EF4444',         // نفس لون negative
 };
 
 // Generic formatter for tooltip values to handle different types
