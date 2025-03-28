@@ -1,6 +1,7 @@
+
 import { PlayerStats } from '@/utils/dataProcessing/playerAnalysisTypes';
-import { PlayerComparison, TrainingRecommendation } from '@/utils/ml/playerMLService';
-import { PlayerAnalysis } from '@/components/AnalysisReport.d';
+import { PlayerComparison, TrainingRecommendation, ProfessionalPlayer, SimilarityMetric } from '@/utils/ml/playerMLService';
+import { PlayerAnalysis, PlayerMovement, PassAttempt, PositionHeatmap } from '@/components/AnalysisReport.d';
 
 export const getPlayerStats = (): PlayerStats => ({
   avgSpeed: 15.2,
@@ -13,71 +14,88 @@ export const getPlayerStats = (): PlayerStats => ({
   movementEfficiency: 80,
 });
 
-export const getMockAnalysis = (): PlayerAnalysis => ({
-  id: "analysis-1",
-  playerName: "Alex Johnson",
-  position: "Midfielder",
-  timestamp: new Date().toISOString(),
-  duration: 120,
-  confidence: 0.85,
-  stats: {
-    pace: 82,
-    shooting: 75,
-    passing: 85,
-    dribbling: 78,
-    defending: 65,
-    physical: 75,
-    stamina: 80,
-    acceleration: 83,
-    agility: 76,
-    balance: 72,
-    ballControl: 79,
-    decision: 74,
-    anticipation: 71,
-    positioning: 76,
-    vision: 83,
-    composure: 79
-  },
-  movements: [],
-  passes: [],
-  heatmap: [],
-  strengths: [
-    "Exceptional vision for through balls",
-    "Consistent passing accuracy over long distances",
-    "Effective at switching play to the opposite flank"
-  ],
-  weaknesses: [
-    "Occasionally loses concentration during defensive transitions",
-    "Could improve decision-making in the final third"
-  ],
-  summary: "A technically gifted midfielder with excellent passing range and vision.",
-  advancedInsights: ["Shows great potential in central midfield role", "Excellent at creating chances"],
-  recommendations: [
-    "Practice scanning before receiving passes with 'shoulder checks'",
-    "Work on quick transition from defense to attack",
-  ],
-  performanceScore: 82,
-  // Added fields to match updated interface
-  marketValue: "$2.5M",
-  talentScore: 85,
-  compatibilityScore: 80,
-  performance: {
-    technical: 82,
-    physical: 75,
-    tactical: 79,
-    mental: 81,
-  },
-  detailedSkills: {
-    passing: 85,
-    shooting: 72,
-    dribbling: 78,
-    tackling: 65,
-    positioning: 76
-  }
-});
+// Define a new interface for the mock analysis data
+export interface MockAnalysis {
+  playerMovements: PlayerMovement[];
+  passes: PassAttempt[];
+  heatmap: PositionHeatmap[];
+  analysis: PlayerAnalysis;
+}
 
-export const getPlayerComparison = (): PlayerComparison => ({
-  similarProfessionals: [
+export const getMockAnalysis = (): MockAnalysis => {
+  const analysis: PlayerAnalysis = {
+    id: "analysis-1",
+    playerName: "Alex Johnson",
+    position: "Midfielder",
+    timestamp: new Date().toISOString(),
+    duration: 120,
+    confidence: 0.85,
+    stats: {
+      pace: 82,
+      shooting: 75,
+      passing: 85,
+      dribbling: 78,
+      defending: 65,
+      physical: 75,
+      stamina: 80,
+      acceleration: 83,
+      agility: 76,
+      balance: 72,
+      ballControl: 79,
+      decision: 74,
+      anticipation: 71,
+      positioning: 76,
+      vision: 83,
+      composure: 79
+    },
+    movements: [],
+    passes: [],
+    heatmap: [],
+    strengths: [
+      "Exceptional vision for through balls",
+      "Consistent passing accuracy over long distances",
+      "Effective at switching play to the opposite flank"
+    ],
+    weaknesses: [
+      "Occasionally loses concentration during defensive transitions",
+      "Could improve decision-making in the final third"
+    ],
+    summary: "A technically gifted midfielder with excellent passing range and vision.",
+    advancedInsights: ["Shows great potential in central midfield role", "Excellent at creating chances"],
+    recommendations: [
+      "Practice scanning before receiving passes with 'shoulder checks'",
+      "Work on quick transition from defense to attack",
+    ],
+    performanceScore: 82,
+    // Added fields to match updated interface
+    marketValue: "$2.5M",
+    talentScore: 85,
+    compatibilityScore: 80,
+    performance: {
+      technical: 82,
+      physical: 75,
+      tactical: 79,
+      mental: 81,
+    },
+    detailedSkills: {
+      passing: 85,
+      shooting: 72,
+      dribbling: 78,
+      tackling: 65,
+      positioning: 76
+    }
+  };
+  
+  return {
+    playerMovements: [],
+    passes: [],
+    heatmap: [],
+    analysis
+  };
+};
+
+export const getPlayerComparison = (): PlayerComparison => {
+  const similarPlayers: ProfessionalPlayer[] = [
     {
       name: "Kevin De Bruyne",
       team: "Manchester City",
@@ -99,15 +117,21 @@ export const getPlayerComparison = (): PlayerComparison => ({
       similarity: 68,
       strengths: ["Work Rate", "Technical Ability", "Versatility"]
     }
-  ],
-  similarityMetrics: [
+  ];
+  
+  const similarityMetrics: SimilarityMetric[] = [
     { category: "Passing", score: 78, description: "Excellent range of passing with good accuracy." },
     { category: "Vision", score: 82, description: "Great awareness of teammates' positioning." },
     { category: "Technique", score: 75, description: "Good ball control and first touch." },
     { category: "Positioning", score: 70, description: "Solid understanding of spatial awareness." },
     { category: "Decision Making", score: 65, description: "Sometimes hesitates in the final third." }
-  ]
-});
+  ];
+  
+  return {
+    similarProfessionals: similarPlayers,
+    similarityMetrics
+  };
+};
 
 export const getTrainingRecommendations = (): TrainingRecommendation[] => ([
   {

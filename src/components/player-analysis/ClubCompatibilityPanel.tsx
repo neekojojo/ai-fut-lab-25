@@ -21,9 +21,31 @@ const ClubCompatibilityPanel: React.FC<ClubCompatibilityPanelProps> = ({ playerA
   useEffect(() => {
     const fetchCompatibility = async () => {
       try {
+        // Convert PlayerAnalysis stats to the format expected by teamTacticsService
+        const adaptedStats = {
+          avgSpeed: playerAnalysis.stats.pace || 70,
+          maxSpeed: playerAnalysis.stats.acceleration || 75,
+          avgAcceleration: playerAnalysis.stats.acceleration || 70,
+          distanceCovered: 1000,
+          balanceScore: playerAnalysis.stats.balance || 70,
+          technicalScore: playerAnalysis.stats.ballControl || 75,
+          physicalScore: playerAnalysis.stats.physical || 75,
+          movementEfficiency: playerAnalysis.stats.agility || 70,
+          // Additional properties needed by calculateTacticalFit
+          passing: playerAnalysis.stats.passing || 70,
+          ballControl: playerAnalysis.stats.ballControl || 70,
+          vision: playerAnalysis.stats.vision || 70,
+          pace: playerAnalysis.stats.pace || 70,
+          stamina: playerAnalysis.stats.stamina || 70,
+          physical: playerAnalysis.stats.physical || 70,
+          positioning: playerAnalysis.stats.positioning || 70,
+          anticipation: playerAnalysis.stats.anticipation || 70,
+          decision: playerAnalysis.stats.decision || 70
+        };
+        
         // Analyze compatibility with Saudi League teams
         const results = await teamTacticsService.analyzeTeamCompatibility(
-          playerAnalysis.stats,
+          adaptedStats,
           playerAnalysis.position,
           playerAnalysis.strengths
         );

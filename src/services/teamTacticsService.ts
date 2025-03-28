@@ -1,6 +1,29 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { PlayerStats } from '@/utils/dataProcessing/playerDataAnalysis';
+
+// Extended PlayerStats interface to include all properties needed
+export interface ExtendedPlayerStats {
+  // Original PlayerStats properties
+  avgSpeed: number;
+  maxSpeed: number;
+  avgAcceleration: number;
+  distanceCovered: number;
+  balanceScore: number;
+  technicalScore: number;
+  physicalScore: number;
+  movementEfficiency: number;
+  
+  // Additional properties for analysis
+  passing?: number;
+  ballControl?: number;
+  vision?: number;
+  pace?: number;
+  stamina?: number;
+  physical?: number;
+  positioning?: number;
+  anticipation?: number;
+  decision?: number;
+}
 
 // Interface for Saudi League team data
 export interface SaudiLeagueTeam {
@@ -207,23 +230,23 @@ const calculatePositionFit = (playerPosition: string, team: SaudiLeagueTeam): nu
 };
 
 // Calculate tactical fit score based on player stats and team profile
-const calculateTacticalFit = (playerStats: PlayerStats, team: SaudiLeagueTeam): number => {
+const calculateTacticalFit = (playerStats: ExtendedPlayerStats, team: SaudiLeagueTeam): number => {
   // Create player tactical vector
   const playerTacticalVector = [
     // Technical values
-    playerStats.passing / 100 * 100,
-    playerStats.ballControl / 100 * 100,
-    playerStats.vision / 100 * 100,
+    (playerStats.passing || 70) / 100 * 100,
+    (playerStats.ballControl || 70) / 100 * 100,
+    (playerStats.vision || 70) / 100 * 100,
     
     // Physical values
-    playerStats.pace / 100 * 100,
-    playerStats.stamina / 100 * 100,
-    playerStats.physical / 100 * 100,
+    (playerStats.pace || 70) / 100 * 100,
+    (playerStats.stamina || 70) / 100 * 100,
+    (playerStats.physical || 70) / 100 * 100,
     
     // Tactical values
-    playerStats.positioning / 100 * 100,
-    playerStats.anticipation / 100 * 100,
-    playerStats.decision / 100 * 100
+    (playerStats.positioning || 70) / 100 * 100,
+    (playerStats.anticipation || 70) / 100 * 100,
+    (playerStats.decision || 70) / 100 * 100
   ];
   
   // Create team tactical vector that corresponds to player attributes
@@ -352,7 +375,7 @@ const generateRoleDescription = (playerPosition: string, team: SaudiLeagueTeam):
 
 // Main compatibility analysis function
 export const analyzeTeamCompatibility = async (
-  playerStats: PlayerStats,
+  playerStats: ExtendedPlayerStats,
   playerPosition: string,
   playerStrengths: string[]
 ): Promise<TeamCompatibilityResult[]> => {

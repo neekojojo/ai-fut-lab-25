@@ -1,6 +1,9 @@
+
 import React from 'react';
 import { 
-  PlayerStats, 
+  PlayerStats as DataProcessingPlayerStats, 
+} from '@/utils/dataProcessing/playerAnalysisTypes';
+import { 
   ProfessionalPlayer, 
   SimilarityMetric, 
   TrainingRecommendation 
@@ -23,11 +26,11 @@ interface MockAnalysis {
 
 interface AnalysisContentProps {
   activeTab: string;
-  playerStats: PlayerStats;
+  playerStats: DataProcessingPlayerStats;
   mockAnalysis: MockAnalysis;
   trainingRecommendations: TrainingRecommendation[];
   playerComparison: {
-    similarPlayers: ProfessionalPlayer[];
+    similarProfessionals: ProfessionalPlayer[];
     similarityMetrics: SimilarityMetric[];
   };
 }
