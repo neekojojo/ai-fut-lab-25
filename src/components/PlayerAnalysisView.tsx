@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import AnalysisHeader from './player-analysis/AnalysisHeader';
 import AnalysisTabNav from './player-analysis/AnalysisTabNav';
 import AnalysisContent from './player-analysis/AnalysisContent';
@@ -40,7 +40,7 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
     console.log("Switching to advanced view mode");
     setViewMode('advanced');
     
-    // Add a console log to confirm the execution
+    // إضافة إشعار لتأكيد التنفيذ
     toast({
       title: "تم فتح التحليل المتقدم",
       description: "تم الانتقال إلى عرض التحليل المتقدم للحركة"
@@ -51,13 +51,15 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
   if (viewMode === 'advanced') {
     console.log("Rendering advanced analysis view");
     return (
-      <AdvancedAnalysisView 
-        analysis={mockAnalysis.analysis} 
-        onBack={() => {
-          console.log("Going back to tabs view");
-          setViewMode('tabs');
-        }} 
-      />
+      <div className="animate-fade-in">
+        <AdvancedAnalysisView 
+          analysis={mockAnalysis.analysis} 
+          onBack={() => {
+            console.log("Going back to tabs view");
+            setViewMode('tabs');
+          }} 
+        />
+      </div>
     );
   }
   

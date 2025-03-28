@@ -3,7 +3,8 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Activity } from "lucide-react";
-import NumberMovementChart from '@/components/NumberMovementChart';
+import { ChartContainer } from '@/components/ui/chart';
+import { Line, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface AdvancedAnalysisViewProps {
   analysis: any;
@@ -13,22 +14,22 @@ interface AdvancedAnalysisViewProps {
 const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, onBack }) => {
   // Example movement data for charts
   const speedData = [
-    { name: "0m", current: 0, previous: 0 },
-    { name: "5m", current: 12, previous: 10 },
-    { name: "10m", current: 18, previous: 15 },
-    { name: "15m", current: 22, previous: 20 },
-    { name: "20m", current: 19, previous: 17 },
-    { name: "25m", current: 15, previous: 14 },
-    { name: "30m", current: 10, previous: 8 }
+    { name: "0م", current: 0, previous: 0 },
+    { name: "5م", current: 12, previous: 10 },
+    { name: "10م", current: 18, previous: 15 },
+    { name: "15م", current: 22, previous: 20 },
+    { name: "20م", current: 19, previous: 17 },
+    { name: "25م", current: 15, previous: 14 },
+    { name: "30م", current: 10, previous: 8 }
   ];
 
   const accelerationData = [
-    { name: "0s", current: 0, previous: 0 },
-    { name: "1s", current: 4.2, previous: 3.8 },
-    { name: "2s", current: 3.8, previous: 3.5 },
-    { name: "3s", current: 2.5, previous: 2.2 },
-    { name: "4s", current: 1.8, previous: 1.5 },
-    { name: "5s", current: 0.9, previous: 0.8 }
+    { name: "0ث", current: 0, previous: 0 },
+    { name: "1ث", current: 4.2, previous: 3.8 },
+    { name: "2ث", current: 3.8, previous: 3.5 },
+    { name: "3ث", current: 2.5, previous: 2.2 },
+    { name: "4ث", current: 1.8, previous: 1.5 },
+    { name: "5ث", current: 0.9, previous: 0.8 }
   ];
 
   const movementPatternData = [
@@ -41,14 +42,28 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
   ];
 
   const energyEfficiencyData = [
-    { name: "0min", current: 100, previous: 100 },
-    { name: "15min", current: 95, previous: 90 },
-    { name: "30min", current: 90, previous: 82 },
-    { name: "45min", current: 88, previous: 78 },
-    { name: "60min", current: 85, previous: 73 },
-    { name: "75min", current: 82, previous: 68 },
-    { name: "90min", current: 80, previous: 65 }
+    { name: "0د", current: 100, previous: 100 },
+    { name: "15د", current: 95, previous: 90 },
+    { name: "30د", current: 90, previous: 82 },
+    { name: "45د", current: 88, previous: 78 },
+    { name: "60د", current: 85, previous: 73 },
+    { name: "75د", current: 82, previous: 68 },
+    { name: "90د", current: 80, previous: 65 }
   ];
+
+  const renderLineChart = (data: any[], dataKeys: string[], colors: string[]) => (
+    <ResponsiveContainer width="100%" height={250}>
+      <Line 
+        data={data} 
+        type="monotone" 
+        dataKey={dataKeys[0]} 
+        stroke={colors[0]} 
+        strokeWidth={2} 
+        dot={{ r: 4 }}
+        activeDot={{ r: 6 }}
+      />
+    </ResponsiveContainer>
+  );
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -69,27 +84,70 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
             <CardTitle>السرعة والتسارع</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <NumberMovementChart
-              title="منحنى السرعة"
-              data={speedData}
-              type="line"
-              colors={{
-                current: "#8B5CF6",
-                previous: "#D1D5DB"
-              }}
-              description="تحليل سرعة اللاعب خلال مسافات مختلفة مقارنة بالأداء السابق"
-            />
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium">منحنى السرعة</h3>
+              <div className="bg-muted/20 p-4 rounded-lg">
+                <ChartContainer className="h-[250px]">
+                  <Line 
+                    data={speedData} 
+                    type="monotone" 
+                    dataKey="current" 
+                    name="الحالي"
+                    stroke="#8B5CF6" 
+                    strokeWidth={2}
+                    activeDot={{ r: 6 }}
+                  />
+                  <Line 
+                    data={speedData} 
+                    type="monotone" 
+                    dataKey="previous" 
+                    name="السابق"
+                    stroke="#D1D5DB" 
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                  />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                </ChartContainer>
+              </div>
+              <p className="text-xs text-muted-foreground">تحليل سرعة اللاعب خلال مسافات مختلفة مقارنة بالأداء السابق</p>
+            </div>
 
-            <NumberMovementChart
-              title="معدل التسارع"
-              data={accelerationData}
-              type="area"
-              colors={{
-                current: "#10B981",
-                previous: "#D1D5DB"
-              }}
-              description="تحليل معدل التسارع للاعب خلال فترات زمنية مختلفة"
-            />
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium">معدل التسارع</h3>
+              <div className="bg-muted/20 p-4 rounded-lg">
+                <ChartContainer className="h-[250px]">
+                  <Area 
+                    data={accelerationData} 
+                    type="monotone" 
+                    dataKey="current" 
+                    name="الحالي"
+                    stroke="#10B981" 
+                    fill="#10B98120"
+                    strokeWidth={2}
+                  />
+                  <Area 
+                    data={accelerationData} 
+                    type="monotone" 
+                    dataKey="previous" 
+                    name="السابق"
+                    stroke="#D1D5DB" 
+                    fill="#D1D5DB20"
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                  />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                </ChartContainer>
+              </div>
+              <p className="text-xs text-muted-foreground">تحليل معدل التسارع للاعب خلال فترات زمنية مختلفة</p>
+            </div>
           </CardContent>
         </Card>
 
@@ -98,27 +156,66 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
             <CardTitle>أنماط الحركة وكفاءة الطاقة</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <NumberMovementChart
-              title="نمط الحركة"
-              data={movementPatternData}
-              type="bar"
-              colors={{
-                current: "#3B82F6",
-                previous: "#D1D5DB"
-              }}
-              description="تحليل أنماط حركة اللاعب ومقارنتها بالأداء السابق"
-            />
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium">نمط الحركة</h3>
+              <div className="bg-muted/20 p-4 rounded-lg">
+                <ChartContainer className="h-[250px]">
+                  <Bar 
+                    data={movementPatternData} 
+                    dataKey="current" 
+                    name="الحالي"
+                    fill="#3B82F6" 
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <Bar 
+                    data={movementPatternData} 
+                    dataKey="previous" 
+                    name="السابق"
+                    fill="#D1D5DB" 
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                </ChartContainer>
+              </div>
+              <p className="text-xs text-muted-foreground">تحليل أنماط حركة اللاعب ومقارنتها بالأداء السابق</p>
+            </div>
 
-            <NumberMovementChart
-              title="كفاءة الطاقة"
-              data={energyEfficiencyData}
-              type="line"
-              colors={{
-                current: "#F59E0B",
-                previous: "#D1D5DB"
-              }}
-              description="تحليل كفاءة استهلاك الطاقة خلال المباراة"
-            />
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium">كفاءة الطاقة</h3>
+              <div className="bg-muted/20 p-4 rounded-lg">
+                <ChartContainer className="h-[250px]">
+                  <Line 
+                    data={energyEfficiencyData} 
+                    type="monotone" 
+                    dataKey="current" 
+                    name="الحالي"
+                    stroke="#F59E0B" 
+                    strokeWidth={2}
+                    dot={{ r: 4 }}
+                    activeDot={{ r: 6 }}
+                  />
+                  <Line 
+                    data={energyEfficiencyData} 
+                    type="monotone" 
+                    dataKey="previous" 
+                    name="السابق"
+                    stroke="#D1D5DB" 
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                  />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                </ChartContainer>
+              </div>
+              <p className="text-xs text-muted-foreground">تحليل كفاءة استهلاك الطاقة خلال المباراة</p>
+            </div>
           </CardContent>
         </Card>
       </div>
