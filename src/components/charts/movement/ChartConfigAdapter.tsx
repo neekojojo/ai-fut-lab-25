@@ -1,6 +1,6 @@
 
 import React, { ReactNode } from "react";
-import { ChartConfig } from '@/components/ui/chart/types';
+import { ChartConfig, PayloadConfig } from '@/components/ui/chart/types';
 import { Activity, Zap, AreaChart, BarChart2, LineChart } from 'lucide-react';
 import { ChartConfigType } from './types';
 
@@ -32,13 +32,15 @@ export const adaptChartConfig = (colors: Record<string, string>, chartType: 'lin
       icon = AreaChart;
     }
     
-    config[key] = {
+    const configItem: PayloadConfig = {
       theme: convertTheme(color),
       curve,
       icon,
       color,
       label: key.charAt(0).toUpperCase() + key.slice(1)
     };
+    
+    config[key] = configItem;
   });
   
   return config;

@@ -15,7 +15,7 @@ export function ChartStyle({
     const cssRules: string[] = [];
 
     Object.entries(config).forEach(([key, value]) => {
-      if (value.theme) {
+      if (value?.theme) {
         const { light, dark } = value.theme;
         cssRules.push(`
           [data-chart="${id}"] [data-key="${key}"] {
