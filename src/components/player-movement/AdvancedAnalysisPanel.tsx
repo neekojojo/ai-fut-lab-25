@@ -88,6 +88,35 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
   const technicalConsistency = enhancedMovement.technicalConsistency || Math.round(70 + Math.random() * 20);
   const pressureResistance = enhancedMovement.pressureResistance || Math.round(65 + Math.random() * 25);
   
+  // Define types for the recommendations to fix type errors
+  interface RecommendationImpact {
+    metric: string;
+    expectedGain: number;
+  }
+
+  interface Recommendation {
+    title: string;
+    description: string;
+    duration: number;
+    expectedImpact: RecommendationImpact[];
+  }
+
+  // Ensuring that we have the needed properties with the right types
+  const strengths = performanceMetrics.strengths || ['speed', 'agility', 'tacticalAwareness'];
+  const weaknesses = performanceMetrics.weaknesses || ['endurance', 'recoveryRate']; 
+  const recommendations: Recommendation[] = (performanceMetrics.recommendations as Recommendation[]) || [
+    {
+      title: "تمارين السرعة والانفجارية",
+      description: "مجموعة من التمارين المركزة لتحسين السرعة والقوة الانفجارية",
+      duration: 4,
+      expectedImpact: [
+        { metric: "speed", expectedGain: 8 },
+        { metric: "explosiveness", expectedGain: 12 },
+        { metric: "agility", expectedGain: 5 }
+      ]
+    }
+  ];
+  
   return (
     <div className="space-y-6">
       <Tabs defaultValue="movement" className="w-full">
@@ -681,7 +710,7 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
                 <div>
                   <h3 className="text-lg font-medium mb-3">نقاط القوة</h3>
                   <ul className="space-y-2">
-                    {performanceMetrics.strengths.map((strength, index) => (
+                    {strengths.map((strength, index) => (
                       <li key={index} className="flex items-start gap-2">
                         <div className="mt-1 h-5 w-5 rounded-full bg-green-100 flex items-center justify-center text-green-600">
                           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -700,7 +729,7 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
                 <div>
                   <h3 className="text-lg font-medium mb-3">مجالات التحسين</h3>
                   <ul className="space-y-2">
-                    {performanceMetrics.weaknesses.map((weakness, index) => (
+                    {weaknesses.map((weakness, index) => (
                       <li key={index} className="flex items-start gap-2">
                         <div className="mt-1 h-5 w-5 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
                           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -721,7 +750,7 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
               <div className="mt-8">
                 <h3 className="text-lg font-medium mb-3">تدريبات مخصصة</h3>
                 <div className="space-y-4">
-                  {performanceMetrics.recommendations.map((rec, index) => (
+                  {recommendations.map((rec, index) => (
                     <div key={index} className="p-4 border rounded-lg">
                       <div className="flex justify-between items-center mb-2">
                         <h4 className="font-medium">{rec.title}</h4>
@@ -755,3 +784,4 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
 };
 
 export default AdvancedAnalysisPanel;
+
