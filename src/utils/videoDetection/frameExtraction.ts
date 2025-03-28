@@ -2,7 +2,7 @@
 // Helper function to extract a specific number of frames from a video - highly optimized for speed
 export const extractVideoFrames = async (
   videoFile: File,
-  frameCount: number = 8 // Further reduced default frame count for faster processing
+  frameCount: number = 6 // Further reduced default frame count for faster processing
 ): Promise<ImageBitmap[]> => {
   return new Promise((resolve, reject) => {
     const video = document.createElement('video');
@@ -20,13 +20,13 @@ export const extractVideoFrames = async (
       // Instead of rejecting, return an empty array to prevent analysis from failing
       console.warn('Video loading timeout - proceeding with empty frames');
       resolve([]);
-    }, 8000); // Reduced from 10000 to 8000ms
+    }, 6000); // Reduced from 8000 to 6000ms for faster timeout response
     
     video.onloadedmetadata = () => {
       clearTimeout(timeout);
       
       // Determine optimal frame intervals based on video duration
-      const optimalFrameCount = Math.min(frameCount, Math.ceil(video.duration * 2));
+      const optimalFrameCount = Math.min(frameCount, Math.ceil(video.duration));
       const frameInterval = video.duration / optimalFrameCount;
       
       // Prepare to collect frames
@@ -55,7 +55,7 @@ export const extractVideoFrames = async (
         const canvas = document.createElement('canvas');
         
         // Use a lower resolution for faster processing
-        const scaleFactor = 0.5; // Further reduced resolution to 50%
+        const scaleFactor = 0.4; // Further reduced resolution to 40%
         canvas.width = video.videoWidth * scaleFactor;
         canvas.height = video.videoHeight * scaleFactor;
         const ctx = canvas.getContext('2d', { alpha: false }); // Disable alpha for better performance
@@ -93,9 +93,8 @@ export const extractVideoFrames = async (
           if (framesProcessed >= optimalFrameCount) {
             cleanup();
           } else {
-            // Add small random offsets to avoid exact frame times
-            const randomOffset = Math.random() * 0.1;
-            video.currentTime = initialSkip + (framesProcessed * frameInterval) + randomOffset;
+            // Skip random offsets to speed up processing
+            video.currentTime = initialSkip + (framesProcessed * frameInterval);
           }
         }
 
@@ -103,9 +102,10 @@ export const extractVideoFrames = async (
           URL.revokeObjectURL(videoURL);
           video.remove(); // Remove video element to free memory
           
-          // Always provide at least one frame, even if frame extraction failed
-          if (frames.length === 0) {
-            console.warn('No frames extracted, providing placeholder frame');
+          // Always return frames, even if we didn't get the requested number
+          if (frames.length === 0 && optimalFrameCount > 0) {
+            console.warn('No frames extracted, creating single placeholder frame');
+            
             // Create empty placeholder frame
             const placeholderCanvas = document.createElement('canvas');
             placeholderCanvas.width = 320;

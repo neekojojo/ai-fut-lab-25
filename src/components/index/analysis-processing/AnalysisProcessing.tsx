@@ -37,11 +37,15 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
   // Estimate remaining time based on current progress and elapsed time
   const estimateRemainingTime = useCallback(() => {
     if (safeProgress <= 0) return '~';
+    
+    // Improved time estimation for better accuracy
     const timePerProgressPoint = elapsedTime / safeProgress;
     const estimatedRemainingSeconds = timePerProgressPoint * (100 - safeProgress);
     
-    if (estimatedRemainingSeconds < 60) {
+    if (estimatedRemainingSeconds < 30) {
       return 'أقل من دقيقة';
+    } else if (estimatedRemainingSeconds < 60) {
+      return 'حوالي دقيقة واحدة';
     } else {
       const minutes = Math.ceil(estimatedRemainingSeconds / 60);
       return `${minutes} دقائق تقريباً`;
@@ -52,15 +56,16 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
   const checkIfStuck = useCallback(() => {
     const now = Date.now();
     
-    // Consider stuck if no progress for more than 15 seconds (reduced from 30s)
+    // Consider stuck if no progress for more than 8 seconds (reduced from 15s)
     if (safeProgress === lastProgress && safeProgress < 95) {
       const stuckDuration = Math.floor((now - lastProgressTime) / 1000);
       setStuckTime(stuckDuration);
       
-      if (stuckDuration > 10) { // Reduced from 15s to detect stuck state faster
+      if (stuckDuration > 8) { // Reduced threshold to detect stuck state faster
         setIsStuck(true);
       }
     } else {
+      // Reset stuck state when progress changes
       setLastProgress(safeProgress);
       setLastProgressTime(now);
       setStuckTime(0);
@@ -84,7 +89,7 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
   
   // If stuck for too long, show notification
   useEffect(() => {
-    if (isStuck && stuckTime === 15) { // Reduced from 20s to 15s
+    if (isStuck && stuckTime === 10) { // Reduced from 15s to 10s
       toast({
         title: "تنبيه: عملية التحليل تستغرق وقتًا أطول من المعتاد",
         description: "يرجى الانتظار أو إعادة المحاولة إذا استمر ذلك.",
@@ -97,6 +102,13 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
   // Handle reset button click
   const handleReset = () => {
     if (onReset) {
+      // Show confirmation toast before reset
+      toast({
+        title: "جاري إعادة تشغيل التحليل",
+        description: "سيتم إعادة تشغيل التحليل من البداية",
+        duration: 3000,
+      });
+      
       onReset();
     }
   };
@@ -160,6 +172,7 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
         </p>
       </div>
       
+      {/* Show warning immediately when stuck is detected */}
       {isStuck && <StuckWarning onReset={handleReset} />}
       
       <div className="text-center text-sm text-muted-foreground mt-4">

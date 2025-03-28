@@ -1,42 +1,6 @@
 
 /**
- * Utility functions for the analysis processing component
- */
-
-/**
- * Maps progress value to a color based on percentage
- */
-export const getProgressColor = (value: number): string => {
-  if (value < 30) return 'bg-blue-500';
-  if (value < 60) return 'bg-indigo-500';
-  if (value < 90) return 'bg-purple-500';
-  return 'bg-green-500';
-};
-
-/**
- * Calculate time remaining estimation
- */
-export const getEstimatedTimeRemaining = (value: number, elapsedTime: number): string => {
-  if (value >= 100) return 'مكتمل';
-  if (value > 95) return 'ثوان معدودة';
-  
-  // Better estimation based on actual progress rate
-  if (elapsedTime > 0 && value > 0) {
-    const estimatedTotalTime = (elapsedTime / value) * 100;
-    const remainingTime = Math.max(0, estimatedTotalTime - elapsedTime);
-    const remainingMinutes = Math.ceil(remainingTime / 60);
-    
-    if (remainingMinutes < 1) return 'أقل من دقيقة';
-    return `${remainingMinutes} دقائق تقريبًا`;
-  }
-  
-  // Fallback estimation
-  const baseTime = Math.ceil((100 - value) / 10); // rough estimate
-  return `${baseTime} دقائق تقريبًا`;
-};
-
-/**
- * Format time in minutes and seconds
+ * Format time duration in seconds to minutes:seconds format
  */
 export const formatTime = (seconds: number): string => {
   const minutes = Math.floor(seconds / 60);
@@ -45,18 +9,39 @@ export const formatTime = (seconds: number): string => {
 };
 
 /**
- * Get analysis stage description based on progress
+ * Get description of the current analysis stage based on progress percentage
  */
 export const getAnalysisStageDescription = (progress: number): string => {
-  if (progress < 25) {
-    return 'جاري تحليل معلومات الفيديو...';
+  if (progress < 15) {
+    return 'جاري معالجة الفيديو واستخراج الإطارات الأساسية...';
+  } else if (progress < 30) {
+    return 'تحليل حركة اللاعب والمواقع على الملعب...';
   } else if (progress < 50) {
-    return 'تحليل حركة اللاعب والسرعة...';
-  } else if (progress < 75) {
-    return 'تحليل المهارات الفنية والتكتيكية...';
+    return 'قياس السرعة والتسارع وتحليل الأنماط الحركية...';
+  } else if (progress < 70) {
+    return 'تقييم المهارات الفنية والتكتيكية للاعب...';
+  } else if (progress < 85) {
+    return 'تحليل الأداء البدني وقياس مؤشرات اللياقة...';
   } else if (progress < 95) {
-    return 'إنشاء تقرير التحليل النهائي...';
+    return 'مقارنة البيانات بالمعايير المرجعية وإعداد التقرير...';
   } else {
-    return 'اكتمل التحليل، جاري تحضير النتائج...';
+    return 'اكتمال التحليل، جاري إنهاء التقرير النهائي...';
   }
+};
+
+/**
+ * Determine if the process might be experiencing a network issue
+ */
+export const checkNetworkIssue = (elapsedTime: number, progress: number): boolean => {
+  // If we've been running more than 45 seconds with progress < 20%, might be network issue
+  return elapsedTime > 45 && progress < 20;
+};
+
+/**
+ * Calculate estimated remaining time based on progress and elapsed time
+ */
+export const calculateEstimatedRemainingTime = (progress: number, elapsedTime: number): number => {
+  if (progress <= 0) return 180; // Default 3 minutes
+  const timePerPercent = elapsedTime / progress;
+  return Math.round(timePerPercent * (100 - progress));
 };
