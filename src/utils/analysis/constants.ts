@@ -1,4 +1,3 @@
-
 // If this file exists, only append to it. If not, create it.
 
 export const ANALYSIS_STAGES = [
@@ -119,36 +118,36 @@ export const PROFESSIONAL_PLAYERS = [
   }
 ];
 
-// Adding the missing AVAILABLE_BADGES constant
+// Adding the missing AVAILABLE_BADGES constant with proper typing
 export const AVAILABLE_BADGES = [
   {
     name: "صانع اللعب",
     description: "لاعب متميز في تمرير الكرة وصناعة الفرص",
-    level: "gold",
+    level: "gold" as "gold",
     unlockCondition: (analysis) => analysis.stats.passing >= 85 && analysis.stats.vision >= 80
   },
   {
     name: "القناص",
     description: "مهارة استثنائية في إنهاء الهجمات وتسجيل الأهداف",
-    level: "gold",
+    level: "gold" as "gold",
     unlockCondition: (analysis) => analysis.stats.shooting >= 85 && analysis.position === "Forward"
   },
   {
     name: "المدافع الصلب",
     description: "قدرات دفاعية متميزة وصلابة في المواجهات",
-    level: "gold",
+    level: "gold" as "gold",
     unlockCondition: (analysis) => analysis.position === "Defender" && analysis.stats.defending >= 85
   },
   {
     name: "الجناح السريع",
     description: "سرعة فائقة وقدرة على اختراق الدفاعات",
-    level: "silver",
+    level: "silver" as "silver",
     unlockCondition: (analysis) => analysis.stats.pace >= 85 && analysis.stats.dribbling >= 80
   },
   {
     name: "لاعب الوسط الشامل",
     description: "متوازن في المهارات الهجومية والدفاعية",
-    level: "silver",
+    level: "silver" as "silver",
     unlockCondition: (analysis) => (
       analysis.position === "Midfielder" && 
       analysis.stats.passing >= 75 && 
@@ -158,26 +157,25 @@ export const AVAILABLE_BADGES = [
   {
     name: "القائد",
     description: "مهارات قيادية وتأثير إيجابي على الفريق",
-    level: "silver",
+    level: "silver" as "silver",
     unlockCondition: (analysis) => analysis.stats.vision >= 80 && analysis.stats.decision >= 80
   },
   {
     name: "المراوغ الماهر",
     description: "قدرة استثنائية على المراوغة والتحكم بالكرة",
-    level: "bronze",
+    level: "bronze" as "bronze",
     unlockCondition: (analysis) => analysis.stats.dribbling >= 80 && analysis.stats.ballControl >= 80
   },
   {
     name: "لاعب تكتيكي",
     description: "فهم ممتاز للجوانب التكتيكية وتنفيذ التعليمات",
-    level: "bronze",
+    level: "bronze" as "bronze",
     unlockCondition: (analysis) => analysis.performance.tactical >= 80
   },
   {
     name: "اللاعب الواعد",
     description: "إمكانات واعدة ومستقبل مشرق في كرة القدم",
-    level: "bronze",
+    level: "bronze" as "bronze",
     unlockCondition: (analysis) => analysis.talentScore >= 75 && analysis.talentScore < 85
   }
 ];
-

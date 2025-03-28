@@ -3,6 +3,7 @@ import type { PlayerAnalysis } from "@/components/AnalysisReport.d";
 import { PROFESSIONAL_PLAYERS } from "./constants";
 import { generateInjuryRiskAssessment } from "./injuryRiskAnalysis";
 import { determineEarnedBadges } from "./badgeService";
+import { Badge } from "@/types/badges";
 
 // Create a deterministic random generator using a seed
 const getSeededRandom = (seed: number): () => number => {
@@ -273,7 +274,13 @@ export const generateEnhancedAnalysis = (seed: number = Date.now()): PlayerAnaly
     proComparison: {
       name: comparablePro.name,
       similarity: Math.floor(random() * 30) + 40, // 40-70% similarity
-      skills: comparablePro.skills
+      // Fix: Convert string[] to {[key: string]: number} by creating an object
+      skills: Object.fromEntries(
+        comparablePro.skills.map((skill, index) => [
+          skill, 
+          60 + Math.floor(random() * 30) // Random score between 60-90 for each skill
+        ])
+      )
     },
     summary: "Player shows promising skills and attributes for their position.",
     advancedInsights: ["Good movement off the ball", "Strong spatial awareness"],
