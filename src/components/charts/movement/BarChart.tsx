@@ -30,46 +30,44 @@ const BarChartComponent: React.FC<BarChartProps> = ({ data, config }) => {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <ChartConfigAdapter config={config}>
-        {({ config: adaptedConfig }: { config: any }) => (
-          <ChartContainer config={adaptedConfig}>
-            <RechartsBarChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0e0e0" />
-              <XAxis 
-                dataKey="name" 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: '#888', fontSize: 12 }}
-              />
-              <YAxis 
-                domain={[0, getMaxYValue(data)]} 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: '#888', fontSize: 12 }}
-              />
-              <Tooltip content={renderTooltipContent} />
-              <Legend />
-              <Bar dataKey="current" name="Current" radius={[4, 4, 0, 0]}>
+        <ChartContainer>
+          <RechartsBarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0e0e0" />
+            <XAxis 
+              dataKey="name" 
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#888', fontSize: 12 }}
+            />
+            <YAxis 
+              domain={[0, getMaxYValue(data)]} 
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#888', fontSize: 12 }}
+            />
+            <Tooltip content={renderTooltipContent} />
+            <Legend />
+            <Bar dataKey="current" name="Current" radius={[4, 4, 0, 0]}>
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={config.current.color} />
+              ))}
+            </Bar>
+            {data.some((d) => d.previous !== undefined) && (
+              <Bar dataKey="previous" name="Previous" radius={[4, 4, 0, 0]}>
                 {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={config.current.color} />
+                  <Cell key={`cell-${index}`} fill={config.previous.color} />
                 ))}
               </Bar>
-              {data.some((d) => d.previous !== undefined) && (
-                <Bar dataKey="previous" name="Previous" radius={[4, 4, 0, 0]}>
-                  {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={config.previous.color} />
-                  ))}
-                </Bar>
-              )}
-              {data.some((d) => d.alternative !== undefined) && (
-                <Bar dataKey="alternative" name="Alternative" radius={[4, 4, 0, 0]}>
-                  {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={config.alternative.color} />
-                  ))}
-                </Bar>
-              )}
-            </RechartsBarChart>
-          </ChartContainer>
-        )}
+            )}
+            {data.some((d) => d.alternative !== undefined) && (
+              <Bar dataKey="alternative" name="Alternative" radius={[4, 4, 0, 0]}>
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={config.alternative.color} />
+                ))}
+              </Bar>
+            )}
+          </RechartsBarChart>
+        </ChartContainer>
       </ChartConfigAdapter>
     </ResponsiveContainer>
   );

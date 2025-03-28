@@ -29,52 +29,50 @@ const AreaChartComponent: React.FC<AreaChartProps> = ({ data, config }) => {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <ChartConfigAdapter config={config}>
-        {({ config: adaptedConfig }: { config: any }) => (
-          <ChartContainer config={adaptedConfig}>
-            <RechartsAreaChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0e0e0" />
-              <XAxis 
-                dataKey="name" 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: '#888', fontSize: 12 }}
-              />
-              <YAxis 
-                domain={[0, getMaxYValue(data)]} 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: '#888', fontSize: 12 }}
-              />
-              <Tooltip content={renderTooltipContent} />
-              <Legend />
+        <ChartContainer>
+          <RechartsAreaChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0e0e0" />
+            <XAxis 
+              dataKey="name" 
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#888', fontSize: 12 }}
+            />
+            <YAxis 
+              domain={[0, getMaxYValue(data)]} 
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#888', fontSize: 12 }}
+            />
+            <Tooltip content={renderTooltipContent} />
+            <Legend />
+            <Area
+              type="monotone"
+              dataKey="current"
+              name="Current"
+              stroke={config.current.color}
+              fill={`${config.current.color}33`}
+            />
+            {data.some((d) => d.previous !== undefined) && (
               <Area
                 type="monotone"
-                dataKey="current"
-                name="Current"
-                stroke={config.current.color}
-                fill={`${config.current.color}33`}
+                dataKey="previous"
+                name="Previous"
+                stroke={config.previous.color}
+                fill={`${config.previous.color}33`}
               />
-              {data.some((d) => d.previous !== undefined) && (
-                <Area
-                  type="monotone"
-                  dataKey="previous"
-                  name="Previous"
-                  stroke={config.previous.color}
-                  fill={`${config.previous.color}33`}
-                />
-              )}
-              {data.some((d) => d.alternative !== undefined) && (
-                <Area
-                  type="monotone"
-                  dataKey="alternative"
-                  name="Alternative"
-                  stroke={config.alternative.color}
-                  fill={`${config.alternative.color}33`}
-                />
-              )}
-            </RechartsAreaChart>
-          </ChartContainer>
-        )}
+            )}
+            {data.some((d) => d.alternative !== undefined) && (
+              <Area
+                type="monotone"
+                dataKey="alternative"
+                name="Alternative"
+                stroke={config.alternative.color}
+                fill={`${config.alternative.color}33`}
+              />
+            )}
+          </RechartsAreaChart>
+        </ChartContainer>
       </ChartConfigAdapter>
     </ResponsiveContainer>
   );

@@ -24,9 +24,9 @@ const ChartConfigAdapter: React.FC<ChartConfigAdapterProps> = ({
       ...(value.theme && { theme: value.theme }),
     };
     return acc;
-  }, {} as Record<string, any>);
+  }, {} as ChartConfig);
 
-  // Return the children with the adapted config
+  // Pass the adapted config to children
   return (
     <>
       {React.Children.map(children, (child) => {
