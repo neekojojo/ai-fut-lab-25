@@ -2,8 +2,13 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ProfessionalPlayer } from '@/utils/ml/playerMLService';
 
-const SimilarPlayersPanel = ({ playerComparison }) => {
+interface SimilarPlayersPanelProps {
+  playerComparison: ProfessionalPlayer[];
+}
+
+const SimilarPlayersPanel: React.FC<SimilarPlayersPanelProps> = ({ playerComparison }) => {
   return (
     <Card className="w-full">
       <CardHeader>
@@ -24,17 +29,17 @@ const SimilarPlayersPanel = ({ playerComparison }) => {
                 </div>
                 <div>
                   <h3 className="font-semibold">{player.name}</h3>
-                  <p className="text-sm text-muted-foreground">{player.club} • {player.position}</p>
+                  <p className="text-sm text-muted-foreground">{player.team} • {player.position}</p>
                 </div>
                 <div className="ml-auto">
-                  <Badge>{player.matchPercentage}% تشابه</Badge>
+                  <Badge>{player.similarity}% تشابه</Badge>
                 </div>
               </div>
               
               <div>
                 <h4 className="text-sm font-medium mb-2">أوجه التشابه:</h4>
                 <div className="flex flex-wrap gap-2">
-                  {player.similarities && player.similarities.map((similarity, i) => (
+                  {player.strengths && player.strengths.map((similarity, i) => (
                     <Badge key={i} variant="outline" className="bg-green-50">
                       {similarity}
                     </Badge>
@@ -44,7 +49,7 @@ const SimilarPlayersPanel = ({ playerComparison }) => {
               
               <div>
                 <h4 className="text-sm font-medium mb-2">ما يمكن تعلمه:</h4>
-                <p className="text-sm">{player.learningPoints}</p>
+                <p className="text-sm">{player.learningPoints || 'التركيز على تحسين نقاط القوة المماثلة'}</p>
               </div>
             </div>
           ))}

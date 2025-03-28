@@ -4,7 +4,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
-const StatsPanel = ({ stats, analysis }) => {
+interface StatsPanelProps {
+  stats: {
+    technical?: Record<string, number>;
+    physical?: Record<string, number>;
+  };
+  analysis: {
+    strengths?: string[];
+    weaknesses?: string[];
+    overallAssessment?: string;
+  };
+}
+
+const StatsPanel: React.FC<StatsPanelProps> = ({ stats, analysis }) => {
   return (
     <Card className="w-full">
       <CardHeader>
@@ -21,7 +33,7 @@ const StatsPanel = ({ stats, analysis }) => {
                   <div key={key} className="space-y-1">
                     <div className="flex justify-between">
                       <span className="text-sm">{key}</span>
-                      <span className="text-sm font-medium">{value}/100</span>
+                      <span className="text-sm font-medium">{String(value)}/100</span>
                     </div>
                     <Progress value={Number(value)} className="h-2" />
                   </div>
@@ -36,7 +48,7 @@ const StatsPanel = ({ stats, analysis }) => {
                   <div key={key} className="space-y-1">
                     <div className="flex justify-between">
                       <span className="text-sm">{key}</span>
-                      <span className="text-sm font-medium">{value}/100</span>
+                      <span className="text-sm font-medium">{String(value)}/100</span>
                     </div>
                     <Progress value={Number(value)} className="h-2" />
                   </div>

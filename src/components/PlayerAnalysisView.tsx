@@ -24,7 +24,7 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
   
   const playerStats = getPlayerStats();
   const mockAnalysis = getMockAnalysis();
-  const playerComparison = getPlayerComparison();
+  const playerComparison = getPlayerComparison().similarProfessionals; // Get the array from the PlayerComparison object
   const trainingRecommendations = getTrainingRecommendations();
   
   useEffect(() => {

@@ -8,13 +8,14 @@ import TrainingRecommendationsPanel from './TrainingRecommendationsPanel';
 import ClubCompatibilityPanel from './ClubCompatibilityPanel';
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
+import { ProfessionalPlayer } from '@/utils/ml/playerMLService';
 
 interface AnalysisContentProps {
   activeTab: string;
   playerStats: any;
   mockAnalysis: { analysis: any };
   trainingRecommendations: any;
-  playerComparison: any[];
+  playerComparison: ProfessionalPlayer[];
   onViewAdvanced: () => void;
 }
 
