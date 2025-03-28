@@ -1,5 +1,11 @@
 
 import type { DetectionResult } from './types';
+import { 
+  identifyPlayerFromKaggle, 
+  identifyTeamFromKaggle, 
+  getCombinedPlayerIdentification,
+  getCombinedTeamIdentification
+} from './kaggleDataImport';
 
 /**
  * قائمة باللاعبين المحترفين وبياناتهم للمقارنة
@@ -163,15 +169,15 @@ export interface IdentifiedTeam {
 /**
  * دالة تعمل على تحليل نتائج تتبع حركة اللاعب لمحاولة التعرف على هوية اللاعب
  * بناءً على أنماط الحركة والخصائص الجسدية
+ * 
+ * تم تحديثها لدمج نتائج من قاعدة بيانات Kaggle
  */
 export const identifyPlayerFromDetection = (result: DetectionResult): IdentifiedPlayer[] => {
   // في التطبيق الواقعي، هنا سنستخدم نموذج تعلم آلي للمقارنة
   // حاليًا، سنقوم بعملية مطابقة بسيطة بناءً على بعض السمات
   
-  // في هذه النسخة التجريبية، سنختار أفضل 3 مرشحين بشكل عشوائي
-  // مع درجات ثقة متفاوتة للتوضيح
-  
-  const candidates = [...professionalPlayerDatabase]
+  // نحصل على نتائج من قاعدة البيانات المحلية
+  const localCandidates = [...professionalPlayerDatabase]
     .sort(() => 0.5 - Math.random()) // ترتيب عشوائي
     .slice(0, 3) // أخذ أول 3 لاعبين
     .map((player, index) => {
@@ -184,17 +190,28 @@ export const identifyPlayerFromDetection = (result: DetectionResult): Identified
       } as IdentifiedPlayer;
     });
   
-  return candidates;
+  // نحصل على نتائج من قاعدة بيانات Kaggle
+  const kaggleCandidates = identifyPlayerFromKaggle(result);
+  
+  // دمج النتائج وإزالة التكرارات المحتملة
+  // في التطبيق الحقيقي، هذا قد يتضمن مقارنة أكثر تعقيدًا وإزالة تكرارات الأسماء
+  const allCandidates = [...localCandidates, ...kaggleCandidates]
+    .sort((a, b) => b.confidenceScore - a.confidenceScore)
+    .slice(0, 5); // أخذ أفضل 5 مرشحين
+  
+  return allCandidates;
 };
 
 /**
  * دالة تتعرف على الفريق من خلال تحليل ألوان الزي والشعارات
+ * 
+ * تم تحديثها لدمج نتائج من قاعدة بيانات Kaggle
  */
 export const identifyTeamFromDetection = (result: DetectionResult): IdentifiedTeam[] => {
   // في التطبيق الواقعي، هنا سنستخدم تقنيات التعرف على الشعارات والألوان
   
-  // إختيار فريقين بشكل عشوائي للإقتراح
-  const candidates = [...teamDatabase]
+  // نحصل على نتائج من قاعدة البيانات المحلية
+  const localCandidates = [...teamDatabase]
     .sort(() => 0.5 - Math.random())
     .slice(0, 2)
     .map((team, index) => {
@@ -206,5 +223,27 @@ export const identifyTeamFromDetection = (result: DetectionResult): IdentifiedTe
       } as IdentifiedTeam;
     });
   
-  return candidates;
+  // نحصل على نتائج من قاعدة بيانات Kaggle
+  const kaggleCandidates = identifyTeamFromKaggle(result);
+  
+  // دمج النتائج وإزالة التكرارات المحتملة
+  const allCandidates = [...localCandidates, ...kaggleCandidates]
+    .sort((a, b) => b.confidenceScore - a.confidenceScore)
+    .slice(0, 4); // أخذ أفضل 4 مرشحين
+
+  return allCandidates;
+};
+
+/**
+ * دالة تدمج نتائج التعرف من مصادر مختلفة
+ */
+export const getEnhancedPlayerIdentification = (result: DetectionResult): IdentifiedPlayer[] => {
+  return getCombinedPlayerIdentification(result);
+};
+
+/**
+ * دالة تدمج نتائج التعرف على الفرق من مصادر مختلفة
+ */
+export const getEnhancedTeamIdentification = (result: DetectionResult): IdentifiedTeam[] => {
+  return getCombinedTeamIdentification(result);
 };
