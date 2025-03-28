@@ -9,6 +9,16 @@ interface MovementAnalysisResult {
   directionChanges: number;
   positionalHeatmap: {x: number, y: number, value: number}[];
   topSpeed: {timestamp: number, speed: number};
+  // إضافة مقاييس جديدة
+  sprintCount: number;
+  speedZones: {
+    walking: number;   // 0-6 km/h
+    jogging: number;   // 6-14 km/h
+    running: number;   // 14-21 km/h
+    sprinting: number; // >21 km/h
+  };
+  movementEfficiency: number; // 0-100
+  possessionImpact: number;   // 0-100
 }
 
 export const analyzePlayerMovements = async (
@@ -26,7 +36,11 @@ export const analyzePlayerMovements = async (
       maxAcceleration: 0,
       directionChanges: 0,
       positionalHeatmap: [],
-      topSpeed: {timestamp: 0, speed: 0}
+      topSpeed: {timestamp: 0, speed: 0},
+      sprintCount: 0,
+      speedZones: { walking: 0, jogging: 0, running: 0, sprinting: 0 },
+      movementEfficiency: 0,
+      possessionImpact: 0
     };
   }
   
@@ -38,12 +52,44 @@ export const analyzePlayerMovements = async (
   let maxAcceleration = 0;
   let directionChanges = 0;
   let prevDirection = 0;
+  let sprintCount = 0;
+  let sprintActive = false;
+  
+  // Counters for speed zones (in pixels/ms, later converted to approximate km/h)
+  let walkingTime = 0;
+  let joggingTime = 0;
+  let runningTime = 0;
+  let sprintingTime = 0;
+  
+  // Used for movement efficiency calculation
+  let totalDistanceCovered = 0;
+  let directDistance = 0;
+  
+  // A scale factor to convert pixel speed to approximate km/h for visualization
+  // This is an approximation as real conversion would require field dimensions
+  const SPEED_SCALE_FACTOR = 3.6; // Just a visualization factor
   
   // Initialize heatmap grid
-  const heatmapSize = 10; // 10x10 grid
+  const heatmapSize = 20; // 20x20 grid for more detailed heatmap
   const heatmap = Array(heatmapSize).fill(0).map(() => 
     Array(heatmapSize).fill(0)
   );
+  
+  // Store first and last position for efficiency calculation
+  const firstPos = sortedPositions[0];
+  const lastPos = sortedPositions[sortedPositions.length - 1];
+  
+  // Calculate direct distance between first and last position
+  if (firstPos.bbox && lastPos.bbox) {
+    const firstX = firstPos.bbox.x + firstPos.bbox.width / 2;
+    const firstY = firstPos.bbox.y + firstPos.bbox.height / 2;
+    const lastX = lastPos.bbox.x + lastPos.bbox.width / 2;
+    const lastY = lastPos.bbox.y + lastPos.bbox.height / 2;
+    
+    const dx = lastX - firstX;
+    const dy = lastY - firstY;
+    directDistance = Math.sqrt(dx * dx + dy * dy);
+  }
   
   // Process positions to extract metrics
   for (let i = 1; i < sortedPositions.length; i++) {
@@ -64,6 +110,10 @@ export const analyzePlayerMovements = async (
     const dy = currentY - prevY;
     const distance = Math.sqrt(dx * dx + dy * dy);
     
+    // Add to total distance
+    totalDistance += distance;
+    totalDistanceCovered += distance;
+    
     // Calculate time difference in seconds
     const timeDiff = (currentPos.timestamp - prevPos.timestamp) / 1000;
     if (timeDiff <= 0) continue; // Skip invalid time differences
@@ -73,7 +123,6 @@ export const analyzePlayerMovements = async (
     
     // Update metrics
     totalSpeed += speed;
-    totalDistance += distance;
     
     if (speed > maxSpeed) {
       maxSpeed = speed;
@@ -81,6 +130,30 @@ export const analyzePlayerMovements = async (
         timestamp: currentPos.timestamp,
         speed
       };
+    }
+    
+    // Classify speed into zones (approximate conversion to km/h for visualization)
+    const speedKmh = speed * SPEED_SCALE_FACTOR;
+    
+    if (speedKmh < 6) {
+      walkingTime += timeDiff;
+    } else if (speedKmh < 14) {
+      joggingTime += timeDiff;
+    } else if (speedKmh < 21) {
+      runningTime += timeDiff;
+    } else {
+      sprintingTime += timeDiff;
+      
+      // Count sprints (a sprint starts when speed exceeds 21 km/h)
+      if (!sprintActive) {
+        sprintCount++;
+        sprintActive = true;
+      }
+    }
+    
+    // Reset sprint active flag if speed drops below sprint threshold
+    if (sprintActive && speedKmh < 21) {
+      sprintActive = false;
     }
     
     // Calculate acceleration (change in speed over time)
@@ -121,6 +194,28 @@ export const analyzePlayerMovements = async (
     }
   }
   
+  // Calculate speed zone percentages
+  const totalTime = walkingTime + joggingTime + runningTime + sprintingTime;
+  const speedZones = {
+    walking: totalTime > 0 ? walkingTime / totalTime : 0,
+    jogging: totalTime > 0 ? joggingTime / totalTime : 0,
+    running: totalTime > 0 ? runningTime / totalTime : 0,
+    sprinting: totalTime > 0 ? sprintingTime / totalTime : 0
+  };
+  
+  // Calculate movement efficiency (ratio of direct distance to total distance)
+  // A higher value indicates more direct, efficient movement
+  const movementEfficiency = totalDistanceCovered > 0 ? 
+    Math.min(100, (directDistance / totalDistanceCovered) * 100) : 0;
+  
+  // Simulate possession impact based on movement patterns
+  // In a real system, this would be calculated from actual ball possession data
+  const possessionImpact = Math.min(100, 
+    (speedZones.sprinting * 40) + 
+    (directionChanges / 10 * 30) + 
+    (movementEfficiency * 0.3)
+  );
+  
   return {
     averageSpeed,
     maxSpeed,
@@ -128,6 +223,10 @@ export const analyzePlayerMovements = async (
     maxAcceleration,
     directionChanges,
     positionalHeatmap,
-    topSpeed: topSpeedEntry
+    topSpeed: topSpeedEntry,
+    sprintCount,
+    speedZones,
+    movementEfficiency,
+    possessionImpact
   };
 };
