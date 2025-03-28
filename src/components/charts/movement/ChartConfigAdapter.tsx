@@ -1,7 +1,6 @@
 
 import React from "react";
 import { ChartConfigType } from "./types";
-import { ChartConfig } from "@/components/ui/chart/types";
 
 interface ChartConfigAdapterProps {
   config: ChartConfigType;
@@ -24,7 +23,7 @@ const ChartConfigAdapter: React.FC<ChartConfigAdapterProps> = ({
       ...(value.theme && { theme: value.theme }),
     };
     return acc;
-  }, {} as ChartConfig);
+  }, {} as Record<string, any>);
 
   // Clone the children and pass the adapted config
   return React.Children.map(children, (child) => {

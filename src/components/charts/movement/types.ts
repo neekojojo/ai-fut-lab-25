@@ -1,7 +1,6 @@
 
 import { DataPoint } from '../DataTypes';
-import { IconType } from 'react-icons';
-import { CurveType } from '@/components/ui/chart/types';
+import { ChartConfig as UIChartConfig } from "@/components/ui/chart/types";
 
 export interface NumberMovementProps {
   title: string;
@@ -15,6 +14,9 @@ export interface NumberMovementProps {
   description?: string;
 }
 
+// Define CurveType locally since it's not exported from UI library
+export type CurveType = "linear" | "monotone" | "natural" | "step" | "basis";
+
 // Modified to match the ChartConfig type from the UI library
 export interface ChartConfigType {
   current: { color: string; label: string };
@@ -23,7 +25,7 @@ export interface ChartConfigType {
   [key: string]: { 
     color: string; 
     label: string; 
-    icon?: IconType; 
+    icon?: React.ElementType; 
     curve?: CurveType; 
     theme?: Record<string, string> 
   };

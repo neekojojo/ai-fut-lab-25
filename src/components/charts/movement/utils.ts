@@ -1,71 +1,69 @@
 
 import React from "react";
-import { TrendingUp, TrendingDown, ArrowUp, ArrowDown } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { DataPoint } from '../DataTypes';
 
-/**
- * Determines which movement icon to display based on current and previous values
- */
-export const getMovementIcon = (current: number, previous?: number) => {
-  if (!previous || current === previous) return null;
-  const percentChange = ((current - previous) / previous) * 100;
-  
-  if (percentChange > 10) return React.createElement(TrendingUp, { className: "text-green-500" });
-  if (percentChange > 0) return React.createElement(ArrowUp, { className: "text-green-500" });
-  if (percentChange < -10) return React.createElement(TrendingDown, { className: "text-red-500" });
-  if (percentChange < 0) return React.createElement(ArrowDown, { className: "text-red-500" });
-  return null;
+// Function to get an appropriate movement icon based on values
+export const getMovementIcon = (current: number, previous: number) => {
+  const diff = current - previous;
+  const threshold = 5;
+
+  if (diff > threshold) {
+    return React.createElement(TrendingUp, { className: "ml-2 h-4 w-4 text-green-500" });
+  } else if (diff < -threshold) {
+    return React.createElement(TrendingDown, { className: "ml-2 h-4 w-4 text-red-500" });
+  } else {
+    return React.createElement(Minus, { className: "ml-2 h-4 w-4 text-amber-500" });
+  }
 };
 
-/**
- * Calculates the improvement percentage between current and previous data
- */
-export const calculateImprovement = (chartData: any[]) => {
-  if (!chartData.some(d => d.previous !== undefined)) return null;
-  
-  let totalChange = 0;
+// Calculate the improvement percentage between current and previous values
+export const calculateImprovement = (data: DataPoint[]): number => {
+  // If data is empty, return 0
+  if (!data || data.length === 0) return 0;
+
+  // Calculate the total current and previous values
+  let totalCurrent = 0;
+  let totalPrevious = 0;
   let count = 0;
-  
-  chartData.forEach(d => {
-    if (d.previous !== undefined) {
-      totalChange += ((d.current - d.previous) / d.previous) * 100;
+
+  data.forEach((item) => {
+    if (item.current !== undefined && item.previous !== undefined) {
+      totalCurrent += item.current;
+      totalPrevious += item.previous;
       count++;
     }
   });
-  
-  return count > 0 ? (totalChange / count).toFixed(1) : null;
+
+  // Calculate the percentage improvement
+  if (count === 0 || totalPrevious === 0) return 0;
+
+  return Math.round(((totalCurrent - totalPrevious) / totalPrevious) * 100);
 };
 
-/**
- * Calculates the maximum Y-axis value with padding
- */
-export const getMaxYValue = (chartData: any[]) => {
-  let maxValue = 0;
-  
-  chartData.forEach(d => {
-    maxValue = Math.max(
-      maxValue, 
-      d.current, 
-      d.previous || 0, 
-      d.alternative || 0
-    );
-  });
-  
-  return Math.ceil(maxValue * 1.2); // 20% padding
+// Function to calculate the maximum Y value for the charts
+export const getMaxYValue = (data: any[]): number => {
+  if (!data || data.length === 0) return 100;
+
+  const allValues = data.flatMap((item) => [
+    item.current || 0,
+    item.previous || 0,
+    item.alternative || 0,
+  ]);
+
+  const maxValue = Math.max(...allValues);
+  // Add a buffer of 10% for better visualization
+  return Math.ceil(maxValue * 1.1);
 };
 
-/**
- * Ensures that valid data is always provided for charts
- */
-export const ensureData = (data: any[]) => {
+// Ensure that the data is properly formatted for the charts
+export const ensureData = (data: DataPoint[]): DataPoint[] => {
   if (!data || data.length === 0) {
-    // Generate some placeholder data if none provided
+    // Return default data if none is provided
     return [
-      { name: "Metric 1", current: 75, previous: 65, alternative: 85 },
-      { name: "Metric 2", current: 65, previous: 55, alternative: 75 },
-      { name: "Metric 3", current: 80, previous: 70, alternative: 90 },
-      { name: "Metric 4", current: 70, previous: 60, alternative: 80 },
-      { name: "Metric 5", current: 85, previous: 75, alternative: 95 },
+      { name: "No Data", current: 0, previous: 0, alternative: 0 },
     ];
   }
+
   return data;
 };
