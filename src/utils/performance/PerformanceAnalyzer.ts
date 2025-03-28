@@ -3,6 +3,19 @@ import { PlayerPosition } from '../videoDetection/types';
 import { MovementAnalysisResult } from '../videoDetection/movementAnalysis';
 import { EnhancedMovementAnalysis } from '../videoDetection/movementAnalysisEnhanced';
 
+// Define types for recommendations
+export interface RecommendationImpact {
+  metric: string;
+  expectedGain: number;
+}
+
+export interface Recommendation {
+  title: string;
+  description: string;
+  duration: number;
+  expectedImpact: RecommendationImpact[];
+}
+
 export interface PerformanceMetrics {
   technicalScore: number;
   physicalScore: number;
@@ -26,8 +39,8 @@ export interface PerformanceMetrics {
   
   // إضافة تقييم نقاط القوة والضعف
   strengths: string[];
-  improvementAreas: string[];
-  recommendations: string[];
+  weaknesses: string[]; // Added this property to fix the type error
+  recommendations: Recommendation[]; // Changed from string[] to Recommendation[]
 }
 
 export class PerformanceAnalyzer {
@@ -130,13 +143,25 @@ export class PerformanceAnalyzer {
       .sort(([, a], [, b]) => b - a);
     
     // اختيار أعلى 3 نقاط قوة وأقل 3 نقاط (مجالات للتحسين)
-    const strengths = sortedMetrics.slice(0, 3).map(([key]) => this.getMetricDisplayName(key));
-    const improvementAreas = sortedMetrics.slice(-3).map(([key]) => this.getMetricDisplayName(key));
+    const strengths = sortedMetrics.slice(0, 3).map(([key]) => key);
+    const weaknesses = sortedMetrics.slice(-3).map(([key]) => key);
     
     // إنشاء توصيات بناءً على مجالات التحسين
-    const recommendations = improvementAreas.map(area => 
-      this.getRecommendationForArea(area)
-    );
+    const recommendations = weaknesses.map(area => ({
+      title: `تمارين تحسين ${this.getMetricDisplayName(area)}`,
+      description: this.getRecommendationForArea(this.getMetricDisplayName(area)),
+      duration: Math.floor(Math.random() * 4) + 2, // 2-6 weeks randomly
+      expectedImpact: [
+        { 
+          metric: area, 
+          expectedGain: Math.floor(Math.random() * 10) + 5 // 5-15 points gain
+        },
+        { 
+          metric: Object.keys(metrics)[Math.floor(Math.random() * Object.keys(metrics).length)], 
+          expectedGain: Math.floor(Math.random() * 5) + 2 // 2-7 points gain in related metric
+        }
+      ]
+    }));
     
     return {
       technicalScore,
@@ -145,7 +170,7 @@ export class PerformanceAnalyzer {
       overallScore,
       breakdown: metrics,
       strengths,
-      improvementAreas,
+      weaknesses,
       recommendations
     };
   }

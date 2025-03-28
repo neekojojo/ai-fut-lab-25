@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EnhancedMovementAnalysis } from '@/utils/videoDetection/movementAnalysisEnhanced';
 import { TrajectoryPrediction } from '@/utils/videoDetection/trajectoryPrediction';
-import { PerformanceMetrics } from '@/utils/performance/PerformanceAnalyzer';
+import { PerformanceMetrics, Recommendation, RecommendationImpact } from '@/utils/performance/PerformanceAnalyzer';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -88,34 +88,25 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
   const technicalConsistency = enhancedMovement.technicalConsistency || Math.round(70 + Math.random() * 20);
   const pressureResistance = enhancedMovement.pressureResistance || Math.round(65 + Math.random() * 25);
   
-  // Define types for the recommendations to fix type errors
-  interface RecommendationImpact {
-    metric: string;
-    expectedGain: number;
-  }
-
-  interface Recommendation {
-    title: string;
-    description: string;
-    duration: number;
-    expectedImpact: RecommendationImpact[];
-  }
-
-  // Ensuring that we have the needed properties with the right types
-  const strengths = performanceMetrics.strengths || ['speed', 'agility', 'tacticalAwareness'];
-  const weaknesses = performanceMetrics.weaknesses || ['endurance', 'recoveryRate']; 
-  const recommendations: Recommendation[] = (performanceMetrics.recommendations as Recommendation[]) || [
-    {
-      title: "تمارين السرعة والانفجارية",
-      description: "مجموعة من التمارين المركزة لتحسين السرعة والقوة الانفجارية",
-      duration: 4,
-      expectedImpact: [
-        { metric: "speed", expectedGain: 8 },
-        { metric: "explosiveness", expectedGain: 12 },
-        { metric: "agility", expectedGain: 5 }
-      ]
-    }
-  ];
+  // Ensuring that we have the needed properties with the right types and fallbacks
+  const strengths = performanceMetrics.strengths || [];
+  const weaknesses = performanceMetrics.weaknesses || [];
+  
+  // Convert recommendations to the right format if they're strings
+  const recommendations: Recommendation[] = Array.isArray(performanceMetrics.recommendations) 
+    ? performanceMetrics.recommendations.map(rec => {
+        if (typeof rec === 'string') {
+          // Convert string recommendation to proper object structure
+          return {
+            title: `تمارين تحسين الأداء`,
+            description: rec,
+            duration: 4,
+            expectedImpact: [{ metric: "general", expectedGain: 8 }]
+          };
+        }
+        return rec as Recommendation;
+      })
+    : [];
   
   return (
     <div className="space-y-6">
@@ -466,77 +457,77 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
                   
                   <ul className="space-y-2 text-sm">
                     {selectedPosition === 'midfielder' && (
-                      <>
-                        <li className="flex items-start gap-2">
-                          <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">1</div>
-                          <div>
-                            <p className="font-medium">تدريبات التمرير المتقدمة</p>
-                            <p className="text-muted-foreground">تمارين دقة التمرير تحت الضغط والتمريرات الطويلة والقصيرة</p>
-                          </div>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">2</div>
-                          <div>
-                            <p className="font-medium">تدريبات رؤية الملعب</p>
-                            <p className="text-muted-foreground">تمارين لتطوير رؤية الملعب وقراءة تحركات اللاعبين</p>
-                          </div>
-                        </li>
-                      </>
-                    )}
-                    {selectedPosition === 'attacker' && (
-                      <>
-                        <li className="flex items-start gap-2">
-                          <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">1</div>
-                          <div>
-                            <p className="font-medium">تدريبات التسديد</p>
-                            <p className="text-muted-foreground">تمارين دقة التسديد من مختلف المواقع والزوايا</p>
-                          </div>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">2</div>
-                          <div>
-                            <p className="font-medium">تدريبات المراوغة السريعة</p>
-                            <p className="text-muted-foreground">تمارين لتطوير القدرة على المراوغة والتحرك بسرعة مع الكرة</p>
-                          </div>
-                        </li>
-                      </>
-                    )}
-                    {selectedPosition === 'defender' && (
-                      <>
-                        <li className="flex items-start gap-2">
-                          <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">1</div>
-                          <div>
-                            <p className="font-medium">تدريبات التدخل الدفاعي</p>
-                            <p className="text-muted-foreground">تمارين تحسين توقيت وتقنية التدخلات الدفاعية</p>
-                          </div>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">2</div>
-                          <div>
-                            <p className="font-medium">تدريبات القراءة الدفاعية</p>
-                            <p className="text-muted-foreground">تمارين لتطوير قراءة هجمات الخصم واعتراض الكرات</p>
-                          </div>
-                        </li>
-                      </>
-                    )}
-                    {selectedPosition === 'goalkeeper' && (
-                      <>
-                        <li className="flex items-start gap-2">
-                          <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">1</div>
-                          <div>
-                            <p className="font-medium">تدريبات ردود الفعل</p>
-                            <p className="text-muted-foreground">تمارين تحسين سرعة رد الفعل والتصدي للكرات القريبة</p>
-                          </div>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">2</div>
-                          <div>
-                            <p className="font-medium">تدريبات الخروج من المرمى</p>
-                            <p className="text-muted-foreground">تمارين تحسين توقيت وتقنية الخروج من المرمى</p>
-                          </div>
-                        </li>
-                      </>
-                    )}
+                        <>
+                          <li className="flex items-start gap-2">
+                            <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">1</div>
+                            <div>
+                              <p className="font-medium">تدريبات التمرير المتقدمة</p>
+                              <p className="text-muted-foreground">تمارين دقة التمرير تحت الضغط والتمريرات الطويلة والقصيرة</p>
+                            </div>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">2</div>
+                            <div>
+                              <p className="font-medium">تدريبات رؤية الملعب</p>
+                              <p className="text-muted-foreground">تمارين لتطوير رؤية الملعب وقراءة تحركات اللاعبين</p>
+                            </div>
+                          </li>
+                        </>
+                      )}
+                      {selectedPosition === 'attacker' && (
+                        <>
+                          <li className="flex items-start gap-2">
+                            <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">1</div>
+                            <div>
+                              <p className="font-medium">تدريبات التسديد</p>
+                              <p className="text-muted-foreground">تمارين دقة التسديد من مختلف المواقع والزوايا</p>
+                            </div>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">2</div>
+                            <div>
+                              <p className="font-medium">تدريبات المراوغة السريعة</p>
+                              <p className="text-muted-foreground">تمارين لتطوير القدرة على المراوغة والتحرك بسرعة مع الكرة</p>
+                            </div>
+                          </li>
+                        </>
+                      )}
+                      {selectedPosition === 'defender' && (
+                        <>
+                          <li className="flex items-start gap-2">
+                            <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">1</div>
+                            <div>
+                              <p className="font-medium">تدريبات التدخل الدفاعي</p>
+                              <p className="text-muted-foreground">تمارين تحسين توقيت وتقنية التدخلات الدفاعية</p>
+                            </div>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">2</div>
+                            <div>
+                              <p className="font-medium">تدريبات القراءة الدفاعية</p>
+                              <p className="text-muted-foreground">تمارين لتطوير قراءة هجمات الخصم واعتراض الكرات</p>
+                            </div>
+                          </li>
+                        </>
+                      )}
+                      {selectedPosition === 'goalkeeper' && (
+                        <>
+                          <li className="flex items-start gap-2">
+                            <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">1</div>
+                            <div>
+                              <p className="font-medium">تدريبات ردود الفعل</p>
+                              <p className="text-muted-foreground">تمارين تحسين سرعة رد الفعل والتصدي للكرات القريبة</p>
+                            </div>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">2</div>
+                            <div>
+                              <p className="font-medium">تدريبات الخروج من المرمى</p>
+                              <p className="text-muted-foreground">تمارين تحسين توقيت وتقنية الخروج من المرمى</p>
+                            </div>
+                          </li>
+                        </>
+                      )}
                   </ul>
                 </div>
               </CardContent>
@@ -784,4 +775,3 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
 };
 
 export default AdvancedAnalysisPanel;
-
