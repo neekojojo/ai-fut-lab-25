@@ -2,7 +2,7 @@
 import * as React from "react";
 import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils";
-import { ChartContext } from "./ChartContext";
+import { ChartContext, ChartProvider } from "./ChartContext";
 import { ChartStyle } from "./ChartStyle";
 import { ChartConfig } from "./types";
 
@@ -17,7 +17,7 @@ export const ChartContainer = React.forwardRef<
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`;
 
   return (
-    <ChartContext.Provider value={{ config }}>
+    <ChartProvider value={config}>
       <div
         data-chart={chartId}
         ref={ref}
@@ -33,7 +33,7 @@ export const ChartContainer = React.forwardRef<
           {React.isValidElement(children) ? children : null}
         </RechartsPrimitive.ResponsiveContainer>
       </div>
-    </ChartContext.Provider>
+    </ChartProvider>
   );
 });
 

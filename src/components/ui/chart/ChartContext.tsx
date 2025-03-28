@@ -1,8 +1,12 @@
 
 import * as React from "react";
-import { ChartConfig, ChartContextProps } from "./types";
+import { ChartConfig } from "./types";
 
-const ChartContext = React.createContext<ChartContextProps>({
+export interface ChartContextProps {
+  config: ChartConfig;
+}
+
+export const ChartContext = React.createContext<ChartContextProps>({
   config: {},
 });
 

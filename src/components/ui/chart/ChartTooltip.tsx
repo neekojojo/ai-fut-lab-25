@@ -9,7 +9,12 @@ export const ChartTooltip = RechartsPrimitive.Tooltip;
 
 export interface ChartTooltipContentProps extends React.HTMLAttributes<HTMLDivElement> {
   active?: boolean;
-  payload?: RechartsPrimitive.TooltipPayload[];
+  payload?: Array<{
+    dataKey?: string;
+    name?: string;
+    value?: any;
+    color?: string;
+  }>;
   label?: string;
 }
 
