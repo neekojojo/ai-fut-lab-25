@@ -9,9 +9,12 @@ interface AnalysisProcessingProps {
 }
 
 const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({ progress, stage, isMobile }) => {
+  // تأكد من أن progress هو رقم صحيح (ليس NaN)
+  const safeProgress = isNaN(progress) ? 0 : progress;
+  
   return (
     <div className={isMobile ? 'scale-90 transform-origin-top' : ''}>
-      <LoadingAnimation progress={progress} stage={stage} />
+      <LoadingAnimation progress={safeProgress} stage={stage} />
     </div>
   );
 };

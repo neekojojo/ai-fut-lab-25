@@ -7,6 +7,9 @@ interface LoadingAnimationProps {
 }
 
 const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ progress, stage }) => {
+  // التأكد من أن قيمة progress صالحة
+  const safeProgress = isNaN(progress) ? 0 : Math.max(0, Math.min(100, progress));
+  
   // Define more detailed substages for analysis
   const getSubstage = () => {
     if (stage.includes("movements")) {
@@ -26,6 +29,9 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ progress, stage }) 
     }
   };
 
+  // إضافة سجلات للتصحيح
+  console.log("Loading Animation - Progress:", safeProgress, "Stage:", stage);
+
   return (
     <div className="flex flex-col items-center justify-center space-y-6 py-12 animate-fade-in">
       <div className="relative w-32 h-32">
@@ -44,17 +50,17 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ progress, stage }) 
             cy="50"
             style={{
               strokeDasharray: 300,
-              strokeDashoffset: 300 - (progress / 100) * 300
+              strokeDashoffset: 300 - (safeProgress / 100) * 300
             }}
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-2xl font-medium">{progress}%</span>
+          <span className="text-2xl font-medium">{safeProgress}%</span>
         </div>
       </div>
       
       <div className="text-center space-y-2">
-        <h3 className="text-lg font-medium">{stage}</h3>
+        <h3 className="text-lg font-medium">{stage || "بدء تحليل الفيديو"}</h3>
         <p className="text-sm text-muted-foreground max-w-sm">
           {getSubstage()}
         </p>
@@ -64,7 +70,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ progress, stage }) 
         <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
           <div 
             className="h-full bg-primary rounded-full transition-all duration-500 ease-out" 
-            style={{ width: `${progress}%` }}
+            style={{ width: `${safeProgress}%` }}
           ></div>
         </div>
         <div className="flex justify-between text-xs text-muted-foreground">
