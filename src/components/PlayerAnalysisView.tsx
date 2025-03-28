@@ -35,6 +35,12 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
     });
   }, [toast]);
 
+  // معالج لعرض التحليل المتقدم للحركة
+  const handleViewAdvanced = () => {
+    console.log("Switching to advanced view mode");
+    setViewMode('advanced');
+  };
+
   if (viewMode === 'advanced') {
     return (
       <AdvancedAnalysisView 
@@ -59,7 +65,7 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
             mockAnalysis={mockAnalysis}
             trainingRecommendations={trainingRecommendations}
             playerComparison={playerComparison}
-            onViewAdvanced={() => setViewMode('advanced')}
+            onViewAdvanced={handleViewAdvanced}
           />
         </div>
       </div>

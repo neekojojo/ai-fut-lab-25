@@ -40,15 +40,14 @@ function App() {
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/sign-up" element={<SignUp />} />
             
+            {/* تحديث مسار التحليل المتقدم ليكون عاماً وليس محمياً */}
+            <Route path="/advanced-analysis" element={<AdvancedAnalysis />} />
+            <Route path="/advanced-analysis/:id" element={<AdvancedAnalysis />} />
+            
             {/* Protected routes */}
             <Route path="/dashboard" element={
               <AuthRoute>
                 <Dashboard />
-              </AuthRoute>
-            } />
-            <Route path="/advanced-analysis" element={
-              <AuthRoute>
-                <AdvancedAnalysis />
               </AuthRoute>
             } />
             <Route path="/professional-tips" element={

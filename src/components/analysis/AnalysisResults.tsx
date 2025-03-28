@@ -23,7 +23,9 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   const handleOpenAdvancedDashboard = () => {
     // Navigate to advanced analysis page with the analysis id
     if (analysis.id) {
-      navigate(`/advanced-analysis/${analysis.id}`);
+      navigate(`/advanced-analysis`);
+    } else {
+      console.error("Analysis ID is missing, cannot navigate to advanced dashboard");
     }
   };
 

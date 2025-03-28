@@ -36,7 +36,7 @@ const AnalysisContent: React.FC<AnalysisContentProps> = ({
           <MovementPanel analysis={mockAnalysis.analysis} />
           <div className="text-center">
             <Button onClick={onViewAdvanced} variant="outline" className="gap-2">
-              <ExternalLink className="h-4 w-4" />
+              <ExternalLink className="h-4 w-4 mr-1 rtl:ml-1 rtl:mr-0" />
               عرض تحليل الحركة المتقدم
             </Button>
           </div>

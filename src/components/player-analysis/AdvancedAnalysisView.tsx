@@ -55,77 +55,85 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
   const physicalData = generatePhysicalData();
   const skillData = generateSkillData();
 
-  // Enhancement percentage calculations
+  // تطوير النسب المئوية للتحسن
   const movementImprovement = "+5.7%";
   const physicalImprovement = "+9.0%";
   const skillImprovement = "+8.4%";
 
-  // Descriptions
-  const movementDescription = "Analysis of player's movement efficiency including sprint speed, agility, balance, coordination, and acceleration compared to previous assessment and potential improvements.";
-  const physicalDescription = "Progression of physical attributes including speed, strength, stamina, jumping ability and agility, with projections for improvement.";
-  const skillDescription = "Comparison of key technical skills based on position requirements, showing progress since last assessment and projected improvement with targeted training.";
+  // التوصيفات
+  const movementDescription = "تحليل كفاءة حركة اللاعب بما في ذلك سرعة العدو، الرشاقة، التوازن، التنسيق، والتسارع مقارنة بالتقييم السابق والتحسينات المحتملة.";
+  const physicalDescription = "تطور الصفات البدنية بما في ذلك السرعة، القوة، التحمل، القدرة على القفز والرشاقة، مع توقعات للتحسين.";
+  const skillDescription = "مقارنة المهارات الفنية الرئيسية بناءً على متطلبات المركز، مع إظهار التقدم منذ التقييم الأخير والتحسن المتوقع مع التدريب المستهدف.";
+
+  // معالج للعودة
+  const handleBack = () => {
+    console.log("Going back to main view");
+    if (onBack) {
+      onBack();
+    }
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Advanced Player Analysis</h2>
+        <h2 className="text-2xl font-bold">التحليل المتقدم للاعب</h2>
         <Button 
-          onClick={onBack} 
+          onClick={handleBack} 
           variant="ghost"
           className="px-4 py-2 text-sm font-medium"
         >
-          Back to Summary
+          العودة إلى الملخص
         </Button>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-3 mb-6">
-          <TabsTrigger value="movement">Movement Analysis</TabsTrigger>
-          <TabsTrigger value="performance">Performance Charts</TabsTrigger>
-          <TabsTrigger value="ar">AR Visualization</TabsTrigger>
+          <TabsTrigger value="movement">تحليل الحركة</TabsTrigger>
+          <TabsTrigger value="performance">مخططات الأداء</TabsTrigger>
+          <TabsTrigger value="ar">تصور الواقع المعزز</TabsTrigger>
         </TabsList>
 
         <TabsContent value="movement" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Movement Analysis</CardTitle>
+              <CardTitle>تحليل الحركة</CardTitle>
               <CardDescription>
-                Visual analysis of {analysis.playerName}'s movements and skill progression
+                تحليل مرئي لحركات {analysis.playerName} وتطور المهارات
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="physical-movements">
                 <TabsList className="grid w-full grid-cols-3 mb-6">
-                  <TabsTrigger value="physical-movements">Physical Movements</TabsTrigger>
-                  <TabsTrigger value="skill-analysis">Skill Analysis</TabsTrigger>
-                  <TabsTrigger value="physical-metrics">Physical Metrics</TabsTrigger>
+                  <TabsTrigger value="physical-movements">الحركات البدنية</TabsTrigger>
+                  <TabsTrigger value="skill-analysis">تحليل المهارات</TabsTrigger>
+                  <TabsTrigger value="physical-metrics">المقاييس البدنية</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="physical-movements">
                   <div className="space-y-6">
                     <div className="relative">
                       <NumberMovementChart 
-                        title="Movement Efficiency Analysis" 
+                        title="تحليل كفاءة الحركة" 
                         data={movementsData} 
                         type="line"
                         colors={{
-                          current: "#8B5CF6", // Purple
-                          previous: "#9CA3AF", // Gray
-                          alternative: "#F97316", // Orange
+                          current: "#8B5CF6", // بنفسجي
+                          previous: "#9CA3AF", // رمادي
+                          alternative: "#F97316", // برتقالي
                         }}
                         description={movementDescription}
                       />
                       <div className="absolute top-4 right-4 bg-green-100 text-green-800 rounded-full px-3 py-1 text-sm font-medium">
-                        {movementImprovement} vs previous
+                        {movementImprovement} مقارنة بالسابق
                       </div>
                     </div>
 
                     <div className="text-sm text-muted-foreground">
-                      <p className="mb-2">Movement analysis compares current performance metrics with previous assessments and potential alternatives:</p>
-                      <ul className="list-disc pl-5 space-y-1">
-                        <li><span className="font-medium text-purple-500">Current (Purple):</span> Player's current movement efficiency metrics</li>
-                        <li><span className="font-medium text-gray-500">Previous (Gray):</span> Metrics from previous assessment</li>
-                        <li><span className="font-medium text-orange-500">Alternative (Orange):</span> Potential improvements with suggested technique adjustments</li>
+                      <p className="mb-2">يقارن تحليل الحركة مقاييس الأداء الحالية مع التقييمات السابقة والبدائل المحتملة:</p>
+                      <ul className="list-disc pr-5 space-y-1 mr-5">
+                        <li><span className="font-medium text-purple-500">الحالي (بنفسجي):</span> مقاييس كفاءة حركة اللاعب الحالية</li>
+                        <li><span className="font-medium text-gray-500">السابق (رمادي):</span> المقاييس من التقييم السابق</li>
+                        <li><span className="font-medium text-orange-500">البديل (برتقالي):</span> التحسينات المحتملة مع تعديلات التقنية المقترحة</li>
                       </ul>
                     </div>
                   </div>
@@ -135,29 +143,29 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
                   <div className="space-y-6">
                     <div className="relative">
                       <NumberMovementChart 
-                        title="Skill Performance Comparison" 
+                        title="مقارنة أداء المهارات" 
                         data={skillData} 
                         type="bar"
                         colors={{
-                          current: "#0EA5E9", // Blue
-                          previous: "#9CA3AF", // Gray
-                          alternative: "#10B981", // Green
+                          current: "#0EA5E9", // أزرق
+                          previous: "#9CA3AF", // رمادي
+                          alternative: "#10B981", // أخضر
                         }}
                         description={skillDescription}
                       />
                       <div className="absolute top-4 right-4 bg-green-100 text-green-800 rounded-full px-3 py-1 text-sm font-medium">
-                        {skillImprovement} vs previous
+                        {skillImprovement} مقارنة بالسابق
                       </div>
                     </div>
 
                     <div className="text-sm text-muted-foreground">
-                      <p className="mb-2">Skill analysis shows progression in core football abilities:</p>
-                      <ul className="list-disc pl-5 space-y-1">
-                        <li><span className="font-medium text-blue-500">Current (Blue):</span> Current skill ratings based on recent performance</li>
-                        <li><span className="font-medium text-gray-500">Previous (Gray):</span> Skill levels from previous assessment</li>
-                        <li><span className="font-medium text-green-500">Alternative (Green):</span> Projected skill levels with focused training</li>
+                      <p className="mb-2">يوضح تحليل المهارات التقدم في قدرات كرة القدم الأساسية:</p>
+                      <ul className="list-disc pr-5 space-y-1 mr-5">
+                        <li><span className="font-medium text-blue-500">الحالي (أزرق):</span> تقييمات المهارات الحالية بناءً على الأداء الأخير</li>
+                        <li><span className="font-medium text-gray-500">السابق (رمادي):</span> مستويات المهارة من التقييم السابق</li>
+                        <li><span className="font-medium text-green-500">البديل (أخضر):</span> مستويات المهارات المتوقعة مع التدريب المركز</li>
                       </ul>
-                      <p className="mt-2">Player profile is optimized for {analysis.position || "Midfielder"} position.</p>
+                      <p className="mt-2">تم تحسين ملف تعريف اللاعب لمركز {analysis.position || "لاعب وسط"}</p>
                     </div>
                   </div>
                 </TabsContent>
@@ -166,29 +174,29 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
                   <div className="space-y-6">
                     <div className="relative">
                       <NumberMovementChart 
-                        title="Physical Metrics Progression" 
+                        title="تطور المقاييس البدنية" 
                         data={physicalData} 
                         type="area"
                         colors={{
-                          current: "#D946EF", // Pink
-                          previous: "#9CA3AF", // Gray
-                          alternative: "#F97316", // Orange
+                          current: "#D946EF", // وردي
+                          previous: "#9CA3AF", // رمادي
+                          alternative: "#F97316", // برتقالي
                         }}
                         description={physicalDescription}
                       />
                       <div className="absolute top-4 right-4 bg-green-100 text-green-800 rounded-full px-3 py-1 text-sm font-medium">
-                        {physicalImprovement} vs previous
+                        {physicalImprovement} مقارنة بالسابق
                       </div>
                     </div>
 
                     <div className="text-sm text-muted-foreground">
-                      <p className="mb-2">Physical attributes measured through standardized performance tests:</p>
-                      <ul className="list-disc pl-5 space-y-1">
-                        <li><span className="font-medium text-pink-500">Current (Pink):</span> Current physical capabilities</li>
-                        <li><span className="font-medium text-gray-500">Previous (Gray):</span> Physical metrics from previous assessment</li>
-                        <li><span className="font-medium text-orange-500">Alternative (Orange):</span> Projected metrics with specialized conditioning</li>
+                      <p className="mb-2">الصفات البدنية المقاسة من خلال اختبارات الأداء القياسية:</p>
+                      <ul className="list-disc pr-5 space-y-1 mr-5">
+                        <li><span className="font-medium text-pink-500">الحالي (وردي):</span> القدرات البدنية الحالية</li>
+                        <li><span className="font-medium text-gray-500">السابق (رمادي):</span> المقاييس البدنية من التقييم السابق</li>
+                        <li><span className="font-medium text-orange-500">البديل (برتقالي):</span> المقاييس المتوقعة مع التكييف المتخصص</li>
                       </ul>
-                      <p className="mt-2">Overall physical score: {analysis.performance?.physical || 75}/100</p>
+                      <p className="mt-2">الدرجة البدنية الإجمالية: {analysis.performance?.physical || 75}/100</p>
                     </div>
                   </div>
                 </TabsContent>
@@ -200,9 +208,9 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
         <TabsContent value="performance">
           <Card>
             <CardHeader>
-              <CardTitle>Performance Charts</CardTitle>
+              <CardTitle>مخططات الأداء</CardTitle>
               <CardDescription>
-                Detailed analysis of skill metrics, physical attributes, and improvement potential
+                تحليل مفصل لمقاييس المهارات، والسمات البدنية، وإمكانية التحسين
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -227,15 +235,15 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
         <TabsContent value="ar">
           <Card>
             <CardHeader>
-              <CardTitle>Augmented Reality Visualization</CardTitle>
+              <CardTitle>تصور الواقع المعزز</CardTitle>
               <CardDescription>
-                3D visualization of player movements and physical attributes
+                تصور ثلاثي الأبعاد لحركات اللاعب والخصائص البدنية
               </CardDescription>
             </CardHeader>
             <CardContent className="h-[400px] flex items-center justify-center bg-muted/30 rounded-md">
               <div className="text-center">
-                <p className="text-muted-foreground mb-2">AR Visualization requires device camera access</p>
-                <Button>Launch AR Experience</Button>
+                <p className="text-muted-foreground mb-2">يتطلب تصور الواقع المعزز الوصول إلى كاميرا الجهاز</p>
+                <Button>إطلاق تجربة الواقع المعزز</Button>
               </div>
             </CardContent>
           </Card>
