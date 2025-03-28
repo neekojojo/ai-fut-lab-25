@@ -2,7 +2,7 @@
 // Helper function to extract a specific number of frames from a video - highly optimized for speed
 export const extractVideoFrames = async (
   videoFile: File,
-  frameCount: number = 6 // Further reduced default frame count for faster processing
+  frameCount: number = 4 // Further reduced default frame count for faster processing
 ): Promise<ImageBitmap[]> => {
   return new Promise((resolve, reject) => {
     const video = document.createElement('video');
@@ -17,17 +17,36 @@ export const extractVideoFrames = async (
     // Use smaller timeout to prevent hanging
     const timeout = setTimeout(() => {
       URL.revokeObjectURL(videoURL);
-      // Instead of rejecting, return an empty array to prevent analysis from failing
-      console.warn('Video loading timeout - proceeding with empty frames');
-      resolve([]);
-    }, 6000); // Reduced from 8000 to 6000ms for faster timeout response
+      // شكّل إطارًا وهميًا واحدًا على الأقل بدلاً من إرجاع مصفوفة فارغة
+      console.warn('Video loading timeout - creating single placeholder frame');
+      const placeholderCanvas = document.createElement('canvas');
+      placeholderCanvas.width = 320;
+      placeholderCanvas.height = 240;
+      const ctx = placeholderCanvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, 320, 240);
+        createImageBitmap(placeholderCanvas)
+          .then(bitmap => resolve([bitmap]))
+          .catch(() => resolve([]));
+      } else {
+        resolve([]);
+      }
+    }, 4000); // Reduced from 6000ms to 4000ms for faster timeout response
     
     video.onloadedmetadata = () => {
       clearTimeout(timeout);
       
-      // Determine optimal frame intervals based on video duration
+      // تحديد العدد الأمثل للإطارات استنادًا إلى مدة الفيديو
       const optimalFrameCount = Math.min(frameCount, Math.ceil(video.duration));
       const frameInterval = video.duration / optimalFrameCount;
+      
+      // معالجة الإطار الأول والأخير بشكل أسرع للحصول على نتائج سريعة
+      if (optimalFrameCount <= 2 || video.duration < 3) {
+        console.log("Using simplified frame extraction for very short video");
+        processSimplifiedFrames();
+        return;
+      }
       
       // Prepare to collect frames
       const frames: ImageBitmap[] = [];
@@ -55,7 +74,7 @@ export const extractVideoFrames = async (
         const canvas = document.createElement('canvas');
         
         // Use a lower resolution for faster processing
-        const scaleFactor = 0.4; // Further reduced resolution to 40%
+        const scaleFactor = 0.3; // Further reduced resolution to 30%
         canvas.width = video.videoWidth * scaleFactor;
         canvas.height = video.videoHeight * scaleFactor;
         const ctx = canvas.getContext('2d', { alpha: false }); // Disable alpha for better performance
@@ -93,8 +112,8 @@ export const extractVideoFrames = async (
           if (framesProcessed >= optimalFrameCount) {
             cleanup();
           } else {
-            // Skip random offsets to speed up processing
-            video.currentTime = initialSkip + (framesProcessed * frameInterval);
+            // تخطي إطارات عشوائية لتسريع المعالجة - أسرع من قبل
+            video.currentTime = initialSkip + (framesProcessed * frameInterval * 1.2);
           }
         }
 
@@ -127,6 +146,90 @@ export const extractVideoFrames = async (
           }
         }
       };
+      
+      // طريقة مبسطة لاستخراج الإطارات للفيديوهات القصيرة جدا
+      function processSimplifiedFrames() {
+        const canvas = document.createElement('canvas');
+        const scaleFactor = 0.3;
+        canvas.width = video.videoWidth * scaleFactor;
+        canvas.height = video.videoHeight * scaleFactor;
+        const ctx = canvas.getContext('2d', { alpha: false });
+        
+        if (!ctx) {
+          console.warn('Could not create canvas context');
+          URL.revokeObjectURL(videoURL);
+          resolve([]);
+          return;
+        }
+        
+        // الحصول على إطار من بداية الفيديو
+        video.currentTime = 0.1; // تجنب الإطار الأول صفر
+        
+        video.onseeked = () => {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          
+          createImageBitmap(canvas, { resizeQuality: 'low' })
+            .then(bitmap => {
+              // الإطار الأول جاهز، الآن نحصل على الإطار الأخير
+              const frames = [bitmap];
+              
+              // نحصل على إطار من نهاية الفيديو
+              video.currentTime = Math.max(0, video.duration - 0.5);
+              
+              video.onseeked = () => {
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                createImageBitmap(canvas, { resizeQuality: 'low' })
+                  .then(lastBitmap => {
+                    frames.push(lastBitmap);
+                    URL.revokeObjectURL(videoURL);
+                    video.remove();
+                    resolve(frames);
+                  })
+                  .catch(error => {
+                    console.error('Error creating last frame bitmap:', error);
+                    URL.revokeObjectURL(videoURL);
+                    video.remove();
+                    resolve(frames);
+                  });
+              };
+              
+              // معالجة الأخطاء للإطار الأخير
+              video.onerror = () => {
+                console.warn('Error seeking to last frame');
+                URL.revokeObjectURL(videoURL);
+                video.remove();
+                resolve(frames);
+              };
+            })
+            .catch(error => {
+              console.error('Error creating first frame bitmap:', error);
+              URL.revokeObjectURL(videoURL);
+              video.remove();
+              // استخدم إطارًا وهميًا
+              const placeholderCanvas = document.createElement('canvas');
+              placeholderCanvas.width = 320;
+              placeholderCanvas.height = 240;
+              const ctx = placeholderCanvas.getContext('2d');
+              if (ctx) {
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(0, 0, 320, 240);
+                createImageBitmap(placeholderCanvas)
+                  .then(bitmap => resolve([bitmap]))
+                  .catch(() => resolve([]));
+              } else {
+                resolve([]);
+              }
+            });
+        };
+        
+        // معالجة الأخطاء للإطار الأول
+        video.onerror = () => {
+          console.warn('Error seeking to first frame');
+          URL.revokeObjectURL(videoURL);
+          resolve([]);
+        };
+      }
       
       // Handle seeking events
       video.onseeked = processFrame;
@@ -164,7 +267,21 @@ export const extractVideoFrames = async (
       clearTimeout(timeout);
       URL.revokeObjectURL(videoURL);
       console.warn('Error loading video, providing empty frames');
-      resolve([]);
+      
+      // إنشاء إطار افتراضي بدلاً من إرجاع مصفوفة فارغة
+      const placeholderCanvas = document.createElement('canvas');
+      placeholderCanvas.width = 320;
+      placeholderCanvas.height = 240;
+      const ctx = placeholderCanvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, 320, 240);
+        createImageBitmap(placeholderCanvas)
+          .then(bitmap => resolve([bitmap]))
+          .catch(() => resolve([]));
+      } else {
+        resolve([]);
+      }
     };
   });
 };
