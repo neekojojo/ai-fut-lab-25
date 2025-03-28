@@ -10,7 +10,6 @@ import NotFound from "./pages/NotFound";
 import AdvancedAnalysis from "./pages/AdvancedAnalysis";
 import ProfessionalTips from "./pages/ProfessionalTips";
 import StressManagement from "./pages/StressManagement";
-import ExternalSystems from "./pages/ExternalSystems";
 import SignIn from "./components/auth/SignIn";
 import SignUp from "./components/auth/SignUp";
 
@@ -25,7 +24,6 @@ function App() {
             <Route path="/advanced-analysis" element={<AdvancedAnalysis />} />
             <Route path="/professional-tips" element={<ProfessionalTips />} />
             <Route path="/stress-management" element={<StressManagement />} />
-            <Route path="/external-systems" element={<ExternalSystems />} />
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="*" element={<NotFound />} />

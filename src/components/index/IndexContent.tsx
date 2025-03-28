@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import VideoUpload from '../VideoUpload';
 import { ANALYSIS_STAGES } from '@/utils/analysis/constants';
 import { Separator } from '@/components/ui/separator';
-import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, ServerCog } from 'lucide-react';
+import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck } from 'lucide-react';
 
 export interface FileWithPreview extends File {
   preview: string;
@@ -49,10 +49,6 @@ const IndexContent: React.FC = () => {
   const handleResetAnalysis = () => {
     setVideoFile(null);
     setAnalysisStarted(false);
-  };
-
-  const navigateToExternalSystems = () => {
-    window.location.href = '/external-systems';
   };
 
   if (analysisStarted) {
@@ -126,22 +122,6 @@ const IndexContent: React.FC = () => {
                 title="تتبع التقدم مع مرور الوقت"
                 description="تحليل التطور وتحديد مجالات التحسين"
                 icon={<CalendarCheck className="h-8 w-8 text-primary" />}
-              />
-              
-              <StageCard
-                number={6}
-                title="التكامل مع الأنظمة الخارجية"
-                description="ربط مع API خارجية وتحسين الأداء"
-                icon={<ServerCog className="h-8 w-8 text-primary" />}
-                action={
-                  <Button 
-                    size="sm" 
-                    className="w-full mt-2"
-                    onClick={navigateToExternalSystems}
-                  >
-                    استكشاف <ArrowRight className="h-4 w-4 ml-1" />
-                  </Button>
-                }
               />
             </div>
           </div>
