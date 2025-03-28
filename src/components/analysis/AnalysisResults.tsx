@@ -2,7 +2,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import AnalysisReport from '@/components/AnalysisReport';
-import PlayerDigitalIdentity from '@/components/player-analysis/PlayerDigitalIdentity';
 import type { PlayerAnalysis } from '@/components/AnalysisReport.d';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent } from '@/components/ui/card';
@@ -21,17 +20,6 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
 }) => {
   const navigate = useNavigate();
   
-  // Add default values for the new profile fields if they're not provided
-  const enhancedAnalysis = {
-    ...analysis,
-    age: analysis.age || 23,
-    country: analysis.country || 'United States',
-    city: analysis.city || 'New York',
-    height: analysis.height || '6\'1" (185cm)',
-    weight: analysis.weight || '175lbs (79kg)',
-    preferredFoot: analysis.preferredFoot || 'Right'
-  };
-
   const handleOpenAdvancedDashboard = () => {
     // Navigate to advanced analysis page with the analysis id
     if (analysis.id) {
@@ -43,11 +31,8 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
     <div className="space-y-8 animate-fade-in">
       <Card className="border-none shadow-lg overflow-hidden bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20">
         <CardContent className="p-0">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
-            <div className="md:col-span-1 bg-white/60 dark:bg-black/20 backdrop-blur-sm rounded-xl p-4 shadow-sm">
-              <PlayerDigitalIdentity analysis={enhancedAnalysis} />
-            </div>
-            <div className="md:col-span-2 bg-white/60 dark:bg-black/20 backdrop-blur-sm rounded-xl p-4 shadow-sm">
+          <div className="p-6">
+            <div className="bg-white/60 dark:bg-black/20 backdrop-blur-sm rounded-xl p-4 shadow-sm">
               <AnalysisReport analysis={analysis} />
             </div>
           </div>
