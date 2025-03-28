@@ -1,4 +1,5 @@
 
+import React from "react";
 import { TrendingUp, TrendingDown, ArrowUp, ArrowDown } from "lucide-react";
 
 /**
@@ -8,10 +9,10 @@ export const getMovementIcon = (current: number, previous?: number) => {
   if (!previous || current === previous) return null;
   const percentChange = ((current - previous) / previous) * 100;
   
-  if (percentChange > 10) return <TrendingUp className="text-green-500" />;
-  if (percentChange > 0) return <ArrowUp className="text-green-500" />;
-  if (percentChange < -10) return <TrendingDown className="text-red-500" />;
-  if (percentChange < 0) return <ArrowDown className="text-red-500" />;
+  if (percentChange > 10) return React.createElement(TrendingUp, { className: "text-green-500" });
+  if (percentChange > 0) return React.createElement(ArrowUp, { className: "text-green-500" });
+  if (percentChange < -10) return React.createElement(TrendingDown, { className: "text-red-500" });
+  if (percentChange < 0) return React.createElement(ArrowDown, { className: "text-red-500" });
   return null;
 };
 
