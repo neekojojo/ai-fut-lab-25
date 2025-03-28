@@ -5,7 +5,7 @@ import LoadingAnimation from '@/components/LoadingAnimation';
 import PlayerAnalysisView from '@/components/PlayerAnalysisView';
 import PeopleDetection from '@/components/PeopleDetection';
 import type { PlayerAnalysis } from '@/components/AnalysisReport.d';
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/components/auth/AuthContext';
 import AnalysisOptions from '@/components/index/AnalysisOptions';
 import AnalysisProcessing from '@/components/index/AnalysisProcessing';
@@ -102,7 +102,6 @@ const IndexContent: React.FC<IndexContentProps> = ({ navigate, isMobile }) => {
         />
       )}
       
-      {/* Hide model selection UI */}
       {false && analysisState === 'model-selection' && videoFile && (
         <AnalysisOptions 
           videoFile={videoFile}
@@ -128,8 +127,7 @@ const IndexContent: React.FC<IndexContentProps> = ({ navigate, isMobile }) => {
         </div>
       )}
       
-      {/* Hide processing UI - we're going straight to results */}
-      {false && analysisState === 'processing' && (
+      {analysisState === 'processing' && (
         <AnalysisProcessing progress={progress} stage={stage} isMobile={isMobile} />
       )}
       
