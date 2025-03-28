@@ -4,7 +4,10 @@ export interface ChartConfigItem {
   label: string;
   icon?: React.FC<React.SVGProps<SVGSVGElement>>;
   curve?: string;
-  theme?: string;
+  theme?: {
+    light?: string;
+    dark?: string;
+  };
 }
 
 export interface ChartConfig {
@@ -14,6 +17,12 @@ export interface ChartConfig {
 export interface ChartContextProps {
   config: ChartConfig;
 }
+
+// Define theme prefixes for CSS selectors
+export const THEMES = {
+  light: "",
+  dark: ".dark",
+} as const;
 
 export function getPayloadConfigFromPayload(
   config: ChartConfig,
