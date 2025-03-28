@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -95,6 +96,9 @@ const Dashboard: React.FC = () => {
         
       if (error) throw error;
       
+      // Convert preferred_foot to a valid union type value
+      const preferredFoot = data.preferred_foot as 'Left' | 'Right' | 'Both' | undefined;
+      
       const initialProfile: UserProfile = {
         id: user.id,
         email: user.email || '',
@@ -106,7 +110,7 @@ const Dashboard: React.FC = () => {
         city: data.city,
         height: data.height,
         weight: data.weight,
-        preferredFoot: data.preferred_foot,
+        preferredFoot: preferredFoot,
         position: data.position,
         analyses: [],
         badges: [

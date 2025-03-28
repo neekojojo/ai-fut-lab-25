@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -51,6 +50,12 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userProfile, onSignOut }) => {
     setIsLoading(true);
     
     try {
+      // Validate preferred foot to ensure it's one of the allowed values
+      let preferredFoot = null;
+      if (formData.preferredFoot === 'Left' || formData.preferredFoot === 'Right' || formData.preferredFoot === 'Both') {
+        preferredFoot = formData.preferredFoot;
+      }
+
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -61,7 +66,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userProfile, onSignOut }) => {
           city: formData.city,
           height: formData.height,
           weight: formData.weight,
-          preferred_foot: formData.preferredFoot,
+          preferred_foot: preferredFoot,
           position: formData.position
         })
         .eq('id', userProfile.id);
