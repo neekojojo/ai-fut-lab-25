@@ -1,5 +1,4 @@
 
-import { IconType } from 'lucide-react';
 import * as React from 'react';
 
 export interface ChartConfigItem {

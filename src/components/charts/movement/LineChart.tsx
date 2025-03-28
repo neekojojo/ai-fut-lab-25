@@ -12,7 +12,7 @@ import {
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { getMaxYValue } from "./utils";
 import { ChartConfigType } from "./types";
-import ChartConfigAdapter from "./ChartConfigAdapter";
+import { ChartConfigAdapter } from "./ChartConfigAdapter";
 
 interface LineChartProps {
   data: any[];

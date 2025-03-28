@@ -1,6 +1,8 @@
 
+import React, { ReactNode } from "react";
 import { ChartConfig } from '@/components/ui/chart/types';
 import { Activity, Zap, AreaChart, BarChart2, LineChart } from 'lucide-react';
+import { ChartConfigType } from './types';
 
 // Utility function to convert string theme to object format
 const convertTheme = (theme: string) => {
@@ -38,3 +40,24 @@ export const adaptChartConfig = (colors: Record<string, string>, chartType: 'lin
   
   return config;
 };
+
+// Create a ChartConfigAdapter component for use in chart components
+interface ChartConfigAdapterProps {
+  config: ChartConfigType;
+  children: ReactNode;
+}
+
+export const ChartConfigAdapter: React.FC<ChartConfigAdapterProps> = ({ config, children }) => {
+  // Extract colors from the config
+  const colors: Record<string, string> = {};
+  Object.entries(config).forEach(([key, value]) => {
+    colors[key] = value.color;
+  });
+  
+  // For now, we're just passing through children
+  // In a more complex implementation, this could provide context
+  return <>{children}</>;
+};
+
+// Default export for the component
+export default ChartConfigAdapter;
