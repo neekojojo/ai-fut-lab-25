@@ -1,48 +1,32 @@
 
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Index from './pages/Index';
-import Dashboard from './pages/Dashboard';
-import SignIn from './components/auth/SignIn';
-import SignUp from './components/auth/SignUp';
-import NotFound from './pages/NotFound';
-import ProfessionalTips from './pages/ProfessionalTips';
-import StressManagement from './pages/StressManagement';
+import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from '@/components/auth/AuthContext';
-import { Suspense } from 'react';
-import AdvancedAnalysis from './pages/AdvancedAnalysis';
-
-// إنشاء عميل الاستعلام لإدارة حالة البيانات
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 60 * 1000, // البيانات ستظل "طازجة" لمدة دقيقة واحدة
-      retry: 1,
-      refetchOnWindowFocus: false
-    },
-  },
-});
+import Index from "./pages/Index";
+import Dashboard from "./pages/Dashboard";
+import NotFound from "./pages/NotFound";
+import AdvancedAnalysis from "./pages/AdvancedAnalysis";
+import ProfessionalTips from "./pages/ProfessionalTips";
+import StressManagement from "./pages/StressManagement";
+import ExternalSystems from "./pages/ExternalSystems";
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/tips" element={<ProfessionalTips />} />
-            <Route path="/stress-management" element={<StressManagement />} />
-            <Route path="/sign-in" element={<SignIn />} />
-            <Route path="/sign-up" element={<SignUp />} />
-            <Route path="/advanced-analysis/:id" element={<AdvancedAnalysis />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <Toaster />
-        </BrowserRouter>
-      </AuthProvider>
-    </QueryClientProvider>
+    <ThemeProvider defaultTheme="dark">
+      <Router>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/advanced-analysis" element={<AdvancedAnalysis />} />
+          <Route path="/professional-tips" element={<ProfessionalTips />} />
+          <Route path="/stress-management" element={<StressManagement />} />
+          <Route path="/external-systems" element={<ExternalSystems />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
+      <Toaster />
+    </ThemeProvider>
   );
 }
 

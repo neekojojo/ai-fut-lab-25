@@ -1,172 +1,182 @@
 
 import React, { useState } from 'react';
-import { NavigateFunction } from 'react-router-dom';
-import LoadingAnimation from '@/components/LoadingAnimation';
-import PlayerAnalysisView from '@/components/PlayerAnalysisView';
-import PeopleDetection from '@/components/PeopleDetection';
-import type { PlayerAnalysis } from '@/components/AnalysisReport.d';
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from '@/components/auth/AuthContext';
-import AnalysisOptions from '@/components/index/AnalysisOptions';
-import AnalysisProcessing from '@/components/index/analysis-processing';
-import AnalysisResults from '@/components/analysis/AnalysisResults';
-import HeroContent from '@/components/index/HeroContent';
-import AnalysisService from '@/services/AnalysisService';
+import { useToast } from '@/components/ui/use-toast';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import VideoUpload from '../VideoUpload';
+import HeroContent from './HeroContent';
+import AnalysisOptions from './AnalysisOptions';
+import AnalysisProcessing from './AnalysisProcessing';
+import { ANALYSIS_STAGES } from '@/utils/analysis/constants';
+import { Separator } from '@/components/ui/separator';
+import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, ServerCog } from 'lucide-react';
 
-interface IndexContentProps {
-  navigate: NavigateFunction;
-  isMobile: boolean;
+export interface FileWithPreview extends File {
+  preview: string;
 }
 
-const IndexContent: React.FC<IndexContentProps> = ({ navigate, isMobile }) => {
-  const [analysisState, setAnalysisState] = useState<'idle' | 'model-selection' | 'processing' | 'complete' | 'detailed-analysis'>('idle');
-  const [progress, setProgress] = useState(0);
-  const [stage, setStage] = useState('');
-  const [analysis, setAnalysis] = useState<PlayerAnalysis | null>(null);
-  const [showPeopleDetection, setShowPeopleDetection] = useState(false);
-  const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [selectedAnalysisModel, setSelectedAnalysisModel] = useState<'google-automl' | 'kaggle-datasets' | null>(null);
-  const [analysisStartTime, setAnalysisStartTime] = useState(Date.now());
+const IndexContent: React.FC = () => {
+  const [videoFile, setVideoFile] = useState<FileWithPreview | null>(null);
+  const [analysisStarted, setAnalysisStarted] = useState(false);
   const { toast } = useToast();
-  const { user } = useAuth();
+  const navigate = useNavigate();
 
-  const handleVideoUpload = async (file: File) => {
+  const handleFileSelected = (file: FileWithPreview) => {
     setVideoFile(file);
-    
-    // Bypass model selection and directly analyze the video
-    handleAnalyzeWithAI(file);
   };
 
-  const handleSelectModel = (model: 'google-automl' | 'kaggle-datasets') => {
-    setSelectedAnalysisModel(model);
-    // Immediately analyze after selecting model
-    if (videoFile) {
-      handleAnalyzeWithAI(videoFile);
-    }
-  };
-
-  const handleAnalyzeWithAI = async (fileToAnalyze = videoFile) => {
-    if (!fileToAnalyze) return;
-    
-    // Set the analysis start time
-    setAnalysisStartTime(Date.now());
-    
-    AnalysisService.analyzeVideo(
-      fileToAnalyze, 
-      setAnalysisState,
-      setProgress,
-      setStage,
-      setAnalysis,
-      user,
-      { toast },
-      resetAnalysis // Pass reset function as error callback
-    );
-  };
-
-  const handleAdvancedAnalysis = () => {
-    if (videoFile) {
-      setAnalysisState('detailed-analysis');
-    }
-  };
-
-  const resetAnalysis = () => {
-    setAnalysisState('idle');
-    setProgress(0);
-    setStage('');
-    setAnalysis(null);
-    setVideoFile(null);
-    setSelectedAnalysisModel(null);
-  };
-
-  const togglePeopleDetection = () => {
-    setShowPeopleDetection(!showPeopleDetection);
-  };
-
-  const handleGoToDashboard = () => {
-    if (user) {
-      navigate('/dashboard');
-    } else {
+  const handleStartAnalysis = () => {
+    if (!videoFile) {
       toast({
-        title: "Login Required",
-        description: "Please log in to view your dashboard.",
-        duration: 3000,
+        title: "No video selected",
+        description: "Please upload a video file to continue",
+        variant: "destructive",
       });
-      navigate('/sign-in');
+      return;
     }
+
+    setAnalysisStarted(true);
+    toast({
+      title: "Analysis started",
+      description: "Your football video is being analyzed",
+    });
+  };
+
+  const handleAnalysisComplete = () => {
+    toast({
+      title: "Analysis complete",
+      description: "Your football video analysis is ready",
+    });
+    navigate('/dashboard');
   };
 
   const handleResetAnalysis = () => {
-    // If we have a video file, restart the analysis
-    if (videoFile) {
-      handleAnalyzeWithAI(videoFile);
-    } else {
-      // Otherwise just reset to idle state
-      resetAnalysis();
-    }
+    setVideoFile(null);
+    setAnalysisStarted(false);
   };
 
+  const navigateToExternalSystems = () => {
+    navigate('/external-systems');
+  };
+
+  if (analysisStarted) {
+    return (
+      <AnalysisProcessing
+        videoFile={videoFile}
+        onComplete={handleAnalysisComplete}
+        onReset={handleResetAnalysis}
+        stages={ANALYSIS_STAGES}
+      />
+    );
+  }
+
   return (
-    <main className={`flex-1 container mx-auto ${isMobile ? 'py-4 px-3' : 'py-8 px-4 md:px-6 md:py-12'}`}>
-      {analysisState === 'idle' && !showPeopleDetection && (
-        <HeroContent 
-          user={user} 
-          onVideoUpload={handleVideoUpload}
-          onTogglePeopleDetection={togglePeopleDetection}
-          onGoToDashboard={handleGoToDashboard}
-          isMobile={isMobile}
-        />
-      )}
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <HeroContent />
       
-      {false && analysisState === 'model-selection' && videoFile && (
-        <AnalysisOptions 
-          videoFile={videoFile}
-          onSelectModel={handleSelectModel}
-          onAnalyzeWithAI={() => handleAnalyzeWithAI()}
-          isMobile={isMobile}
-        />
-      )}
-      
-      {showPeopleDetection && analysisState === 'idle' && (
-        <div className="space-y-6">
-          <div className={`flex justify-between items-center ${isMobile ? 'flex-col gap-3' : ''}`}>
-            <h2 className="text-2xl font-bold">People Detection in Video</h2>
-            <button
-              onClick={togglePeopleDetection}
-              className="px-4 py-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-            >
-              Return to Football Analysis
-            </button>
-          </div>
+      {!videoFile ? (
+        <>
+          <VideoUpload onFileSelected={handleFileSelected} />
           
-          <PeopleDetection />
-        </div>
-      )}
-      
-      {analysisState === 'processing' && (
-        <AnalysisProcessing 
-          progress={progress} 
-          stage={stage} 
-          isMobile={isMobile}
-          onReset={handleResetAnalysis}
-          analysisStartTime={analysisStartTime}
-        />
-      )}
-      
-      {analysisState === 'complete' && analysis && (
-        <AnalysisResults 
-          analysis={analysis}
-          onResetAnalysis={resetAnalysis}
-          onAdvancedAnalysis={handleAdvancedAnalysis}
-        />
-      )}
-      
-      {analysisState === 'detailed-analysis' && videoFile && (
-        <PlayerAnalysisView
+          <div className="mt-12">
+            <h2 className="text-2xl font-bold text-center mb-6">مراحل تطوير تطبيق تحليل أداء لاعبي كرة القدم</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <StageCard
+                number={1}
+                title="اكتشاف اللاعبين والتعرف عليهم"
+                description="تحديد وتتبع اللاعبين في الفيديو"
+                icon={<FileVideo className="h-8 w-8 text-primary" />}
+              />
+              
+              <StageCard
+                number={2}
+                title="تحليل الحركة والأداء"
+                description="تحليل أنماط الحركة والإحصاءات الفنية"
+                icon={<BarChart3 className="h-8 w-8 text-primary" />}
+              />
+              
+              <StageCard
+                number={3}
+                title="التقييم المتقدم للمهارات"
+                description="تقييم شامل للمهارات الفنية والتكتيكية"
+                icon={<Sparkles className="h-8 w-8 text-primary" />}
+              />
+              
+              <StageCard
+                number={4}
+                title="مقارنة النتائج مع لاعبين محترفين"
+                description="مقارنة المؤشرات مع معايير اللاعبين المحترفين"
+                icon={<Medal className="h-8 w-8 text-primary" />}
+              />
+              
+              <StageCard
+                number={5}
+                title="تتبع التقدم مع مرور الوقت"
+                description="تحليل التطور وتحديد مجالات التحسين"
+                icon={<CalendarCheck className="h-8 w-8 text-primary" />}
+              />
+              
+              <StageCard
+                number={6}
+                title="التكامل مع الأنظمة الخارجية"
+                description="ربط مع API خارجية وتحسين الأداء"
+                icon={<ServerCog className="h-8 w-8 text-primary" />}
+                action={
+                  <Button 
+                    size="sm" 
+                    className="w-full mt-2"
+                    onClick={navigateToExternalSystems}
+                  >
+                    استكشاف <ArrowRight className="h-4 w-4 ml-1" />
+                  </Button>
+                }
+              />
+            </div>
+          </div>
+        </>
+      ) : (
+        <AnalysisOptions
           videoFile={videoFile}
-          onResetAnalysis={resetAnalysis}
+          onReset={handleResetAnalysis}
+          onAnalyze={handleStartAnalysis}
         />
       )}
-    </main>
+    </div>
+  );
+};
+
+interface StageCardProps {
+  number: number;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  action?: React.ReactNode;
+}
+
+const StageCard: React.FC<StageCardProps> = ({ number, title, description, icon, action }) => {
+  return (
+    <Card className="border-primary/10 hover:border-primary/30 transition-colors h-full">
+      <CardHeader className="pb-2">
+        <div className="flex items-start justify-between">
+          <div className="bg-primary/10 p-3 rounded-lg">
+            {icon}
+          </div>
+          <div className="bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center font-bold">
+            {number}
+          </div>
+        </div>
+        <CardTitle className="mt-2 text-lg">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <CardDescription>{description}</CardDescription>
+      </CardContent>
+      {action && (
+        <CardFooter>
+          {action}
+        </CardFooter>
+      )}
+    </Card>
   );
 };
 
