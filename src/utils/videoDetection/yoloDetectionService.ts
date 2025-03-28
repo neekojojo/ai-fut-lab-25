@@ -40,12 +40,15 @@ const calculateDistanceAndSpeed = (positions: PlayerPosition[]): PlayerPosition[
 
 // Create a mock YOLO implementation since we're having issues with the ultralytics package
 class MockYOLO {
-  constructor(modelName) {
+  // Define the modelName property with a proper TypeScript type
+  modelName: string;
+
+  constructor(modelName: string) {
     console.log(`Initialized mock YOLO model: ${modelName}`);
     this.modelName = modelName;
   }
 
-  async predict(videoURL, options) {
+  async predict(videoURL: string, options: any) {
     console.log(`Mock predicting with ${this.modelName} on ${videoURL}`);
     
     // Report progress if callback is provided
@@ -102,7 +105,7 @@ class MockYOLO {
 // Replace the ultralytics import with our mock implementation
 const loadYOLO = async () => {
   console.log('Loading mock YOLO implementation');
-  return (modelPath) => new MockYOLO(modelPath);
+  return (modelPath: string) => new MockYOLO(modelPath);
 };
 
 export const detectPlayersWithYOLO = async (
