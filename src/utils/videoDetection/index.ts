@@ -15,6 +15,7 @@ export const detectPeopleInVideo = async (
     return detectPlayersWithYOLO(videoFile, yoloModelSize || 'm', progressCallback);
   } else {
     // Use default TensorFlow detection
+    // Fix: Pass the progressCallback to the TensorFlow detector
     return detectWithTensorflow(videoFile, progressCallback);
   }
 };

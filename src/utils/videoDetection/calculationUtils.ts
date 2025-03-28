@@ -1,5 +1,5 @@
-
 // Utility functions for video detection calculations
+import { PlayerPosition } from './types';
 
 // Calculate angle between three points in degrees
 export const calculateAngle = (
@@ -40,8 +40,51 @@ export const calculateDistance = (
   return Math.sqrt(dx * dx + dy * dy);
 };
 
+// Function to calculate distance and speed between consecutive frames
+export const calculateDistanceAndSpeed = (positions: PlayerPosition[]): PlayerPosition[] => {
+  // If we have fewer than 2 positions, we can't calculate speed
+  if (positions.length < 2) {
+    return positions;
+  }
+
+  const enhancedPositions = [...positions];
+
+  // Loop through positions and calculate speed based on previous position
+  for (let i = 1; i < positions.length; i++) {
+    const prevPos = positions[i - 1];
+    const currPos = positions[i];
+    
+    // Get center points from bounding boxes
+    const prevCenterX = prevPos.bbox.x + prevPos.bbox.width / 2;
+    const prevCenterY = prevPos.bbox.y + prevPos.bbox.height / 2;
+    const currCenterX = currPos.bbox.x + currPos.bbox.width / 2;
+    const currCenterY = currPos.bbox.y + currPos.bbox.height / 2;
+    
+    // Calculate distance between frames
+    const distance = calculateDistance(
+      [prevCenterX, prevCenterY],
+      [currCenterX, currCenterY]
+    );
+    
+    // Calculate time difference in seconds
+    const timeDiff = (currPos.timestamp - prevPos.timestamp) / 1000;
+    
+    // Calculate speed (pixels per second)
+    const speed = timeDiff > 0 ? distance / timeDiff : 0;
+    
+    // Add speed to current position
+    enhancedPositions[i] = {
+      ...currPos,
+      speed,
+      distance
+    };
+  }
+  
+  return enhancedPositions;
+};
+
 // Calculate balance score based on body keypoints
-export const calculateBalanceScore = (positions: any[]): number => {
+export const calculateBalanceScore = (positions: PlayerPosition[]): number => {
   if (positions.length === 0) return 50; // Default value
   
   let totalScore = 0;
@@ -145,4 +188,3 @@ export const calculateMovementEfficiency = (speeds: number[], accelerations: num
   
   return Math.round(efficiencyScore);
 };
-

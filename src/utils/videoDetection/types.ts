@@ -1,3 +1,4 @@
+
 // Type definitions for video detection service
 
 export interface DetectionResult {
@@ -18,6 +19,9 @@ export interface PlayerPosition {
   timestamp: number;
   keypoints: Keypoint[];
   bbox: BoundingBox;
+  confidence: number;
+  speed?: number;
+  distance?: number;
 }
 
 export interface Keypoint {
