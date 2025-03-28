@@ -1,3 +1,4 @@
+
 export interface PlayerMovement {
   x: number;
   y: number;
@@ -151,6 +152,14 @@ export interface PlayerAnalysis {
   progress?: ProgressData;
   injuryRisk?: InjuryRiskData;
   badges?: Badge[];
+  
+  // New player profile fields
+  age?: number;
+  country?: string;
+  city?: string;
+  height?: string;
+  weight?: string;
+  preferredFoot?: 'Left' | 'Right' | 'Both';
 }
 
 export interface UserProfile {

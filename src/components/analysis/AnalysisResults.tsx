@@ -16,11 +16,22 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   onResetAnalysis,
   onAdvancedAnalysis
 }) => {
+  // Add default values for the new profile fields if they're not provided
+  const enhancedAnalysis = {
+    ...analysis,
+    age: analysis.age || 23,
+    country: analysis.country || 'United States',
+    city: analysis.city || 'New York',
+    height: analysis.height || '6\'1" (185cm)',
+    weight: analysis.weight || '175lbs (79kg)',
+    preferredFoot: analysis.preferredFoot || 'Right'
+  };
+
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-1">
-          <PlayerDigitalIdentity analysis={analysis} />
+          <PlayerDigitalIdentity analysis={enhancedAnalysis} />
         </div>
         <div className="md:col-span-2">
           <AnalysisReport analysis={analysis} />

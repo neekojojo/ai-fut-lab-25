@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { CalendarIcon, Award, Zap, DollarSign } from 'lucide-react';
+import { CalendarIcon, Award, Zap, DollarSign, MapPin, User, Ruler, Weight, Flag } from 'lucide-react';
 import { PlayerAnalysis } from '@/components/AnalysisReport.d';
 
 interface PlayerDigitalIdentityProps {
@@ -36,6 +36,50 @@ const PlayerDigitalIdentity: React.FC<PlayerDigitalIdentityProps> = ({ analysis 
             <Badge variant="outline" className="font-bold">
               {analysis.position}
             </Badge>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col">
+              <span className="text-xs text-muted-foreground mb-1">Age</span>
+              <span className="text-sm font-medium">{analysis.age || 'N/A'}</span>
+            </div>
+            
+            <div className="flex flex-col">
+              <span className="text-xs text-muted-foreground mb-1">Country</span>
+              <span className="text-sm font-medium flex items-center">
+                <Flag className="h-3 w-3 mr-1" /> 
+                {analysis.country || 'N/A'}
+              </span>
+            </div>
+            
+            <div className="flex flex-col">
+              <span className="text-xs text-muted-foreground mb-1">City</span>
+              <span className="text-sm font-medium flex items-center">
+                <MapPin className="h-3 w-3 mr-1" /> 
+                {analysis.city || 'N/A'}
+              </span>
+            </div>
+            
+            <div className="flex flex-col">
+              <span className="text-xs text-muted-foreground mb-1">Height</span>
+              <span className="text-sm font-medium flex items-center">
+                <Ruler className="h-3 w-3 mr-1" /> 
+                {analysis.height || 'N/A'}
+              </span>
+            </div>
+            
+            <div className="flex flex-col">
+              <span className="text-xs text-muted-foreground mb-1">Weight</span>
+              <span className="text-sm font-medium flex items-center">
+                <Weight className="h-3 w-3 mr-1" /> 
+                {analysis.weight || 'N/A'}
+              </span>
+            </div>
+            
+            <div className="flex flex-col">
+              <span className="text-xs text-muted-foreground mb-1">Preferred Foot</span>
+              <span className="text-sm font-medium">{analysis.preferredFoot || 'N/A'}</span>
+            </div>
           </div>
           
           <div className="space-y-1">
