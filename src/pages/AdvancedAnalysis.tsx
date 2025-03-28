@@ -5,7 +5,7 @@ import Header from '@/components/Header';
 import AdvancedPlayerDashboard from '@/components/advanced-analysis/AdvancedPlayerDashboard';
 import { PlayerAnalysis } from '@/types/playerAnalysis';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/toaster';
+import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { fetchPlayerAnalysisById, fetchPlayerAnalyses } from '@/services/playerAnalysisService';
 
