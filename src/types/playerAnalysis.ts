@@ -8,7 +8,7 @@ import { InjuryRiskData } from './injuries';
 import { SimilarProfessional } from './training';
 
 // Re-export the types from playerMovement.ts
-export { PlayerMovement, PassAttempt, PositionHeatmap } from './playerMovement';
+export type { PlayerMovement, PassAttempt, PositionHeatmap } from './playerMovement';
 
 // Core player analysis type
 export interface PlayerAnalysis {
