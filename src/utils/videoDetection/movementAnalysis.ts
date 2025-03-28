@@ -49,16 +49,34 @@ export interface MovementAnalysisResult {
       commandOfArea: number;
     };
   };
+  // New metrics for phase 5
+  eyeTrackingMetrics?: {
+    focusScore: number;
+    scanningEfficiency: number;
+    decisionTimeMs: number;
+    awarenessRating: number;
+    anticipationScore: number;
+    focusPoints: {x: number, y: number, duration: number}[];
+  };
+  pressureResistance?: number;
+  technicalConsistency?: number;
+  zoneTransitions?: {
+    defensiveToOffensive: number;
+    offensiveToDefensive: number;
+    effectiveness: number;
+  };
 }
 
 /**
  * Analyzes player movements from position data
  * @param playerPositions Array of player positions over time
  * @param playerRole Optional role of the player (defender, midfielder, attacker, goalkeeper)
+ * @param includeEyeTracking Optional flag to include eye tracking metrics
  */
 export const analyzePlayerMovements = async (
   playerPositions: PlayerPosition[],
-  playerRole?: 'defender' | 'midfielder' | 'attacker' | 'goalkeeper'
+  playerRole?: 'defender' | 'midfielder' | 'attacker' | 'goalkeeper',
+  includeEyeTracking: boolean = false
 ): Promise<MovementAnalysisResult> => {
   // Sort positions by timestamp
   const positions = [...playerPositions].sort((a, b) => a.timestamp - b.timestamp);
@@ -80,7 +98,23 @@ export const analyzePlayerMovements = async (
         sustained: 0,
         deceleration: 0
       },
-      positionSpecificMetrics: {}
+      positionSpecificMetrics: {},
+      // Phase 5 defaults
+      eyeTrackingMetrics: includeEyeTracking ? {
+        focusScore: 0,
+        scanningEfficiency: 0,
+        decisionTimeMs: 0,
+        awarenessRating: 0,
+        anticipationScore: 0,
+        focusPoints: []
+      } : undefined,
+      pressureResistance: 0,
+      technicalConsistency: 0,
+      zoneTransitions: {
+        defensiveToOffensive: 0,
+        offensiveToDefensive: 0,
+        effectiveness: 0
+      }
     };
   }
   
@@ -93,6 +127,19 @@ export const analyzePlayerMovements = async (
   let accelerations: number[] = [];
   let directions: {angle: number, timestamp: number}[] = [];
   let directionChanges = 0;
+  
+  // Zone transition tracking
+  let inDefensiveZone = false;
+  let inOffensiveZone = false;
+  let defensiveToOffensive = 0;
+  let offensiveToDefensive = 0;
+  let successfulTransitions = 0;
+  let totalTransitions = 0;
+  
+  // Technical consistency tracking
+  let movementVariations: number[] = [];
+  let pressureMoments = 0;
+  let pressureHandledWell = 0;
   
   for (let i = 1; i < positionsWithBBox.length; i++) {
     const prev = positionsWithBBox[i-1];
@@ -144,6 +191,57 @@ export const analyzePlayerMovements = async (
       
       if (normalizedDiff > Math.PI / 4) { // 45 degrees in radians
         directionChanges++;
+      }
+    }
+    
+    // Track technical consistency
+    // Higher speed variations indicate less technical consistency
+    if (i > 1 && speeds.length >= 2) {
+      const speedVariation = Math.abs(speeds[speeds.length - 1] - speeds[speeds.length - 2]) / speeds[speeds.length - 2];
+      movementVariations.push(speedVariation);
+      
+      // Detect pressure moments (sudden acceleration or deceleration)
+      if (Math.abs(accelerations[accelerations.length - 1]) > 5) {
+        pressureMoments++;
+        
+        // Handled well if maintained direction despite acceleration change
+        if (directions.length >= 2) {
+          const recentAngleDiff = Math.abs(directions[directions.length - 1].angle - directions[directions.length - 2].angle);
+          if (recentAngleDiff < Math.PI / 6) { // Less than 30 degrees change
+            pressureHandledWell++;
+          }
+        }
+      }
+    }
+    
+    // Track zone transitions (simplified field zones)
+    // Assuming y < 240 is defensive zone, y > 240 is offensive zone (for 480 height)
+    const wasInDefensiveZone = inDefensiveZone;
+    const wasInOffensiveZone = inOffensiveZone;
+    
+    // Update zone status
+    inDefensiveZone = currCenter.y < 240;
+    inOffensiveZone = currCenter.y >= 240;
+    
+    // Count transitions
+    if (wasInDefensiveZone && inOffensiveZone) {
+      defensiveToOffensive++;
+      totalTransitions++;
+      
+      // Consider successful if speed maintained during transition
+      if (speeds.length >= 2 && speeds[speeds.length - 1] >= speeds[speeds.length - 2] * 0.9) {
+        successfulTransitions++;
+      }
+    } else if (wasInOffensiveZone && inDefensiveZone) {
+      offensiveToDefensive++;
+      totalTransitions++;
+      
+      // Consider successful if direction maintained during transition
+      if (directions.length >= 2) {
+        const recentAngleDiff = Math.abs(directions[directions.length - 1].angle - directions[directions.length - 2].angle);
+        if (recentAngleDiff < Math.PI / 6) { // Less than 30 degrees change
+          successfulTransitions++;
+        }
       }
     }
   }
@@ -277,6 +375,40 @@ export const analyzePlayerMovements = async (
       };
     });
   
+  // Phase 5: Technical consistency calculation (0-100)
+  const avgVariation = movementVariations.length > 0 
+    ? movementVariations.reduce((sum, v) => sum + v, 0) / movementVariations.length
+    : 0;
+  const technicalConsistency = Math.max(0, Math.min(100, 100 - (avgVariation * 100)));
+  
+  // Phase 5: Pressure resistance calculation (0-100)
+  const pressureResistance = pressureMoments > 0
+    ? Math.min(100, (pressureHandledWell / pressureMoments) * 100)
+    : 50; // Default to 50 if no pressure moments detected
+  
+  // Phase 5: Zone transitions
+  const zoneTransitions = {
+    defensiveToOffensive,
+    offensiveToDefensive,
+    effectiveness: totalTransitions > 0 
+      ? (successfulTransitions / totalTransitions) * 100
+      : 0
+  };
+  
+  // Phase 5: Generate simulated eye tracking metrics if requested
+  const eyeTrackingMetrics = includeEyeTracking ? {
+    focusScore: Math.random() * 40 + 60, // 60-100 range
+    scanningEfficiency: Math.random() * 50 + 50, // 50-100 range
+    decisionTimeMs: Math.random() * 400 + 200, // 200-600ms range
+    awarenessRating: Math.random() * 30 + 70, // 70-100 range
+    anticipationScore: Math.random() * 40 + 60, // 60-100 range
+    focusPoints: Array(10).fill(0).map(() => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      duration: Math.random() * 500 + 100 // 100-600ms
+    }))
+  } : undefined;
+  
   // Generate position-specific metrics based on player role
   const positionSpecificMetrics: MovementAnalysisResult['positionSpecificMetrics'] = {};
   
@@ -324,6 +456,11 @@ export const analyzePlayerMovements = async (
     positionalHeatmap,
     topSpeed,
     accelerationProfile,
-    positionSpecificMetrics
+    positionSpecificMetrics,
+    // Phase 5 additions
+    eyeTrackingMetrics,
+    pressureResistance,
+    technicalConsistency,
+    zoneTransitions
   };
 };

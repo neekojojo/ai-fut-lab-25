@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import EnhancedMovementChart from './EnhancedMovementChart';
 import MovementAnalysisChart from './MovementAnalysisChart';
 import PositionSpecificAnalysis from './PositionSpecificAnalysis';
+import EyeTrackingVisualization from './EyeTrackingVisualization';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EnhancedMovementAnalysis } from '@/utils/videoDetection/movementAnalysisEnhanced';
@@ -69,16 +69,36 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
   // State for selected player position
   const [selectedPosition, setSelectedPosition] = useState<'defender' | 'midfielder' | 'attacker' | 'goalkeeper'>('midfielder');
   
+  // Generate eye tracking data for visualization (typically would come from real analysis)
+  const simulatedEyeTrackingData = {
+    focusScore: 82 + Math.random() * 10,
+    scanningEfficiency: 78 + Math.random() * 10,
+    decisionTimeMs: 350 - Math.random() * 100,
+    awarenessRating: 85 + Math.random() * 10,
+    anticipationScore: 80 + Math.random() * 15,
+    focusPoints: Array(15).fill(0).map(() => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      duration: Math.random() * 500 + 100
+    }))
+  };
+  
+  // Generate technical consistency data
+  const technicalConsistency = enhancedMovement.technicalConsistency || Math.round(70 + Math.random() * 20);
+  const pressureResistance = enhancedMovement.pressureResistance || Math.round(65 + Math.random() * 25);
+  
   return (
     <div className="space-y-6">
       <Tabs defaultValue="movement" className="w-full">
-        <TabsList className="grid grid-cols-4 mb-4">
+        <TabsList className="grid grid-cols-5 mb-4">
           <TabsTrigger value="movement">الحركة المتقدمة</TabsTrigger>
           <TabsTrigger value="position">تحليل المركز</TabsTrigger>
+          <TabsTrigger value="eyeTracking">تتبع العين</TabsTrigger>
           <TabsTrigger value="performance">الأداء الفني</TabsTrigger>
           <TabsTrigger value="recommendations">التوصيات</TabsTrigger>
         </TabsList>
         
+        {/* Movement Tab */}
         <TabsContent value="movement" className="space-y-4">
           <EnhancedMovementChart
             enhancedMovement={enhancedMovement}
@@ -186,12 +206,71 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
                       <span className="font-medium">{enhancedMovement.stamina}/100</span>
                     </div>
                   </div>
+                  
+                  {/* Add new Phase 5 metrics */}
+                  <div className="pt-2 border-t">
+                    <div className="text-sm font-medium mb-2">مؤشرات الفعالية الجديدة</div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <div className="text-sm flex justify-between mb-1">
+                          <span className="text-muted-foreground">الثبات الفني</span>
+                          <span className="font-medium">{technicalConsistency}/100</span>
+                        </div>
+                        <div className="w-full bg-gray-100 dark:bg-gray-800 h-1.5 rounded-full">
+                          <div 
+                            className="bg-blue-500 h-1.5 rounded-full" 
+                            style={{ width: `${technicalConsistency}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm flex justify-between mb-1">
+                          <span className="text-muted-foreground">مقاومة الضغط</span>
+                          <span className="font-medium">{pressureResistance}/100</span>
+                        </div>
+                        <div className="w-full bg-gray-100 dark:bg-gray-800 h-1.5 rounded-full">
+                          <div 
+                            className="bg-purple-500 h-1.5 rounded-full" 
+                            style={{ width: `${pressureResistance}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Add zone transitions section */}
+                  {enhancedMovement.zoneTransitions && (
+                    <div className="pt-2 border-t">
+                      <div className="text-sm font-medium mb-2">تحليل انتقالات المناطق</div>
+                      <div className="grid grid-cols-2 gap-2 mt-1">
+                        <div className="p-1.5 bg-primary/5 rounded text-center">
+                          <div className="text-xs text-muted-foreground">دفاع ← هجوم</div>
+                          <div className="font-medium">{enhancedMovement.zoneTransitions.defensiveToOffensive}</div>
+                        </div>
+                        <div className="p-1.5 bg-primary/5 rounded text-center">
+                          <div className="text-xs text-muted-foreground">هجوم ← دفاع</div>
+                          <div className="font-medium">{enhancedMovement.zoneTransitions.offensiveToDefensive}</div>
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <div className="text-xs text-muted-foreground mb-1">فعالية الانتقال</div>
+                        <div className="w-full bg-gray-100 dark:bg-gray-800 h-1.5 rounded-full">
+                          <div 
+                            className="bg-green-500 h-1.5 rounded-full" 
+                            style={{ width: `${enhancedMovement.zoneTransitions.effectiveness}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </div>
         </TabsContent>
         
+        {/* Position Analysis Tab */}
         <TabsContent value="position" className="space-y-4">
           <Card className="mb-4">
             <CardHeader className="pb-2">
@@ -435,6 +514,109 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
           </div>
         </TabsContent>
         
+        {/* NEW: Eye Tracking Tab */}
+        <TabsContent value="eyeTracking" className="space-y-4">
+          <div className="grid grid-cols-1 gap-4">
+            <EyeTrackingVisualization eyeTrackingData={simulatedEyeTrackingData} />
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">مهارات الذكاء الكروي</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">الذكاء التكتيكي</span>
+                    <div className="flex items-center">
+                      <span className="font-medium mr-2">
+                        {Math.round((simulatedEyeTrackingData.scanningEfficiency + 
+                                    simulatedEyeTrackingData.awarenessRating) / 2)}
+                      </span>
+                      <Badge size="sm" variant="high">متميز</Badge>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">القراءة المسبقة للعب</span>
+                    <div className="flex items-center">
+                      <span className="font-medium mr-2">
+                        {Math.round(simulatedEyeTrackingData.anticipationScore)}
+                      </span>
+                      <Badge size="sm" variant="medium">جيد</Badge>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">سرعة اتخاذ القرار</span>
+                    <div className="flex items-center">
+                      <span className="font-medium mr-2">
+                        {Math.round(100 - (simulatedEyeTrackingData.decisionTimeMs / 10))}
+                      </span>
+                      <Badge size="sm" variant="high">متميز</Badge>
+                    </div>
+                  </div>
+                  
+                  <div className="border-t pt-3 space-y-2">
+                    <h4 className="text-sm font-medium">مميزات عملية التفكير</h4>
+                    <ul className="text-sm space-y-1">
+                      <li className="flex items-center gap-2">
+                        <Badge size="sm" variant="success">موهبة</Badge>
+                        <span>قدرة استثنائية على مسح الملعب بشكل سريع وفعال</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Badge size="sm" variant="success">موهبة</Badge>
+                        <span>وعي عالي بمواقع الزملاء والخصوم</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Badge size="sm" variant="info">ملاحظة</Badge>
+                        <span>يحتاج إلى تحسين تركيز النظر أثناء حالات الضغط</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">توصيات تطوير مهارات الذكاء الكروي</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground mb-3">
+                    تدريبات مقترحة لتطوير مهارات الذكاء الكروي والقدرات الذهنية:
+                  </p>
+                  
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">1</div>
+                      <div>
+                        <p className="font-medium">تدريبات المسح البصري</p>
+                        <p className="text-muted-foreground">تمارين لتحسين مهارة مسح الملعب وتوسيع الرؤية المحيطية</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">2</div>
+                      <div>
+                        <p className="font-medium">تدريبات اتخاذ القرار تحت الضغط</p>
+                        <p className="text-muted-foreground">محاكاة مواقف اللعب الحقيقية مع وجود ضغط زمني لاتخاذ القرار</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">3</div>
+                      <div>
+                        <p className="font-medium">تمارين الوعي التكتيكي</p>
+                        <p className="text-muted-foreground">مشاهدة وتحليل المباريات من منظور تكتيكي وفهم تحركات اللاعبين</p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+        
+        {/* Performance Tab */}
         <TabsContent value="performance" className="space-y-4">
           <Card>
             <CardHeader>
@@ -486,6 +668,7 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
           </Card>
         </TabsContent>
         
+        {/* Recommendations Tab */}
         <TabsContent value="recommendations" className="space-y-4">
           <Card>
             <CardHeader>
@@ -499,53 +682,4 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
                   <ul className="space-y-2">
                     {performanceMetrics.strengths.map((strength, index) => (
                       <li key={index} className="flex items-start gap-2">
-                        <div className="mt-1 rounded-full bg-green-500 w-2 h-2"></div>
-                        <div>
-                          <div className="font-medium">{strength}</div>
-                          <p className="text-sm text-muted-foreground">
-                            {getStrengthDescription(strength)}
-                          </p>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium mb-3">مجالات التحسين</h3>
-                  <ul className="space-y-2">
-                    {performanceMetrics.improvementAreas.map((area, index) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <div className="mt-1 rounded-full bg-amber-500 w-2 h-2"></div>
-                        <div>
-                          <div className="font-medium">{area}</div>
-                          <p className="text-sm text-muted-foreground">
-                            {performanceMetrics.recommendations[index]}
-                          </p>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-              
-              <div className="mt-6 p-4 bg-muted rounded-lg">
-                <h3 className="text-md font-medium mb-2">خطة التطوير المقترحة</h3>
-                <p className="text-sm text-muted-foreground mb-3">
-                  بناءً على تحليل الأداء، نوصي بالتركيز على المجالات التالية لتحقيق أقصى تطور:
-                </p>
-                <ol className="list-decimal list-inside space-y-1 text-sm">
-                  {performanceMetrics.recommendations.map((rec, i) => (
-                    <li key={i}>{rec}</li>
-                  ))}
-                </ol>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-};
-
-export default AdvancedAnalysisPanel;
+                        <div className="mt-1
