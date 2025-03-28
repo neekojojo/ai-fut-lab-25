@@ -29,11 +29,11 @@ export const analyzeVideo = async (
     
     // Setup timeout to prevent indefinite hanging
     let analysisTimeout: number | undefined;
-    const maxAnalysisTime = 120000; // Reduced to 2 minutes max
+    const maxAnalysisTime = 180000; // 3 minutes max
     
     // Set to processing state with initial progress
     setAnalysisState('processing');
-    setProgress(0);
+    setProgress(2); // Start with non-zero progress
     setStage('بدء تحليل الفيديو');
     
     console.log("Starting video analysis...");
@@ -48,7 +48,7 @@ export const analyzeVideo = async (
     
     // Setup timeout to prevent indefinite hanging
     analysisTimeout = window.setTimeout(() => {
-      console.error("Analysis timed out after 2 minutes");
+      console.error("Analysis timed out after 3 minutes");
       toast({
         title: "انتهت مهلة التحليل",
         description: "استغرقت عملية التحليل وقتاً طويلاً جداً، يرجى المحاولة مرة أخرى.",
@@ -66,31 +66,41 @@ export const analyzeVideo = async (
     setAnalysis(result.analysis);
     
     // Track current progress and stage
-    let currentProgress = 0;
-    let currentStage = "بدء تحليل الفيديو";
+    let currentProgress = 5;
+    let currentStage = "استخراج إطارات الفيديو";
+    setProgress(currentProgress);
+    setStage(currentStage);
     
-    // Setup heartbeat to ensure UI progress updates
+    // Setup heartbeat to ensure UI progress updates - check more frequently
     let lastProgressUpdate = Date.now();
     const heartbeatInterval = window.setInterval(() => {
-      // If progress hasn't changed for 20 seconds, nudge it forward slightly
+      // If progress hasn't changed for 15 seconds, nudge it forward slightly
       const now = Date.now();
-      if (now - lastProgressUpdate > 20000 && lastProgressUpdate > 0) {
+      if (now - lastProgressUpdate > 15000 && lastProgressUpdate > 0) {
         if (currentProgress < 95) {
           console.log("Heartbeat nudging progress forward");
-          currentProgress += 1;
+          currentProgress += 2; // Increase by 2% to show movement
           setProgress(currentProgress);
           setStage(currentStage + ' (مستمر...)');
         }
       }
       
-      // If total time exceeds 90% of max time, speed up progress to ensure completion
+      // If total time exceeds 80% of max time, speed up progress to ensure completion
       const totalElapsed = now - analysisStartTime;
-      if (totalElapsed > (maxAnalysisTime * 0.9) && currentProgress < 90) {
+      if (totalElapsed > (maxAnalysisTime * 0.8) && currentProgress < 85) {
         console.log("Analysis approaching timeout, accelerating progress");
-        currentProgress = Math.min(95, currentProgress + 5);
+        currentProgress = Math.min(90, currentProgress + 5);
         setProgress(currentProgress);
       }
-    }, 10000); // Check more frequently
+      
+      // Ensure progress never gets stuck at very low values for long periods
+      const minExpectedProgress = Math.min(80, Math.floor(totalElapsed / maxAnalysisTime * 100));
+      if (currentProgress < minExpectedProgress) {
+        console.log("Adjusting progress to meet minimum expected value");
+        currentProgress = minExpectedProgress;
+        setProgress(currentProgress);
+      }
+    }, 7000); // Check more frequently (reduced from 10000 to 7000ms)
     
     // Register for progress updates with detailed stages
     result.progressUpdates((progress, stage) => {

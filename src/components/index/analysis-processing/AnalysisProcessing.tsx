@@ -34,6 +34,20 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
   const [elapsedTime, setElapsedTime] = useState(0);
   const { toast } = useToast();
   
+  // Estimate remaining time based on current progress and elapsed time
+  const estimateRemainingTime = useCallback(() => {
+    if (safeProgress <= 0) return '~';
+    const timePerProgressPoint = elapsedTime / safeProgress;
+    const estimatedRemainingSeconds = timePerProgressPoint * (100 - safeProgress);
+    
+    if (estimatedRemainingSeconds < 60) {
+      return 'أقل من دقيقة';
+    } else {
+      const minutes = Math.ceil(estimatedRemainingSeconds / 60);
+      return `${minutes} دقائق تقريباً`;
+    }
+  }, [safeProgress, elapsedTime]);
+  
   // Detect if analysis seems stuck
   const checkIfStuck = useCallback(() => {
     const now = Date.now();
@@ -43,7 +57,7 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
       const stuckDuration = Math.floor((now - lastProgressTime) / 1000);
       setStuckTime(stuckDuration);
       
-      if (stuckDuration > 15) {
+      if (stuckDuration > 10) { // Reduced from 15s to detect stuck state faster
         setIsStuck(true);
       }
     } else {
@@ -70,7 +84,7 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
   
   // If stuck for too long, show notification
   useEffect(() => {
-    if (isStuck && stuckTime === 20) { // Reduced from 45s to 20s
+    if (isStuck && stuckTime === 15) { // Reduced from 20s to 15s
       toast({
         title: "تنبيه: عملية التحليل تستغرق وقتًا أطول من المعتاد",
         description: "يرجى الانتظار أو إعادة المحاولة إذا استمر ذلك.",
@@ -86,9 +100,17 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
       onReset();
     }
   };
+
+  // Map progress percentage to colors
+  const getProgressColor = () => {
+    if (safeProgress < 30) return 'bg-blue-500';
+    if (safeProgress < 60) return 'bg-indigo-500';
+    if (safeProgress < 90) return 'bg-purple-500';
+    return 'bg-green-500';
+  };
   
   return (
-    <div className={`animate-fade-in space-y-8 ${isMobile ? 'scale-95 transform-origin-top' : ''}`}>
+    <div className={`animate-fade-in space-y-6 ${isMobile ? 'scale-95 transform-origin-top' : ''}`}>
       <div className="text-center">
         <h2 className="text-2xl font-bold mb-2">تحليل الفيديو</h2>
         <p className="text-muted-foreground">
@@ -105,6 +127,27 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
         <LoadingAnimation progress={safeProgress} stage={stage} />
       </div>
       
+      {/* Enhanced progress indicator with estimated time */}
+      <div className="max-w-md mx-auto w-full space-y-3">
+        <div className="flex justify-between text-sm mb-1">
+          <span className="text-muted-foreground">{stage || 'جاري التحليل...'}</span>
+          <span className="font-medium">{safeProgress}%</span>
+        </div>
+        
+        <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+          <div 
+            className={`h-full transition-all duration-500 ease-out ${getProgressColor()}`}
+            style={{ width: `${safeProgress}%` }} 
+          ></div>
+        </div>
+        
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>0%</span>
+          <span>الوقت المتبقي: {estimateRemainingTime()}</span>
+          <span>100%</span>
+        </div>
+      </div>
+      
       <ProgressIndicator 
         progress={safeProgress} 
         stage={stage} 
@@ -119,7 +162,7 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
       
       {isStuck && <StuckWarning onReset={handleReset} />}
       
-      <div className="text-center text-sm text-muted-foreground mt-6">
+      <div className="text-center text-sm text-muted-foreground mt-4">
         <p>يرجى عدم إغلاق المتصفح أثناء المعالجة</p>
       </div>
     </div>
