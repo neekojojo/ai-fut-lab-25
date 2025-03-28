@@ -1,15 +1,17 @@
-
 import type { DetectionResult } from './types';
 import { 
   identifyPlayerFromKaggle, 
   identifyTeamFromKaggle, 
-  getCombinedPlayerIdentification,
-  getCombinedTeamIdentification,
+  getCombinedPlayerIdentification as getCombinedPlayerIdFromKaggle,
+  getCombinedTeamIdentification as getCombinedTeamIdFromKaggle,
   getSportsVideoAnalysisDataByPlayerId,
   getSportsVideoAnalysisByPlayerName,
   getSportsVideoAnalysisByTeam,
-  analyzePlayerMovementFromVideoData
-} from './kaggleDataImport';
+  analyzePlayerMovementFromVideoData,
+  analyzePlayerFromVideoDatasets as analyzePlayerFromVideoDatasetsFn,
+  findVideoAnalysisByPlayerName as findVideoAnalysisByPlayerNameFn,
+  findVideoAnalysisByTeamName as findVideoAnalysisByTeamNameFn
+} from './kaggle';
 
 /**
  * قائمة باللاعبين المحترفين وبياناتهم للمقارنة
@@ -134,7 +136,6 @@ const teamDatabase = [
     colors: ['أصفر', 'أسود'],
     logo: 'alittihad.png'
   },
-  // يمكن إضافة المزيد من الفرق حسب الحاجة
 ];
 
 /**
@@ -257,62 +258,33 @@ export const identifyTeamFromDetection = (result: DetectionResult): IdentifiedTe
  * دالة تدمج نتائج التعرف من مصادر مختلفة
  */
 export const getEnhancedPlayerIdentification = (result: DetectionResult): IdentifiedPlayer[] => {
-  return getCombinedPlayerIdentification(result);
+  return getCombinedPlayerIdFromKaggle(result);
 };
 
 /**
  * دالة تدمج نتائج التعرف على الفرق من مصادر مختلفة
  */
 export const getEnhancedTeamIdentification = (result: DetectionResult): IdentifiedTeam[] => {
-  return getCombinedTeamIdentification(result);
+  return getCombinedTeamIdFromKaggle(result);
 };
 
 /**
  * دالة تحلل بيانات حركة اللاعب من مجموعات بيانات تحليل الفيديو
  */
 export const analyzePlayerFromVideoDatasets = (playerId: string): VideoAnalysisResult | null => {
-  const playerData = getSportsVideoAnalysisDataByPlayerId(playerId);
-  
-  if (playerData.length === 0) {
-    return null;
-  }
-  
-  const analysis = analyzePlayerMovementFromVideoData(playerId);
-  const firstPlayerData = playerData[0];
-  
-  return {
-    playerId: firstPlayerData.player_id,
-    playerName: firstPlayerData.player_name,
-    teamName: firstPlayerData.team_name,
-    movement: {
-      avgSpeed: analysis.avgSpeed,
-      successRate: analysis.successRate,
-      confidenceScore: analysis.confidenceScore
-    },
-    events: analysis.events
-  };
+  return analyzePlayerFromVideoDatasetsFn(playerId);
 };
 
 /**
  * دالة للبحث عن بيانات تحليل الفيديو حسب اسم اللاعب
  */
 export const findVideoAnalysisByPlayerName = (playerName: string): VideoAnalysisResult[] => {
-  const playerDataList = getSportsVideoAnalysisByPlayerName(playerName);
-  const uniquePlayerIds = [...new Set(playerDataList.map(data => data.player_id))];
-  
-  return uniquePlayerIds
-    .map(playerId => analyzePlayerFromVideoDatasets(playerId))
-    .filter((result): result is VideoAnalysisResult => result !== null);
+  return findVideoAnalysisByPlayerNameFn(playerName);
 };
 
 /**
  * دالة للبحث عن بيانات تحليل الفيديو حسب اسم الفريق
  */
 export const findVideoAnalysisByTeamName = (teamName: string): VideoAnalysisResult[] => {
-  const teamDataList = getSportsVideoAnalysisByTeam(teamName);
-  const uniquePlayerIds = [...new Set(teamDataList.map(data => data.player_id))];
-  
-  return uniquePlayerIds
-    .map(playerId => analyzePlayerFromVideoDatasets(playerId))
-    .filter((result): result is VideoAnalysisResult => result !== null);
+  return findVideoAnalysisByTeamNameFn(teamName);
 };
