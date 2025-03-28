@@ -1,4 +1,3 @@
-
 import { analyzeFootballVideo } from '@/utils/analysis';
 import { savePlayerAnalysis } from '@/services/playerAnalysisService';
 import { User } from '@supabase/supabase-js';
@@ -193,9 +192,13 @@ const createPlaceholderAnalysis = (): PlayerAnalysis => {
   return {
     id: 'placeholder-' + Date.now(),
     playerId: 'auto-generated',
+    playerName: "John Doe",
+    position: "Forward",
     date: new Date().toISOString(),
-    performanceScore: 75,
+    timestamp: new Date().toISOString(),
+    duration: 120,
     confidence: 0.7,
+    performanceScore: 75,
     movements: [
       { timestamp: 0, x: 100, y: 100, speed: 5, acceleration: 1, direction: 45, isActive: true },
       { timestamp: 1, x: 110, y: 110, speed: 6, acceleration: 0.5, direction: 50, isActive: true },
@@ -208,24 +211,27 @@ const createPlaceholderAnalysis = (): PlayerAnalysis => {
       dribbling: 73,
       defending: 65,
       physical: 68,
+      stamina: 73,
+      acceleration: 75,
+      agility: 74,
+      balance: 73,
+      ballControl: 74,
+      decision: 73,
+      anticipation: 72,
       positioning: 70,
+      vision: 72,
+      composure: 74,
       finishing: 71,
       shotPower: 72,
       longShots: 69,
       volleys: 68,
       penalties: 70,
-      vision: 72,
       crossing: 71,
       freeKick: 69,
       shortPassing: 73,
       longPassing: 72,
       curve: 70,
-      agility: 74,
-      balance: 73,
       reactions: 72,
-      ballControl: 74,
-      acceleration: 75,
-      stamina: 73,
       strength: 70,
       jumping: 72,
       heading: 69
@@ -243,7 +249,12 @@ const createPlaceholderAnalysis = (): PlayerAnalysis => {
         area: 'المراوغة',
         exercises: ['تمارين المراوغة في مساحات ضيقة', 'تمارين التحكم بالكرة']
       }
-    ]
+    ],
+    summary: "تحليل أساسي للاعب استنادًا إلى البيانات المتاحة.",
+    advancedInsights: ["يُظهر حركة جيدة خارج الكرة", "وعي مكاني قوي"],
+    strengths: ["سرعة عالية", "تمركز جيد"],
+    weaknesses: ["يحتاج لتحسين التسديد", "القوة البدنية متوسطة"],
+    recommendations: ["تمارين تحسين دقة التسديد", "تمارين لزيادة القوة البدنية"]
   };
 };
 
