@@ -1,13 +1,15 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import EnhancedMovementChart from './EnhancedMovementChart';
 import MovementAnalysisChart from './MovementAnalysisChart';
+import PositionSpecificAnalysis from './PositionSpecificAnalysis';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EnhancedMovementAnalysis } from '@/utils/videoDetection/movementAnalysisEnhanced';
 import { TrajectoryPrediction } from '@/utils/videoDetection/trajectoryPrediction';
 import { PerformanceMetrics } from '@/utils/performance/PerformanceAnalyzer';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface AdvancedAnalysisPanelProps {
   enhancedMovement: EnhancedMovementAnalysis;
@@ -64,11 +66,15 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
     acceleration: enhancedMovement.maxAcceleration * Math.random() * 0.7
   }));
   
+  // State for selected player position
+  const [selectedPosition, setSelectedPosition] = useState<'defender' | 'midfielder' | 'attacker' | 'goalkeeper'>('midfielder');
+  
   return (
     <div className="space-y-6">
       <Tabs defaultValue="movement" className="w-full">
-        <TabsList className="grid grid-cols-3 mb-4">
+        <TabsList className="grid grid-cols-4 mb-4">
           <TabsTrigger value="movement">الحركة المتقدمة</TabsTrigger>
+          <TabsTrigger value="position">تحليل المركز</TabsTrigger>
           <TabsTrigger value="performance">الأداء الفني</TabsTrigger>
           <TabsTrigger value="recommendations">التوصيات</TabsTrigger>
         </TabsList>
@@ -180,6 +186,249 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
                       <span className="font-medium">{enhancedMovement.stamina}/100</span>
                     </div>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="position" className="space-y-4">
+          <Card className="mb-4">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">تحليل مخصص حسب المركز</CardTitle>
+              <CardDescription>تحليل الأداء بناءً على متطلبات المركز المحدد</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between mb-6">
+                <div className="text-sm text-muted-foreground">اختر مركز اللاعب:</div>
+                <Select 
+                  value={selectedPosition} 
+                  onValueChange={(value) => setSelectedPosition(value as any)}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="اختر المركز" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="defender">مدافع</SelectItem>
+                    <SelectItem value="midfielder">لاعب وسط</SelectItem>
+                    <SelectItem value="attacker">مهاجم</SelectItem>
+                    <SelectItem value="goalkeeper">حارس مرمى</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <PositionSpecificAnalysis 
+                data={{
+                  ...enhancedMovement,
+                  positionSpecificMetrics: {
+                    defenderMetrics: {
+                      tacklesAttempted: Math.round(enhancedMovement.directionChanges * 0.3),
+                      interceptionsAttempted: Math.round(enhancedMovement.directionChanges * 0.5),
+                      clearancesAttempted: Math.round(enhancedMovement.directionChanges * 0.2),
+                      defensePositioning: Math.round(enhancedMovement.movementEfficiency)
+                    },
+                    midfielderMetrics: {
+                      passesAttempted: Math.round(enhancedMovement.directionChanges * 0.7),
+                      passAccuracy: Math.round(enhancedMovement.movementEfficiency * 0.8),
+                      ballControl: Math.round((1 - (enhancedMovement.speedZones.sprinting + enhancedMovement.speedZones.running) / 2) * 100),
+                      visionScore: Math.round(enhancedMovement.movementEfficiency * 0.9)
+                    },
+                    attackerMetrics: {
+                      shotsAttempted: Math.round(enhancedMovement.speedZones.sprinting * 10),
+                      shotsOnTarget: Math.round(enhancedMovement.speedZones.sprinting * 10 * (enhancedMovement.movementEfficiency / 100)),
+                      dribbleAttempts: Math.round(enhancedMovement.directionChanges * 0.8),
+                      dribbleSuccess: Math.round(enhancedMovement.directionChanges * 0.8 * (enhancedMovement.movementEfficiency / 100))
+                    },
+                    goalkeeperMetrics: {
+                      savesAttempted: Math.round(enhancedMovement.directionChanges * 0.4),
+                      saveSuccess: Math.round(enhancedMovement.directionChanges * 0.4 * (enhancedMovement.movementEfficiency / 100)),
+                      distribution: Math.round(enhancedMovement.movementEfficiency * 0.7),
+                      commandOfArea: Math.round((enhancedMovement.speedZones.walking + enhancedMovement.speedZones.jogging) * 100)
+                    }
+                  },
+                  topSpeed: enhancedMovement.maxSpeed * 1.2,
+                  accelerationProfile: {
+                    explosive: 0.8,
+                    sustained: 0.65,
+                    deceleration: 0.7
+                  }
+                }} 
+                playerPosition={selectedPosition}
+              />
+            </CardContent>
+          </Card>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">ملخص الحركة حسب المركز</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">التوافق مع المركز</span>
+                    <div className="flex items-center">
+                      <span className="font-medium mr-2">
+                        {selectedPosition === 'midfielder' ? '85%' :
+                          selectedPosition === 'attacker' ? '78%' :
+                          selectedPosition === 'defender' ? '72%' : '65%'}
+                      </span>
+                      <Badge size="sm" variant={
+                        selectedPosition === 'midfielder' ? 'high' :
+                        selectedPosition === 'attacker' ? 'medium' :
+                        'low'
+                      }>
+                        {selectedPosition === 'midfielder' ? 'عالي' :
+                          selectedPosition === 'attacker' ? 'جيد' : 'متوسط'}
+                      </Badge>
+                    </div>
+                  </div>
+                  
+                  <div className="border-t pt-3 space-y-2">
+                    <h4 className="text-sm font-medium">قدرات بارزة في هذا المركز</h4>
+                    <ul className="text-sm space-y-1">
+                      {selectedPosition === 'midfielder' && (
+                        <>
+                          <li className="flex items-center gap-2">
+                            <Badge size="sm" variant="success">موهبة</Badge>
+                            <span>رؤية ممتازة للملعب وقدرة على التمرير</span>
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <Badge size="sm" variant="success">موهبة</Badge>
+                            <span>تحكم جيد بالكرة تحت الضغط</span>
+                          </li>
+                        </>
+                      )}
+                      {selectedPosition === 'attacker' && (
+                        <>
+                          <li className="flex items-center gap-2">
+                            <Badge size="sm" variant="success">موهبة</Badge>
+                            <span>سرعة عالية في الانطلاقات الهجومية</span>
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <Badge size="sm" variant="medium">جيد</Badge>
+                            <span>قدرة على المراوغة والالتفاف</span>
+                          </li>
+                        </>
+                      )}
+                      {selectedPosition === 'defender' && (
+                        <>
+                          <li className="flex items-center gap-2">
+                            <Badge size="sm" variant="success">موهبة</Badge>
+                            <span>قدرة على تنظيم خط الدفاع</span>
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <Badge size="sm" variant="medium">جيد</Badge>
+                            <span>القدرة على قراءة هجمات الخصم</span>
+                          </li>
+                        </>
+                      )}
+                      {selectedPosition === 'goalkeeper' && (
+                        <>
+                          <li className="flex items-center gap-2">
+                            <Badge size="sm" variant="medium">جيد</Badge>
+                            <span>ردود فعل سريعة</span>
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <Badge size="sm" variant="medium">جيد</Badge>
+                            <span>السيطرة على منطقة الجزاء</span>
+                          </li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">تدريبات خاصة بالمركز</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground mb-3">
+                    تدريبات مقترحة لتطوير أداء اللاعب في مركز {
+                      selectedPosition === 'midfielder' ? 'لاعب الوسط' :
+                      selectedPosition === 'attacker' ? 'المهاجم' :
+                      selectedPosition === 'defender' ? 'المدافع' : 'حارس المرمى'
+                    }:
+                  </p>
+                  
+                  <ul className="space-y-2 text-sm">
+                    {selectedPosition === 'midfielder' && (
+                      <>
+                        <li className="flex items-start gap-2">
+                          <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">1</div>
+                          <div>
+                            <p className="font-medium">تدريبات التمرير المتقدمة</p>
+                            <p className="text-muted-foreground">تمارين دقة التمرير تحت الضغط والتمريرات الطويلة والقصيرة</p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">2</div>
+                          <div>
+                            <p className="font-medium">تدريبات رؤية الملعب</p>
+                            <p className="text-muted-foreground">تمارين لتطوير رؤية الملعب وقراءة تحركات اللاعبين</p>
+                          </div>
+                        </li>
+                      </>
+                    )}
+                    {selectedPosition === 'attacker' && (
+                      <>
+                        <li className="flex items-start gap-2">
+                          <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">1</div>
+                          <div>
+                            <p className="font-medium">تدريبات التسديد</p>
+                            <p className="text-muted-foreground">تمارين دقة التسديد من مختلف المواقع والزوايا</p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">2</div>
+                          <div>
+                            <p className="font-medium">تدريبات المراوغة السريعة</p>
+                            <p className="text-muted-foreground">تمارين لتطوير القدرة على المراوغة والتحرك بسرعة مع الكرة</p>
+                          </div>
+                        </li>
+                      </>
+                    )}
+                    {selectedPosition === 'defender' && (
+                      <>
+                        <li className="flex items-start gap-2">
+                          <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">1</div>
+                          <div>
+                            <p className="font-medium">تدريبات التدخل الدفاعي</p>
+                            <p className="text-muted-foreground">تمارين تحسين توقيت وتقنية التدخلات الدفاعية</p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">2</div>
+                          <div>
+                            <p className="font-medium">تدريبات القراءة الدفاعية</p>
+                            <p className="text-muted-foreground">تمارين لتطوير قراءة هجمات الخصم واعتراض الكرات</p>
+                          </div>
+                        </li>
+                      </>
+                    )}
+                    {selectedPosition === 'goalkeeper' && (
+                      <>
+                        <li className="flex items-start gap-2">
+                          <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">1</div>
+                          <div>
+                            <p className="font-medium">تدريبات ردود الفعل</p>
+                            <p className="text-muted-foreground">تمارين تحسين سرعة رد الفعل والتصدي للكرات القريبة</p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs">2</div>
+                          <div>
+                            <p className="font-medium">تدريبات الخروج من المرمى</p>
+                            <p className="text-muted-foreground">تمارين تحسين توقيت وتقنية الخروج من المرمى</p>
+                          </div>
+                        </li>
+                      </>
+                    )}
+                  </ul>
                 </div>
               </CardContent>
             </Card>

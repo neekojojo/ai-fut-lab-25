@@ -16,14 +16,49 @@ export interface MovementAnalysisResult {
   };
   movementEfficiency: number;
   positionalHeatmap: {x: number, y: number, value: number}[];
+  // Add new fields for phase 4
+  topSpeed: number;
+  accelerationProfile: {
+    explosive: number;
+    sustained: number;
+    deceleration: number;
+  };
+  positionSpecificMetrics: {
+    defenderMetrics?: {
+      tacklesAttempted: number;
+      interceptionsAttempted: number;
+      clearancesAttempted: number;
+      defensePositioning: number;
+    };
+    midfielderMetrics?: {
+      passesAttempted: number;
+      passAccuracy: number;
+      ballControl: number;
+      visionScore: number;
+    };
+    attackerMetrics?: {
+      shotsAttempted: number;
+      shotsOnTarget: number;
+      dribbleAttempts: number;
+      dribbleSuccess: number;
+    };
+    goalkeeperMetrics?: {
+      savesAttempted: number;
+      saveSuccess: number;
+      distribution: number;
+      commandOfArea: number;
+    };
+  };
 }
 
 /**
  * Analyzes player movements from position data
  * @param playerPositions Array of player positions over time
+ * @param playerRole Optional role of the player (defender, midfielder, attacker, goalkeeper)
  */
 export const analyzePlayerMovements = async (
-  playerPositions: PlayerPosition[]
+  playerPositions: PlayerPosition[],
+  playerRole?: 'defender' | 'midfielder' | 'attacker' | 'goalkeeper'
 ): Promise<MovementAnalysisResult> => {
   // Sort positions by timestamp
   const positions = [...playerPositions].sort((a, b) => a.timestamp - b.timestamp);
@@ -38,7 +73,14 @@ export const analyzePlayerMovements = async (
       directionChanges: 0,
       speedZones: { walking: 0, jogging: 0, running: 0, sprinting: 0 },
       movementEfficiency: 0,
-      positionalHeatmap: []
+      positionalHeatmap: [],
+      topSpeed: 0,
+      accelerationProfile: {
+        explosive: 0,
+        sustained: 0,
+        deceleration: 0
+      },
+      positionSpecificMetrics: {}
     };
   }
   
@@ -110,8 +152,30 @@ export const analyzePlayerMovements = async (
   const maxSpeed = Math.max(...speeds, 0);
   const averageSpeed = speeds.reduce((sum, speed) => sum + speed, 0) / speeds.length || 0;
   
+  // Top speed - highest speed maintained for at least 1 second
+  // For simulation, we'll use the 95th percentile of all speed values
+  const sortedSpeeds = [...speeds].sort((a, b) => b - a);
+  const topSpeedIndex = Math.floor(sortedSpeeds.length * 0.05); // Top 5%
+  const topSpeed = sortedSpeeds[Math.min(topSpeedIndex, sortedSpeeds.length - 1)] || maxSpeed;
+  
   // Calculate max acceleration
   const maxAcceleration = Math.max(...accelerations.map(a => Math.abs(a)), 0);
+  
+  // Acceleration profile analysis
+  const positiveAccelerations = accelerations.filter(a => a > 0);
+  const negativeAccelerations = accelerations.filter(a => a < 0);
+  
+  const accelerationProfile = {
+    explosive: positiveAccelerations.length > 0 
+      ? Math.max(...positiveAccelerations) / maxAcceleration
+      : 0,
+    sustained: positiveAccelerations.length > 0
+      ? positiveAccelerations.reduce((sum, a) => sum + a, 0) / positiveAccelerations.length / maxAcceleration
+      : 0,
+    deceleration: negativeAccelerations.length > 0
+      ? Math.abs(Math.min(...negativeAccelerations)) / maxAcceleration
+      : 0
+  };
   
   // Categorize speeds into zones (based on percentages of max speed)
   const walkingThreshold = maxSpeed * 0.3;
@@ -213,6 +277,42 @@ export const analyzePlayerMovements = async (
       };
     });
   
+  // Generate position-specific metrics based on player role
+  const positionSpecificMetrics: MovementAnalysisResult['positionSpecificMetrics'] = {};
+  
+  if (playerRole) {
+    // Use position data and movement patterns to estimate position-specific metrics
+    if (playerRole === 'defender') {
+      positionSpecificMetrics.defenderMetrics = {
+        tacklesAttempted: Math.round(directionChanges * 0.3),
+        interceptionsAttempted: Math.round(directionChanges * 0.5),
+        clearancesAttempted: Math.round(directionChanges * 0.2),
+        defensePositioning: Math.round(efficiency)
+      };
+    } else if (playerRole === 'midfielder') {
+      positionSpecificMetrics.midfielderMetrics = {
+        passesAttempted: Math.round(directionChanges * 0.7),
+        passAccuracy: Math.round(efficiency * 0.8),
+        ballControl: Math.round((1 - (speedZones.sprinting + speedZones.running) / 2) * 100),
+        visionScore: Math.round(efficiency * 0.9)
+      };
+    } else if (playerRole === 'attacker') {
+      positionSpecificMetrics.attackerMetrics = {
+        shotsAttempted: Math.round(speedZones.sprinting * 10),
+        shotsOnTarget: Math.round(speedZones.sprinting * 10 * (efficiency / 100)),
+        dribbleAttempts: Math.round(directionChanges * 0.8),
+        dribbleSuccess: Math.round(directionChanges * 0.8 * (efficiency / 100))
+      };
+    } else if (playerRole === 'goalkeeper') {
+      positionSpecificMetrics.goalkeeperMetrics = {
+        savesAttempted: Math.round(directionChanges * 0.4),
+        saveSuccess: Math.round(directionChanges * 0.4 * (efficiency / 100)),
+        distribution: Math.round(efficiency * 0.7),
+        commandOfArea: Math.round((speedZones.walking + speedZones.jogging) * 100)
+      };
+    }
+  }
+  
   return {
     totalDistance,
     maxSpeed,
@@ -221,6 +321,9 @@ export const analyzePlayerMovements = async (
     directionChanges,
     speedZones,
     movementEfficiency: efficiency,
-    positionalHeatmap
+    positionalHeatmap,
+    topSpeed,
+    accelerationProfile,
+    positionSpecificMetrics
   };
 };
