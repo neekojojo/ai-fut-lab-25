@@ -21,10 +21,13 @@ const NumberMovementChart: React.FC<NumberMovementProps> = ({
   // Process data for charts if empty
   const chartData = ensureData(data);
 
+  // Create a config object that includes our chart configuration
   const config: ChartConfigType = {
     current: { color: colors.current, label: "Current" },
     previous: { color: colors.previous || "#D1D5DB", label: "Previous" },
     alternative: { color: colors.alternative || "#F97316", label: "Alternative" },
+    // Adding default property for the index signature requirement
+    default: { color: "#D1D5DB", label: "Default" }
   };
 
   // Calculate the average improvement between current and previous

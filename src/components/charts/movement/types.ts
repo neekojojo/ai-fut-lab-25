@@ -13,8 +13,10 @@ export interface NumberMovementProps {
   description?: string;
 }
 
+// Modified to include an index signature to make it compatible with ChartConfig
 export interface ChartConfigType {
   current: { color: string; label: string };
   previous: { color: string; label: string };
   alternative: { color: string; label: string };
+  [key: string]: { color: string; label: string; icon?: React.ElementType; curve?: string; theme?: Record<string, string> };
 }
