@@ -22,9 +22,11 @@ const AdvancedAnalysis: React.FC = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
+        console.log("Fetching advanced analysis data, id:", id);
         
         // إذا لم يكن هناك معرف، استخدم التحليل الوهمي
         if (!id) {
+          console.log("No ID provided, using mock data");
           const mockData = getMockAnalysis();
           setAnalysis(mockData.analysis);
           setPreviousAnalyses([]);
@@ -35,6 +37,7 @@ const AdvancedAnalysis: React.FC = () => {
         try {
           const currentAnalysis = await fetchPlayerAnalysisById(id);
           if (currentAnalysis) {
+            console.log("Analysis found:", currentAnalysis);
             setAnalysis(currentAnalysis);
             
             // محاولة استرداد التحليلات السابقة
@@ -53,6 +56,7 @@ const AdvancedAnalysis: React.FC = () => {
         } catch (e) {
           console.warn("Could not fetch analysis by ID:", e);
           // استخدام التحليل الوهمي كاحتياطي
+          console.log("Using mock data as fallback");
           const mockData = getMockAnalysis();
           setAnalysis(mockData.analysis);
           setPreviousAnalyses([]);
@@ -66,6 +70,7 @@ const AdvancedAnalysis: React.FC = () => {
   }, [id, toast]);
   
   const handleBack = () => {
+    console.log("Navigating back");
     navigate(-1);
   };
   

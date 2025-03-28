@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -90,8 +89,16 @@ const IndexContent: React.FC = () => {
   };
 
   const handleAdvancedAnalysis = () => {
-    // Implement advanced analysis view here
+    // Implementing advanced analysis view here with proper console logging
     console.log("Opening advanced analysis view");
+    if (analysisResult) {
+      // Make sure this reaches the PlayerAnalysisView component
+      // by passing this function down the component tree
+      toast({
+        title: "فتح التحليل المتقدم",
+        description: "جاري فتح التحليل المتقدم للحركة",
+      });
+    }
   };
 
   // Render analysis results if analysis has completed

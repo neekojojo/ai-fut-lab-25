@@ -14,21 +14,14 @@ export interface ChartConfig {
   [key: string]: ChartConfigItem;
 }
 
-export interface ChartContextProps {
-  config: ChartConfig;
-}
-
-// Define theme prefixes for CSS selectors
+// إضافة ثوابت THEMES التي تحتاجها ChartStyle.tsx
 export const THEMES = {
-  light: "",
-  dark: ".dark",
-} as const;
-
-export function getPayloadConfigFromPayload(
-  config: ChartConfig,
-  item: any,
-  fallbackKey = ""
-) {
-  const key = item?.name || item?.dataKey || fallbackKey;
-  return config[key] as ChartConfigItem;
-}
+  light: {
+    DEFAULT_COLOR: "#000",
+    PREFIX: ".chart-light"
+  },
+  dark: {
+    DEFAULT_COLOR: "#fff",
+    PREFIX: ".chart-dark"
+  }
+};
