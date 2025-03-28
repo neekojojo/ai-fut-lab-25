@@ -1,3 +1,4 @@
+
 import type { PlayerAnalysis } from "@/components/AnalysisReport.d";
 import { ANALYSIS_STAGES } from "./constants";
 import { generateEnhancedAnalysis } from "./analysisMockGenerator";
@@ -6,7 +7,7 @@ import { playerMLService } from "@/utils/ml/playerMLService";
 import { apiProxyService } from "@/services/apiProxyService";
 import { detectPeopleInVideo } from "@/utils/videoDetection";
 import { analyzePlayerMovements } from "@/utils/videoDetection/movementAnalysis";
-import { computePlayerStats } from "@/utils/dataProcessing/statsCalculator";
+import { StatsCalculator } from "@/utils/dataProcessing/statsCalculator";
 import { extractVideoFrames } from "@/utils/videoDetection/frameExtraction";
 
 // Cache to store analysis results by video hash
