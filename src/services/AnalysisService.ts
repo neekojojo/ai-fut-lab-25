@@ -20,9 +20,17 @@ export const analyzeVideo = async (
   setStage: (stage: string) => void,
   setAnalysis: (analysis: PlayerAnalysis) => void,
   user: User | null,
-  { toast }: ToastFunctions
+  { toast }: ToastFunctions,
+  onErrorCallback?: () => void
 ) => {
   try {
+    // Record start time
+    const analysisStartTime = Date.now();
+    
+    // Setup timeout to prevent indefinite hanging
+    let analysisTimeout: number | undefined;
+    const maxAnalysisTime = 180000; // 3 minutes max
+    
     // Set to processing state with initial progress
     setAnalysisState('processing');
     setProgress(0);
@@ -38,15 +46,44 @@ export const analyzeVideo = async (
     setProgress(5);
     setStage('استخراج بيانات الفيديو');
     
+    // Setup timeout to prevent indefinite hanging
+    analysisTimeout = window.setTimeout(() => {
+      console.error("Analysis timed out after 3 minutes");
+      toast({
+        title: "انتهت مهلة التحليل",
+        description: "استغرقت عملية التحليل وقتاً طويلاً جداً، يرجى المحاولة مرة أخرى.",
+        variant: "destructive",
+        duration: 5000,
+      });
+      setAnalysisState('idle');
+      if (onErrorCallback) onErrorCallback();
+    }, maxAnalysisTime);
+    
     // Start analysis with proper progress tracking
     const result = await analyzeFootballVideo(videoFile);
     
     // Set initial analysis result
     setAnalysis(result.analysis);
     
+    // Setup heartbeat to ensure UI progress updates
+    let lastProgressUpdate = 0;
+    const heartbeatInterval = window.setInterval(() => {
+      // If progress hasn't changed for 30 seconds, nudge it forward slightly
+      const now = Date.now();
+      if (now - lastProgressUpdate > 30000 && lastProgressUpdate > 0) {
+        const currentProgress = result.getCurrentProgress();
+        if (currentProgress < 95) {
+          console.log("Heartbeat nudging progress forward");
+          setProgress(currentProgress + 1);
+          setStage(result.getCurrentStage() + ' (مستمر...)');
+        }
+      }
+    }, 15000);
+    
     // Register for progress updates with detailed stages
     result.progressUpdates((progress, stage) => {
       console.log(`Progress update received: ${progress}%, stage: ${stage}`);
+      lastProgressUpdate = Date.now();
       
       // Always update UI with latest progress
       setProgress(progress);
@@ -54,6 +91,10 @@ export const analyzeVideo = async (
       
       // When analysis completes, transition to complete state
       if (progress >= 100) {
+        // Clean up
+        if (analysisTimeout) clearTimeout(analysisTimeout);
+        clearInterval(heartbeatInterval);
+        
         setTimeout(() => {
           finishAnalysis(result.analysis, user, toast, setAnalysisState);
         }, 500); // Small delay to ensure UI updates before transition
@@ -68,6 +109,7 @@ export const analyzeVideo = async (
       duration: 5000,
     });
     setAnalysisState('idle');
+    if (onErrorCallback) onErrorCallback();
   }
 };
 
@@ -83,13 +125,27 @@ const extractVideoMetadata = (videoFile: File): Promise<{
     const video = document.createElement('video');
     video.preload = 'metadata';
     
+    // Set up timeouts to avoid hanging
+    const timeout = setTimeout(() => {
+      console.warn("Video metadata extraction timed out");
+      URL.revokeObjectURL(video.src);
+      // Return default values instead of failing
+      resolve({
+        duration: 60,
+        width: 1280,
+        height: 720,
+        frameRate: 30
+      });
+    }, 5000);
+    
     // Set up event handlers
     video.onloadedmetadata = () => {
+      clearTimeout(timeout);
       const frameRate = estimateFrameRate(video);
       resolve({
-        duration: video.duration,
-        width: video.videoWidth,
-        height: video.videoHeight,
+        duration: video.duration || 60,
+        width: video.videoWidth || 1280,
+        height: video.videoHeight || 720,
         frameRate
       });
       // Clean up
@@ -97,7 +153,15 @@ const extractVideoMetadata = (videoFile: File): Promise<{
     };
     
     video.onerror = () => {
-      reject(new Error('Failed to load video metadata'));
+      clearTimeout(timeout);
+      console.warn("Failed to load video metadata, using defaults");
+      // Return default values instead of failing
+      resolve({
+        duration: 60,
+        width: 1280,
+        height: 720,
+        frameRate: 30
+      });
       URL.revokeObjectURL(video.src);
     };
     
