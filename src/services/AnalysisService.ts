@@ -33,66 +33,20 @@ export const analyzeVideo = async (
     // Start real video analysis
     const result = await analyzeFootballVideo(videoFile);
     
+    // Set analysis result immediately
+    setAnalysis(result.analysis);
+    
     // Set up progress updates to track real analysis progress
     result.progressUpdates((progress, stage) => {
       console.log(`Progress update: ${progress}%, stage: ${stage}`);
       setProgress(progress);
       setStage(stage);
-    });
-    
-    // Set analysis result
-    setAnalysis(result.analysis);
-    
-    console.log("Analysis completed, setting state to complete");
-    
-    // Set to complete state when done
-    setTimeout(() => {
-      setAnalysisState('complete');
       
-      // Save analysis if user is logged in
-      if (user && result.analysis) {
-        try {
-          savePlayerAnalysis(result.analysis, user.id)
-            .then(() => {
-              toast({
-                title: "تم حفظ التحليل",
-                description: "تم تخزين تحليل اللاعب في قاعدة البيانات.",
-                duration: 3000,
-              });
-            })
-            .catch(error => {
-              console.error('Error saving analysis:', error);
-              toast({
-                title: "خطأ في حفظ التحليل",
-                description: "حدث خطأ أثناء تخزين التحليل. يرجى المحاولة مرة أخرى.",
-                variant: "destructive",
-                duration: 5000,
-              });
-            });
-        } catch (error) {
-          console.error('Error saving analysis:', error);
-          toast({
-            title: "خطأ في حفظ التحليل",
-            description: "حدث خطأ أثناء تخزين التحليل. يرجى المحاولة مرة أخرى.",
-            variant: "destructive",
-            duration: 5000,
-          });
-        }
-      } else if (!user && result.analysis) {
-        toast({
-          title: "لم يتم حفظ التحليل",
-          description: "قم بتسجيل الدخول أو إنشاء حساب لحفظ نتائج التحليل.",
-          duration: 5000,
-        });
+      // When analysis completes, transition to complete state
+      if (progress >= 100) {
+        finishAnalysis(result.analysis, user, toast, setAnalysisState);
       }
-      
-      toast({
-        title: "اكتمل التحليل",
-        description: "تقرير أداء اللاعب جاهز للعرض.",
-        duration: 5000,
-      });
-    }, 500);
-    
+    });
   } catch (error) {
     console.error('Error analyzing video:', error);
     toast({
@@ -103,6 +57,60 @@ export const analyzeVideo = async (
     });
     setAnalysisState('idle');
   }
+};
+
+// Separate function to handle completion of analysis
+const finishAnalysis = (
+  analysis: PlayerAnalysis,
+  user: User | null,
+  toast: ToastFunctions['toast'],
+  setAnalysisState: (state: 'idle' | 'model-selection' | 'processing' | 'complete' | 'detailed-analysis') => void
+) => {
+  // Set to complete state
+  setAnalysisState('complete');
+  
+  // Save analysis if user is logged in
+  if (user && analysis) {
+    try {
+      savePlayerAnalysis(analysis, user.id)
+        .then(() => {
+          toast({
+            title: "تم حفظ التحليل",
+            description: "تم تخزين تحليل اللاعب في قاعدة البيانات.",
+            duration: 3000,
+          });
+        })
+        .catch(error => {
+          console.error('Error saving analysis:', error);
+          toast({
+            title: "خطأ في حفظ التحليل",
+            description: "حدث خطأ أثناء تخزين التحليل. يرجى المحاولة مرة أخرى.",
+            variant: "destructive",
+            duration: 5000,
+          });
+        });
+    } catch (error) {
+      console.error('Error saving analysis:', error);
+      toast({
+        title: "خطأ في حفظ التحليل",
+        description: "حدث خطأ أثناء تخزين التحليل. يرجى المحاولة مرة أخرى.",
+        variant: "destructive",
+        duration: 5000,
+      });
+    }
+  } else if (!user && analysis) {
+    toast({
+      title: "لم يتم حفظ التحليل",
+      description: "قم بتسجيل الدخول أو إنشاء حساب لحفظ نتائج التحليل.",
+      duration: 5000,
+    });
+  }
+  
+  toast({
+    title: "اكتمل التحليل",
+    description: "تقرير أداء اللاعب جاهز للعرض.",
+    duration: 5000,
+  });
 };
 
 const AnalysisService = {

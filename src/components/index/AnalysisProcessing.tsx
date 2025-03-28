@@ -1,6 +1,7 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import LoadingAnimation from '@/components/LoadingAnimation';
+import { Progress } from '@/components/ui/progress';
 
 interface AnalysisProcessingProps {
   progress: number;
@@ -13,13 +14,36 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({ progress, stage
   const safeProgress = isNaN(progress) ? 0 : Math.max(0, Math.min(100, progress));
   
   // سجل قيم التقدم للتصحيح
-  React.useEffect(() => {
+  useEffect(() => {
     console.log(`AnalysisProcessing - Progress: ${safeProgress}%, Stage: ${stage || 'N/A'}`);
   }, [safeProgress, stage]);
   
   return (
-    <div className={isMobile ? 'scale-90 transform-origin-top' : ''}>
-      <LoadingAnimation progress={safeProgress} stage={stage} />
+    <div className={`animate-fade-in space-y-8 ${isMobile ? 'scale-95 transform-origin-top' : ''}`}>
+      <div className="text-center">
+        <h2 className="text-2xl font-bold mb-2">تحليل الفيديو</h2>
+        <p className="text-muted-foreground">
+          يرجى الانتظار أثناء تحليل أداء اللاعب. قد تستغرق هذه العملية بضع دقائق.
+        </p>
+      </div>
+      
+      <div className="flex flex-col items-center justify-center">
+        <LoadingAnimation progress={safeProgress} stage={stage} />
+      </div>
+      
+      {/* إضافة مؤشر خطي للتقدم */}
+      <div className="max-w-md mx-auto w-full space-y-2">
+        <Progress value={safeProgress} className="h-2" />
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>0%</span>
+          <span>50%</span>
+          <span>100%</span>
+        </div>
+      </div>
+      
+      <div className="text-center text-sm text-muted-foreground">
+        <p>يرجى عدم إغلاق المتصفح أثناء المعالجة</p>
+      </div>
     </div>
   );
 };

@@ -18,6 +18,20 @@ export const analyzeFootballVideo = async (videoFile: File): Promise<{
   analysis: PlayerAnalysis, 
   progressUpdates: (callback: (progress: number, stage: string) => void) => void
 }> => {
+  // Setup progress tracking variables
+  let currentProgress = 0;
+  let currentStage = ANALYSIS_STAGES[0];
+  const updateCallbacks: Array<(progress: number, stage: string) => void> = [];
+  
+  // Function to update progress
+  const updateProgress = (progress: number, stage: string) => {
+    console.log(`Analysis progress: ${progress}%, stage: ${stage}`);
+    currentProgress = progress;
+    currentStage = stage;
+    // Immediately call all registered callbacks with new progress
+    updateCallbacks.forEach(callback => callback(progress, stage));
+  };
+
   return new Promise(async (resolve) => {
     // Generate a deterministic hash for the video file
     const videoHash = `${videoFile.name}-${videoFile.size}-${videoFile.lastModified}`;
@@ -27,31 +41,40 @@ export const analyzeFootballVideo = async (videoFile: File): Promise<{
       console.log("Using cached analysis result");
       const cachedAnalysis = analysisCache.get(videoHash)!;
       
+      // Immediately resolve with cached analysis
       resolve({
         analysis: cachedAnalysis,
         progressUpdates: (callback) => {
+          // Register callback
+          updateCallbacks.push(callback);
           // Immediately call with 100% progress
-          callback(100, ANALYSIS_STAGES[ANALYSIS_STAGES.length - 1]);
+          setTimeout(() => {
+            callback(100, ANALYSIS_STAGES[ANALYSIS_STAGES.length - 1]);
+          }, 50);
         }
       });
       return;
     }
     
-    // Set up progress tracking
-    let currentProgress = 0;
-    let currentStage = ANALYSIS_STAGES[0];
-    const updateCallbacks: ((progress: number, stage: string) => void)[] = [];
-    
-    const updateProgress = (progress: number, stage: string) => {
-      console.log(`Analysis progress: ${progress}%, stage: ${stage}`);
-      currentProgress = progress;
-      currentStage = stage;
-      updateCallbacks.forEach(callback => callback(progress, stage));
-    };
+    // Initial progress update
+    updateProgress(0, "بدء تحليل الفيديو");
     
     // Start with baseline random analysis
     const hashNum = videoHash.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
     const baselineAnalysis = generateEnhancedAnalysis(hashNum);
+    
+    // Immediately provide the result object with the progress update function
+    const result = {
+      analysis: baselineAnalysis,
+      progressUpdates: (callback: (progress: number, stage: string) => void) => {
+        // Add callback to the list
+        updateCallbacks.push(callback);
+        // Immediately call with current progress
+        callback(currentProgress, currentStage);
+      }
+    };
+    
+    resolve(result);
     
     // Create a new Promise to handle the analysis process
     const performAnalysis = async () => {
@@ -118,18 +141,17 @@ export const analyzeFootballVideo = async (videoFile: File): Promise<{
         // Step 4 - Generate final report (90%)
         updateProgress(80, "إنشاء تقرير التحليل النهائي");
         
-        // Simulate some processing time for better UX
+        // Update the analysis in the result
+        result.analysis = enhancedAnalysis;
+        
+        // Cache the analysis result
+        analysisCache.set(videoHash, enhancedAnalysis);
+        
+        // Complete the analysis
+        updateProgress(95, "جاري تنسيق النتائج النهائية");
         setTimeout(() => {
-          updateProgress(95, "جاري تنسيق النتائج النهائية");
-          
-          // Cache the analysis result for future use
-          analysisCache.set(videoHash, enhancedAnalysis);
-          
-          // Complete the analysis
-          setTimeout(() => {
-            updateProgress(100, ANALYSIS_STAGES[ANALYSIS_STAGES.length - 1]);
-          }, 500);
-        }, 700);
+          updateProgress(100, ANALYSIS_STAGES[ANALYSIS_STAGES.length - 1]);
+        }, 500);
         
         return enhancedAnalysis;
       } catch (error) {
@@ -140,21 +162,8 @@ export const analyzeFootballVideo = async (videoFile: File): Promise<{
       }
     };
     
-    // Start the analysis process
-    const analysis = await performAnalysis();
-    
-    // Cache the analysis
-    analysisCache.set(videoHash, analysis);
-    
-    // Return the result and progress update function
-    resolve({
-      analysis,
-      progressUpdates: (callback) => {
-        updateCallbacks.push(callback);
-        // Immediately call with current progress
-        callback(currentProgress, currentStage);
-      }
-    });
+    // Start the analysis process asynchronously
+    performAnalysis();
   });
 };
 
