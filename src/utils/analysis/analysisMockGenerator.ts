@@ -1,4 +1,3 @@
-
 import type { PlayerAnalysis } from "@/components/AnalysisReport.d";
 import { PROFESSIONAL_PLAYERS } from "./constants";
 import { generateInjuryRiskAssessment } from "./injuryRiskAnalysis";
@@ -276,7 +275,7 @@ export const generateEnhancedAnalysis = (seed: number = Date.now()): PlayerAnaly
       similarity: Math.floor(random() * 30) + 40, // 40-70% similarity
       // Fix: Convert string[] to {[key: string]: number} by creating an object
       skills: Object.fromEntries(
-        comparablePro.skills.map((skill, index) => [
+        comparablePro.skills.map((skill) => [
           skill, 
           60 + Math.floor(random() * 30) // Random score between 60-90 for each skill
         ])
@@ -294,7 +293,7 @@ export const generateEnhancedAnalysis = (seed: number = Date.now()): PlayerAnaly
   const injuryRisk = generateInjuryRiskAssessment(position, physicalScore);
   
   // Determine earned badges
-  const badges = determineEarnedBadges(analysis);
+  const badges: Badge[] = determineEarnedBadges(analysis);
   
   // Add progress tracking (simulated)
   const progress = {
