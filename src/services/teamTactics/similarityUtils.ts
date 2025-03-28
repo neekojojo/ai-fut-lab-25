@@ -74,18 +74,18 @@ export const determineStrengthsMatch = (playerStrengths: string[], teamWeaknesse
   
   const keywordMap: { [key: string]: string[] } = {
     "Technical": ["Creativity", "Technical quality", "Ball control", "Passing"],
-    "Passing": ["Creativity in midfield", "Technical quality", "Midfield control"],
-    "Speed": ["Pace", "Fast transitions", "Counter-attacking"],
-    "Physical": ["Physicality", "Athletic", "Strength"],
-    "Tactical": ["Tactical awareness", "Positioning", "Game intelligence"],
-    "Finishing": ["Finishing efficiency", "Goal scoring", "Attacking prowess"]
+    "تحكم بالكرة": ["Creativity in midfield", "Technical quality", "Midfield control"],
+    "السرعة": ["Pace", "Fast transitions", "Counter-attacking", "Lack of pace"],
+    "القوة البدنية": ["Physicality", "Athletic", "Strength"],
+    "الرؤية الميدانية": ["Tactical awareness", "Positioning", "Game intelligence"],
+    "التسديد": ["Finishing efficiency", "Goal scoring", "Attacking prowess"]
   };
   
   for (const playerStrength of playerStrengths) {
     for (const teamWeakness of teamWeaknesses) {
       // Check for direct match
       if (teamWeakness.toLowerCase().includes(playerStrength.toLowerCase())) {
-        matches.push(`Your ${playerStrength} addresses ${teamWeakness}`);
+        matches.push(`مهارتك في ${playerStrength} تعالج ${teamWeakness}`);
         continue;
       }
       
@@ -96,7 +96,7 @@ export const determineStrengthsMatch = (playerStrengths: string[], teamWeaknesse
           const relatedConcepts = keywordMap[keyword];
           for (const concept of relatedConcepts) {
             if (teamWeakness.toLowerCase().includes(concept.toLowerCase())) {
-              matches.push(`Your ${playerStrength} could help with "${teamWeakness}"`);
+              matches.push(`مهارتك في ${playerStrength} يمكن أن تساعد في "${teamWeakness}"`);
               break;
             }
           }

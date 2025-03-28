@@ -1,5 +1,4 @@
 
-import { supabase } from '@/integrations/supabase/client';
 import { 
   ExtendedPlayerStats, 
   SaudiLeagueTeam, 
@@ -22,11 +21,11 @@ import {
 export { getTeams as getSaudiLeagueTeams };
 
 // Main compatibility analysis function
-export const analyzeTeamCompatibility = async (
+export const analyzeTeamCompatibility = (
   playerStats: ExtendedPlayerStats,
   playerPosition: string,
   playerStrengths: string[]
-): Promise<TeamCompatibilityResult[]> => {
+): TeamCompatibilityResult[] => {
   // In production, fetch teams from Supabase
   // const { data: teams, error } = await supabase.from('saudi_league_teams').select('*');
   // if (error) throw error;

@@ -1,195 +1,106 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { TeamCompatibilityResult } from '@/services/teamTactics/types';
-import { PlayerAnalysis } from '@/components/AnalysisReport.d';
-import { Loader2 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { analyzeTeamCompatibility } from '@/services/teamTactics';
 
-interface TeamCompatibilityPanelProps {
-  playerAnalysis: PlayerAnalysis;
-}
-
-const TeamCompatibilityPanel: React.FC<TeamCompatibilityPanelProps> = ({ playerAnalysis }) => {
-  const [compatibilityResults, setCompatibilityResults] = useState<TeamCompatibilityResult[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [expanded, setExpanded] = useState<string | null>(null);
-  
-  useEffect(() => {
-    const fetchCompatibility = async () => {
-      try {
-        const adaptedStats = {
-          avgSpeed: playerAnalysis.stats.pace || 70,
-          maxSpeed: playerAnalysis.stats.acceleration || 75,
-          avgAcceleration: playerAnalysis.stats.acceleration || 70,
-          distanceCovered: 1000,
-          balanceScore: playerAnalysis.stats.balance || 70,
-          technicalScore: playerAnalysis.stats.ballControl || 75,
-          physicalScore: playerAnalysis.stats.physical || 75,
-          movementEfficiency: playerAnalysis.stats.agility || 70,
-          passing: playerAnalysis.stats.passing || 70,
-          ballControl: playerAnalysis.stats.ballControl || 70,
-          vision: playerAnalysis.stats.vision || 70,
-          pace: playerAnalysis.stats.pace || 70,
-          stamina: playerAnalysis.stats.stamina || 70,
-          physical: playerAnalysis.stats.physical || 70,
-          positioning: playerAnalysis.stats.positioning || 70,
-          anticipation: playerAnalysis.stats.anticipation || 70,
-          decision: playerAnalysis.stats.decision || 70
-        };
-        
-        const results = await analyzeTeamCompatibility(
-          adaptedStats,
-          playerAnalysis.position,
-          playerAnalysis.strengths
-        );
-        
-        setCompatibilityResults(results);
-      } catch (error) {
-        console.error('Error analyzing team compatibility:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchCompatibility();
-  }, [playerAnalysis]);
-  
-  const toggleExpand = (teamId: string) => {
-    if (expanded === teamId) {
-      setExpanded(null);
-    } else {
-      setExpanded(teamId);
-    }
+const TeamCompatibilityPanel = ({ playerAnalysis }) => {
+  // Convert player analysis data to the format needed for compatibility analysis
+  const playerStats = {
+    avgSpeed: playerAnalysis.movementMetrics?.averageSpeed || 70,
+    maxSpeed: playerAnalysis.movementMetrics?.topSpeed || 85,
+    avgAcceleration: playerAnalysis.movementMetrics?.acceleration || 65,
+    distanceCovered: playerAnalysis.movementMetrics?.distanceCovered || 8500,
+    balanceScore: playerAnalysis.technicalMetrics?.balance || 75,
+    technicalScore: playerAnalysis.technicalMetrics?.overall || 70,
+    physicalScore: playerAnalysis.physicalMetrics?.overall || 68,
+    movementEfficiency: playerAnalysis.movementMetrics?.efficiency || 72,
+    passing: playerAnalysis.technicalMetrics?.passing || 65,
+    ballControl: playerAnalysis.technicalMetrics?.ballControl || 68,
+    vision: playerAnalysis.technicalMetrics?.vision || 62,
+    pace: playerAnalysis.physicalMetrics?.pace || 75,
+    stamina: playerAnalysis.physicalMetrics?.stamina || 70
   };
   
-  if (isLoading) {
-    return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>تحليل التوافق مع الأندية</CardTitle>
-          <CardDescription>جاري تحليل توافق اللاعب مع أندية الدوري السعودي...</CardDescription>
-        </CardHeader>
-        <CardContent className="flex justify-center items-center py-10">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </CardContent>
-      </Card>
-    );
-  }
+  const playerPosition = playerAnalysis.position || "Midfielder";
+  const playerStrengths = playerAnalysis.strengths || [
+    "تحكم بالكرة", 
+    "السرعة",
+    "الرؤية الميدانية"
+  ];
+
+  // Get compatibility results with Saudi League teams
+  const teamResults = analyzeTeamCompatibility(playerStats, playerPosition, playerStrengths);
   
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>تحليل التوافق مع الأندية</CardTitle>
-        <CardDescription>مدى توافق اللاعب مع تكتيكات وأسلوب لعب أندية الدوري السعودي</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {compatibilityResults.map((result) => (
-            <Card key={result.team.id} className={`overflow-hidden border ${
-              result.compatibilityScore > 80 ? 'border-green-200 bg-green-50 dark:bg-green-900/10' : 
-              result.compatibilityScore > 60 ? 'border-blue-200 bg-blue-50 dark:bg-blue-900/10' : 
-              'border-gray-200 dark:border-gray-700'
-            }`}>
-              <div className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                    <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>توافق اللاعب مع الأندية</CardTitle>
+          <CardDescription>تحليل مدى توافق أداء اللاعب مع أندية الدوري السعودي</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-8">
+            {teamResults.slice(0, 3).map((result, index) => (
+              <div key={result.team.id} className="border rounded-lg p-4 bg-card">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-md overflow-hidden">
                       <img 
                         src={result.team.logo} 
                         alt={result.team.name} 
-                        className="h-full w-full object-cover"
+                        className="w-full h-full object-contain" 
                       />
                     </div>
                     <div>
-                      <h3 className="font-semibold">{result.team.name}</h3>
+                      <h3 className="font-bold text-lg">{result.team.name}</h3>
                       <p className="text-sm text-muted-foreground">{result.team.formation} • {result.team.playingStyle}</p>
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold">{result.compatibilityScore}%</div>
-                    <div className="text-xs text-muted-foreground">نسبة التوافق</div>
+                    <span className="text-2xl font-bold">{result.compatibilityScore}%</span>
+                    <p className="text-xs text-muted-foreground">توافق</p>
                   </div>
                 </div>
                 
-                <div className="mt-4 grid grid-cols-2 gap-2">
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">التوافق مع المركز</p>
-                    <Progress value={result.positionFit} className="h-2" />
+                <div className="space-y-3 mb-4">
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>التوافق مع المركز</span>
+                    <span className="font-medium">{result.positionFit}%</span>
                   </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">التوافق التكتيكي</p>
-                    <Progress value={result.tacticalFit} className="h-2" />
+                  <Progress value={result.positionFit} className="h-2" />
+                  
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>التوافق التكتيكي</span>
+                    <span className="font-medium">{result.tacticalFit.toFixed(0)}%</span>
                   </div>
+                  <Progress value={result.tacticalFit} className="h-2" />
                 </div>
                 
-                {expanded === result.team.id && (
-                  <div className="mt-4 space-y-3 animate-in fade-in">
-                    <div>
-                      <h4 className="text-sm font-medium mb-2">دورك في الفريق:</h4>
-                      <p className="text-sm bg-background p-2 rounded-md">
-                        {result.roleDescription}
-                      </p>
-                    </div>
-                    
-                    {result.strengthsMatch.length > 0 && (
-                      <div>
-                        <h4 className="text-sm font-medium mb-2">كيف يمكنك تعزيز الفريق:</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {result.strengthsMatch.map((match, index) => (
-                            <Badge key={index} variant="outline" className="bg-green-50 dark:bg-green-900/10">
-                              {match}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div className="grid grid-cols-2 gap-4 mt-3">
-                      <div>
-                        <h4 className="text-sm font-medium mb-2">نقاط قوة النادي:</h4>
-                        <ul className="text-sm space-y-1">
-                          {result.team.strengths.map((strength, index) => (
-                            <li key={index} className="flex items-center">
-                              <span className="size-2 rounded-full bg-green-500 mr-2"></span>
-                              {strength}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-medium mb-2">تحديات النادي:</h4>
-                        <ul className="text-sm space-y-1">
-                          {result.team.weaknesses.map((weakness, index) => (
-                            <li key={index} className="flex items-center">
-                              <span className="size-2 rounded-full bg-red-500 mr-2"></span>
-                              {weakness}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium mb-2">دور اللاعب المتوقع</h4>
+                  <p className="text-sm leading-relaxed">{result.roleDescription}</p>
+                </div>
+                
+                {result.strengthsMatch.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">نقاط القوة المتوافقة</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {result.strengthsMatch.map((strength, idx) => (
+                        <Badge key={idx} variant="outline" className="bg-green-50 text-green-900 dark:bg-green-900/20 dark:text-green-400">
+                          {strength}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
                 )}
-                
-                <div className="mt-3 text-center">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => toggleExpand(result.team.id)}
-                  >
-                    {expanded === result.team.id ? 'عرض أقل' : 'عرض المزيد'}
-                  </Button>
-                </div>
               </div>
-            </Card>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

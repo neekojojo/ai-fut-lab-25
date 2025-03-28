@@ -19,39 +19,39 @@ export const positionMappings: PositionMappings = {
 // Role descriptions by formation and position
 export const formationRoles: Record<string, Record<string, string>> = {
   "4-2-3-1": {
-    "Striker": "Lead the attack as the main goal threat, link up with attacking midfielders",
-    "Winger": "Provide width and creativity from wide areas, cut inside to support attacks",
-    "Attacking Midfielder": "Create chances as the team's primary playmaker behind the striker",
-    "Central Midfielder": "Control the tempo and distribute the ball in a balanced role",
-    "Defensive Midfielder": "Shield the defense and start attacks from deep positions",
-    "Full Back": "Provide width in attack while maintaining defensive responsibilities",
-    "Center Back": "Lead the defensive line and build attacks from the back",
-    "Goalkeeper": "Start the team's build-up play and organize the defense"
+    "Striker": "قيادة الهجوم كتهديد رئيسي للتسجيل، والتواصل مع لاعبي الوسط المهاجمين",
+    "Winger": "توفير العرض والإبداع من المناطق الواسعة، والقطع إلى الداخل لدعم الهجمات",
+    "Attacking Midfielder": "خلق الفرص كصانع ألعاب أساسي خلف المهاجم",
+    "Midfielder": "التحكم في الإيقاع وتوزيع الكرة في دور متوازن",
+    "Defensive Midfielder": "حماية الدفاع وبدء الهجمات من المواقع العميقة",
+    "Full Back": "توفير العرض في الهجوم مع الحفاظ على المسؤوليات الدفاعية",
+    "Center Back": "قيادة الخط الدفاعي وبناء الهجمات من الخلف",
+    "Goalkeeper": "بدء بناء اللعب للفريق وتنظيم الدفاع"
   },
   "4-3-3": {
-    "Striker": "Central focal point for attacks with emphasis on finishing",
-    "Winger": "Attack from wide positions, providing pace and creativity in the final third",
-    "Midfielder": "Play in a dynamic midfield three, balancing attack and defense",
-    "Defensive Midfielder": "Anchor the midfield three, focusing on defensive coverage",
-    "Full Back": "Overlap with wingers to create overloads in wide areas",
-    "Center Back": "Defend against counter-attacks with emphasis on covering space",
-    "Goalkeeper": "Quick distribution to initiate counter-attacks"
+    "Striker": "نقطة محورية مركزية للهجمات مع التركيز على التسجيل",
+    "Winger": "الهجوم من المواقع العريضة، وتوفير السرعة والإبداع في الثلث الأخير",
+    "Midfielder": "اللعب في وسط ميدان ديناميكي ثلاثي، مع موازنة الهجوم والدفاع",
+    "Defensive Midfielder": "تثبيت وسط الميدان الثلاثي، مع التركيز على التغطية الدفاعية",
+    "Full Back": "التداخل مع الأجنحة لخلق زيادة عددية في المناطق العريضة",
+    "Center Back": "الدفاع ضد الهجمات المرتدة مع التركيز على تغطية المساحات",
+    "Goalkeeper": "توزيع سريع للكرة لبدء الهجمات المرتدة"
   },
   "4-4-2": {
-    "Striker": "Work as part of a strike partnership, with shared defensive responsibilities",
-    "Winger": "Traditional wide role with crossing ability and tracking back",
-    "Midfielder": "Box-to-box role with emphasis on work rate and positioning",
-    "Full Back": "Provide occasional attacking support while focusing on defensive solidity",
-    "Center Back": "Traditional defending with emphasis on partnership and aerial ability",
-    "Goalkeeper": "Command the penalty area and organize defensive shape"
+    "Striker": "العمل كجزء من شراكة هجومية، مع مسؤوليات دفاعية مشتركة",
+    "Winger": "دور جناح تقليدي مع قدرة على العرضيات والعودة للدفاع",
+    "Midfielder": "دور من منطقة لمنطقة مع التركيز على معدل العمل والتموضع",
+    "Full Back": "تقديم دعم هجومي عرضي مع التركيز على الصلابة الدفاعية",
+    "Center Back": "دفاع تقليدي مع التركيز على الشراكة والقدرة الهوائية",
+    "Goalkeeper": "السيطرة على منطقة الجزاء وتنظيم الشكل الدفاعي"
   },
   "3-5-2": {
-    "Striker": "Work as part of a strike partnership with movement to create space",
-    "Midfielder": "Control central areas with emphasis on ball retention",
-    "Defensive Midfielder": "Shield the back three and distribute play",
-    "Full Back": "Wing-back role with significant attacking and defensive responsibilities",
-    "Center Back": "Part of a back three, requiring good distribution and covering ability",
-    "Goalkeeper": "Involved in build-up play with good distribution skills"
+    "Striker": "العمل كجزء من شراكة هجومية مع حركة لخلق المساحات",
+    "Midfielder": "السيطرة على المناطق المركزية مع التركيز على الاحتفاظ بالكرة",
+    "Defensive Midfielder": "حماية الخط الخلفي الثلاثي وتوزيع اللعب",
+    "Full Back": "دور الظهير الجناح مع مسؤوليات هجومية ودفاعية كبيرة",
+    "Center Back": "جزء من دفاع ثلاثي، يتطلب توزيعًا جيدًا وقدرة على التغطية",
+    "Goalkeeper": "المشاركة في بناء اللعب مع مهارات توزيع جيدة"
   }
 };
 
@@ -71,10 +71,10 @@ export function generateRoleDescription(playerPosition: string, team: import('./
   // Get formation-specific role
   const teamFormationRoles = formationRoles[team.formation] || {};
   const roleDescription = teamFormationRoles[genericPosition] || 
-    `Play as a ${genericPosition} in ${team.name}'s ${team.formation} system`;
+    `اللعب كـ ${genericPosition} في نظام ${team.name} بتشكيل ${team.formation}`;
   
   // Add team playing style context
-  return `${roleDescription}. Adapt to ${team.name}'s ${team.playingStyle} approach.`;
+  return `${roleDescription}. التكيف مع أسلوب لعب ${team.name} الذي يعتمد على ${team.playingStyle}.`;
 }
 
 // Calculate position fit score
