@@ -1,3 +1,4 @@
+
 import { IdentifiedPlayer, IdentifiedTeam } from './playerIdentification';
 import type { DetectionResult } from './types';
 
@@ -337,7 +338,7 @@ export const convertKaggleToIdentifiedPlayer = (player: KagglePlayerData): Ident
     team: player.team,
     nationality: player.nationality,
     position: player.position,
-    number: "", // بيانات Kaggle لا تشمل رقم اللاعب عادة
+    rating: player.overall_rating,
     confidenceScore: 0.95, // افتراض درجة ثقة عالية لبيانات Kaggle
     physicalAttributes: {
       height: player.height_cm,

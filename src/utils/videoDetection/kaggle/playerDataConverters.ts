@@ -20,7 +20,14 @@ export const searchKagglePlayersByName = (name: string): IdentifiedPlayer[] => {
     position: player.position,
     nationality: player.nationality,
     rating: player.overall_rating,
-    confidenceScore: 0.9
+    confidenceScore: 0.9,
+    physicalAttributes: {
+      height: player.height_cm,
+      weight: player.weight_kg,
+      speed: player.pace,
+      agility: player.dribbling,
+      stamina: player.physic
+    }
   }));
 };
 
@@ -45,7 +52,14 @@ export const identifyPlayerFromKaggle = (result: DetectionResult): IdentifiedPla
         position: player.position,
         nationality: player.nationality,
         rating: player.overall_rating,
-        confidenceScore: confidenceScores[index]
+        confidenceScore: confidenceScores[index],
+        physicalAttributes: {
+          height: player.height_cm,
+          weight: player.weight_kg,
+          speed: player.pace,
+          agility: player.dribbling,
+          stamina: player.physic
+        }
       };
     });
   
@@ -63,6 +77,13 @@ export const convertKaggleToIdentifiedPlayer = (kagglePlayer: any): IdentifiedPl
     position: kagglePlayer.position,
     nationality: kagglePlayer.nationality,
     rating: kagglePlayer.overall_rating,
-    confidenceScore: 0.9
+    confidenceScore: 0.9,
+    physicalAttributes: {
+      height: kagglePlayer.height_cm,
+      weight: kagglePlayer.weight_kg,
+      speed: kagglePlayer.pace,
+      agility: kagglePlayer.dribbling,
+      stamina: kagglePlayer.physic
+    }
   };
 };

@@ -12,6 +12,14 @@ export interface IdentifiedPlayer {
   nationality: string;
   rating: number;
   confidenceScore: number;
+  // إضافة خصائص جديدة لتحسين بنية البيانات
+  physicalAttributes?: {
+    height?: number;
+    weight?: number;
+    speed?: number;
+    agility?: number;
+    stamina?: number;
+  };
 }
 
 // معلومات الفريق المُحدد هويته
