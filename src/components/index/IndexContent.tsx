@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { NavigateFunction } from 'react-router-dom';
 import LoadingAnimation from '@/components/LoadingAnimation';
@@ -7,7 +8,7 @@ import type { PlayerAnalysis } from '@/components/AnalysisReport.d';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/components/auth/AuthContext';
 import AnalysisOptions from '@/components/index/AnalysisOptions';
-import AnalysisProcessing from '@/components/index/AnalysisProcessing';
+import AnalysisProcessing from '@/components/index/analysis-processing';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
 import HeroContent from '@/components/index/HeroContent';
 import AnalysisService from '@/services/AnalysisService';
