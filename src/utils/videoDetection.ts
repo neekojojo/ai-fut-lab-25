@@ -1,7 +1,6 @@
 
-// This file is now a re-export from the refactored module structure
-// All functionality has been moved to more focused files in the videoDetection directory
+// This file is a central export point for all video detection related functionality
 
-export * from './videoDetection';
+// Re-export from the new module structure
+export * from './videoDetection/index';
 export * from './videoDetection/kaggle';
-
