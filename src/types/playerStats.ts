@@ -17,6 +17,22 @@ export interface PlayerStats {
   positioning: number;
   vision: number;
   composure: number;
+  
+  // Additional properties used in the application
+  finishing?: number;
+  shotPower?: number;
+  longShots?: number;
+  volleys?: number;
+  penalties?: number;
+  crossing?: number;
+  freeKick?: number;
+  shortPassing?: number;
+  longPassing?: number;
+  curve?: number;
+  reactions?: number;
+  strength?: number;
+  jumping?: number;
+  heading?: number;
 }
 
 export interface PerformanceMetrics {

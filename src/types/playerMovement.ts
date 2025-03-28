@@ -5,6 +5,9 @@ export interface PlayerMovement {
   y: number;
   timestamp: number;
   speed: number;
+  acceleration?: number;  // Added acceleration property
+  direction?: number;     // Added direction property
+  isActive?: boolean;     // Added isActive property
   // For chart rendering
   name?: string;
   current?: number;
