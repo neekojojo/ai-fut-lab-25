@@ -1,4 +1,3 @@
-
 // Type definitions for video detection service
 
 export interface DetectionResult {
@@ -49,3 +48,6 @@ export interface PlayerMovementAnalysis {
   balanceScore: number;
   movementEfficiency: number;
 }
+
+// Add YOLO-specific types if needed
+export type YOLOModelSize = 'n' | 's' | 'm' | 'l' | 'x';
