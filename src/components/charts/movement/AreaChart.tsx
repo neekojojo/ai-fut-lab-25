@@ -49,7 +49,8 @@ const AreaChartComponent: React.FC<AreaChartProps> = ({ data, config }) => {
             dataKey="current"
             name="Current"
             stroke={config.current.color}
-            fill={`${config.current.color}33`}
+            fill={config.current.color}
+            fillOpacity={0.4}
           />
           {data.some((d) => d.previous !== undefined) && (
             <Area
@@ -57,7 +58,9 @@ const AreaChartComponent: React.FC<AreaChartProps> = ({ data, config }) => {
               dataKey="previous"
               name="Previous"
               stroke={config.previous.color}
-              fill={`${config.previous.color}33`}
+              fill={config.previous.color}
+              fillOpacity={0.2}
+              strokeDasharray="5 5"
             />
           )}
           {data.some((d) => d.alternative !== undefined) && (
@@ -66,7 +69,9 @@ const AreaChartComponent: React.FC<AreaChartProps> = ({ data, config }) => {
               dataKey="alternative"
               name="Alternative"
               stroke={config.alternative.color}
-              fill={`${config.alternative.color}33`}
+              fill={config.alternative.color}
+              fillOpacity={0.2}
+              strokeDasharray="3 3"
             />
           )}
         </RechartsAreaChart>

@@ -1,254 +1,164 @@
 
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React from 'react';
 import { Button } from "@/components/ui/button";
-import NumberMovementChart from "../NumberMovementChart";
-import type { PlayerAnalysis } from "@/types/playerAnalysis";
-import type { DataPoint } from "../charts/DataTypes";
-import MovementAnalysis from "../MovementAnalysis";
-import AdvancedPlayerCharts from '../AdvancedPlayerCharts';
-import ClubCompatibilityPanel from './ClubCompatibilityPanel';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Activity } from "lucide-react";
+import NumberMovementChart from '@/components/NumberMovementChart';
 
 interface AdvancedAnalysisViewProps {
-  analysis: PlayerAnalysis;
+  analysis: any;
   onBack: () => void;
 }
 
 const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, onBack }) => {
-  const [activeTab, setActiveTab] = useState('movement');
-  
-  // Generate movement data
-  const generateMovementData = (): DataPoint[] => {
-    return [
-      { name: "Sprint", current: 78, previous: 72, alternative: 85 },
-      { name: "Agility", current: 82, previous: 75, alternative: 88 },
-      { name: "Balance", current: 79, previous: 74, alternative: 86 },
-      { name: "Coordination", current: 81, previous: 76, alternative: 87 },
-      { name: "Acceleration", current: 83, previous: 77, alternative: 89 }
-    ];
-  };
+  // Example movement data for charts
+  const speedData = [
+    { name: "0m", current: 0, previous: 0 },
+    { name: "5m", current: 12, previous: 10 },
+    { name: "10m", current: 18, previous: 15 },
+    { name: "15m", current: 22, previous: 20 },
+    { name: "20m", current: 19, previous: 17 },
+    { name: "25m", current: 15, previous: 14 },
+    { name: "30m", current: 10, previous: 8 }
+  ];
 
-  // Generate physical data
-  const generatePhysicalData = (): DataPoint[] => {
-    return [
-      { name: "Speed", current: 80, previous: 73, alternative: 86 },
-      { name: "Strength", current: 75, previous: 68, alternative: 82 },
-      { name: "Stamina", current: 82, previous: 75, alternative: 88 },
-      { name: "Jumping", current: 77, previous: 70, alternative: 84 },
-      { name: "Agility", current: 81, previous: 74, alternative: 87 }
-    ];
-  };
+  const accelerationData = [
+    { name: "0s", current: 0, previous: 0 },
+    { name: "1s", current: 4.2, previous: 3.8 },
+    { name: "2s", current: 3.8, previous: 3.5 },
+    { name: "3s", current: 2.5, previous: 2.2 },
+    { name: "4s", current: 1.8, previous: 1.5 },
+    { name: "5s", current: 0.9, previous: 0.8 }
+  ];
 
-  // Generate skill data
-  const generateSkillData = (): DataPoint[] => {
-    return [
-      { name: "Passing", current: 83, previous: 76, alternative: 89 },
-      { name: "Shooting", current: 79, previous: 72, alternative: 85 },
-      { name: "Dribbling", current: 81, previous: 74, alternative: 87 },
-      { name: "Tackling", current: 76, previous: 69, alternative: 83 },
-      { name: "Positioning", current: 80, previous: 73, alternative: 86 }
-    ];
-  };
+  const movementPatternData = [
+    { name: "0%", current: 5, previous: 3 },
+    { name: "20%", current: 15, previous: 12 },
+    { name: "40%", current: 25, previous: 18 },
+    { name: "60%", current: 20, previous: 22 },
+    { name: "80%", current: 30, previous: 25 },
+    { name: "100%", current: 10, previous: 8 }
+  ];
 
-  const movementsData = generateMovementData();
-  const physicalData = generatePhysicalData();
-  const skillData = generateSkillData();
-
-  // تطوير النسب المئوية للتحسن
-  const movementImprovement = "+5.7%";
-  const physicalImprovement = "+9.0%";
-  const skillImprovement = "+8.4%";
-
-  // التوصيفات
-  const movementDescription = "تحليل كفاءة حركة اللاعب بما في ذلك سرعة العدو، الرشاقة، التوازن، التنسيق، والتسارع مقارنة بالتقييم السابق والتحسينات المحتملة.";
-  const physicalDescription = "تطور الصفات البدنية بما في ذلك السرعة، القوة، التحمل، القدرة على القفز والرشاقة، مع توقعات للتحسين.";
-  const skillDescription = "مقارنة المهارات الفنية الرئيسية بناءً على متطلبات المركز، مع إظهار التقدم منذ التقييم الأخير والتحسن المتوقع مع التدريب المستهدف.";
-
-  // معالج للعودة
-  const handleBack = () => {
-    console.log("Going back to main view");
-    if (onBack) {
-      onBack();
-    }
-  };
+  const energyEfficiencyData = [
+    { name: "0min", current: 100, previous: 100 },
+    { name: "15min", current: 95, previous: 90 },
+    { name: "30min", current: 90, previous: 82 },
+    { name: "45min", current: 88, previous: 78 },
+    { name: "60min", current: 85, previous: 73 },
+    { name: "75min", current: 82, previous: 68 },
+    { name: "90min", current: 80, previous: 65 }
+  ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">التحليل المتقدم للاعب</h2>
-        <Button 
-          onClick={handleBack} 
-          variant="ghost"
-          className="px-4 py-2 text-sm font-medium"
-        >
-          العودة إلى الملخص
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-primary/5 to-transparent rounded-lg shadow-sm border border-primary/10">
+        <h1 className="text-2xl font-bold flex items-center">
+          <Activity className="mr-2 h-6 w-6 text-primary" />
+          تحليل الحركة المتقدم
+        </h1>
+        <Button variant="outline" size="sm" onClick={onBack}>
+          <ArrowLeft className="ml-2 h-4 w-4 rtl:mr-2 rtl:ml-0" />
+          العودة
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-3 mb-6">
-          <TabsTrigger value="movement">تحليل الحركة</TabsTrigger>
-          <TabsTrigger value="performance">مخططات الأداء</TabsTrigger>
-          <TabsTrigger value="ar">تصور الواقع المعزز</TabsTrigger>
-        </TabsList>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>السرعة والتسارع</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <NumberMovementChart
+              title="منحنى السرعة"
+              data={speedData}
+              type="line"
+              colors={{
+                current: "#8B5CF6",
+                previous: "#D1D5DB"
+              }}
+              description="تحليل سرعة اللاعب خلال مسافات مختلفة مقارنة بالأداء السابق"
+            />
 
-        <TabsContent value="movement" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>تحليل الحركة</CardTitle>
-              <CardDescription>
-                تحليل مرئي لحركات {analysis.playerName} وتطور المهارات
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="physical-movements">
-                <TabsList className="grid w-full grid-cols-3 mb-6">
-                  <TabsTrigger value="physical-movements">الحركات البدنية</TabsTrigger>
-                  <TabsTrigger value="skill-analysis">تحليل المهارات</TabsTrigger>
-                  <TabsTrigger value="physical-metrics">المقاييس البدنية</TabsTrigger>
-                </TabsList>
+            <NumberMovementChart
+              title="معدل التسارع"
+              data={accelerationData}
+              type="area"
+              colors={{
+                current: "#10B981",
+                previous: "#D1D5DB"
+              }}
+              description="تحليل معدل التسارع للاعب خلال فترات زمنية مختلفة"
+            />
+          </CardContent>
+        </Card>
 
-                <TabsContent value="physical-movements">
-                  <div className="space-y-6">
-                    <div className="relative">
-                      <NumberMovementChart 
-                        title="تحليل كفاءة الحركة" 
-                        data={movementsData} 
-                        type="line"
-                        colors={{
-                          current: "#8B5CF6", // بنفسجي
-                          previous: "#9CA3AF", // رمادي
-                          alternative: "#F97316", // برتقالي
-                        }}
-                        description={movementDescription}
-                      />
-                      <div className="absolute top-4 right-4 bg-green-100 text-green-800 rounded-full px-3 py-1 text-sm font-medium">
-                        {movementImprovement} مقارنة بالسابق
-                      </div>
-                    </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>أنماط الحركة وكفاءة الطاقة</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <NumberMovementChart
+              title="نمط الحركة"
+              data={movementPatternData}
+              type="bar"
+              colors={{
+                current: "#3B82F6",
+                previous: "#D1D5DB"
+              }}
+              description="تحليل أنماط حركة اللاعب ومقارنتها بالأداء السابق"
+            />
 
-                    <div className="text-sm text-muted-foreground">
-                      <p className="mb-2">يقارن تحليل الحركة مقاييس الأداء الحالية مع التقييمات السابقة والبدائل المحتملة:</p>
-                      <ul className="list-disc pr-5 space-y-1 mr-5">
-                        <li><span className="font-medium text-purple-500">الحالي (بنفسجي):</span> مقاييس كفاءة حركة اللاعب الحالية</li>
-                        <li><span className="font-medium text-gray-500">السابق (رمادي):</span> المقاييس من التقييم السابق</li>
-                        <li><span className="font-medium text-orange-500">البديل (برتقالي):</span> التحسينات المحتملة مع تعديلات التقنية المقترحة</li>
-                      </ul>
-                    </div>
-                  </div>
-                </TabsContent>
+            <NumberMovementChart
+              title="كفاءة الطاقة"
+              data={energyEfficiencyData}
+              type="line"
+              colors={{
+                current: "#F59E0B",
+                previous: "#D1D5DB"
+              }}
+              description="تحليل كفاءة استهلاك الطاقة خلال المباراة"
+            />
+          </CardContent>
+        </Card>
+      </div>
 
-                <TabsContent value="skill-analysis">
-                  <div className="space-y-6">
-                    <div className="relative">
-                      <NumberMovementChart 
-                        title="مقارنة أداء المهارات" 
-                        data={skillData} 
-                        type="bar"
-                        colors={{
-                          current: "#0EA5E9", // أزرق
-                          previous: "#9CA3AF", // رمادي
-                          alternative: "#10B981", // أخضر
-                        }}
-                        description={skillDescription}
-                      />
-                      <div className="absolute top-4 right-4 bg-green-100 text-green-800 rounded-full px-3 py-1 text-sm font-medium">
-                        {skillImprovement} مقارنة بالسابق
-                      </div>
-                    </div>
-
-                    <div className="text-sm text-muted-foreground">
-                      <p className="mb-2">يوضح تحليل المهارات التقدم في قدرات كرة القدم الأساسية:</p>
-                      <ul className="list-disc pr-5 space-y-1 mr-5">
-                        <li><span className="font-medium text-blue-500">الحالي (أزرق):</span> تقييمات المهارات الحالية بناءً على الأداء الأخير</li>
-                        <li><span className="font-medium text-gray-500">السابق (رمادي):</span> مستويات المهارة من التقييم السابق</li>
-                        <li><span className="font-medium text-green-500">البديل (أخضر):</span> مستويات المهارات المتوقعة مع التدريب المركز</li>
-                      </ul>
-                      <p className="mt-2">تم تحسين ملف تعريف اللاعب لمركز {analysis.position || "لاعب وسط"}</p>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="physical-metrics">
-                  <div className="space-y-6">
-                    <div className="relative">
-                      <NumberMovementChart 
-                        title="تطور المقاييس البدنية" 
-                        data={physicalData} 
-                        type="area"
-                        colors={{
-                          current: "#D946EF", // وردي
-                          previous: "#9CA3AF", // رمادي
-                          alternative: "#F97316", // برتقالي
-                        }}
-                        description={physicalDescription}
-                      />
-                      <div className="absolute top-4 right-4 bg-green-100 text-green-800 rounded-full px-3 py-1 text-sm font-medium">
-                        {physicalImprovement} مقارنة بالسابق
-                      </div>
-                    </div>
-
-                    <div className="text-sm text-muted-foreground">
-                      <p className="mb-2">الصفات البدنية المقاسة من خلال اختبارات الأداء القياسية:</p>
-                      <ul className="list-disc pr-5 space-y-1 mr-5">
-                        <li><span className="font-medium text-pink-500">الحالي (وردي):</span> القدرات البدنية الحالية</li>
-                        <li><span className="font-medium text-gray-500">السابق (رمادي):</span> المقاييس البدنية من التقييم السابق</li>
-                        <li><span className="font-medium text-orange-500">البديل (برتقالي):</span> المقاييس المتوقعة مع التكييف المتخصص</li>
-                      </ul>
-                      <p className="mt-2">الدرجة البدنية الإجمالية: {analysis.performance?.physical || 75}/100</p>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="performance">
-          <Card>
-            <CardHeader>
-              <CardTitle>مخططات الأداء</CardTitle>
-              <CardDescription>
-                تحليل مفصل لمقاييس المهارات، والسمات البدنية، وإمكانية التحسين
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AdvancedPlayerCharts 
-                playerStats={{
-                  avgSpeed: 12.5,
-                  maxSpeed: 22.8,
-                  avgAcceleration: 2.3,
-                  distanceCovered: 7800,
-                  balanceScore: 82,
-                  technicalScore: 78,
-                  physicalScore: 82,
-                  movementEfficiency: 76
-                }}
-                playerName={analysis.playerName}
-                playerPosition={analysis.position}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="ar">
-          <Card>
-            <CardHeader>
-              <CardTitle>تصور الواقع المعزز</CardTitle>
-              <CardDescription>
-                تصور ثلاثي الأبعاد لحركات اللاعب والخصائص البدنية
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="h-[400px] flex items-center justify-center bg-muted/30 rounded-md">
-              <div className="text-center">
-                <p className="text-muted-foreground mb-2">يتطلب تصور الواقع المعزز الوصول إلى كاميرا الجهاز</p>
-                <Button>إطلاق تجربة الواقع المعزز</Button>
+      <Card>
+        <CardHeader>
+          <CardTitle>تحليل متقدم للأداء الفني</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-primary/5 p-4 rounded-lg">
+                <h3 className="text-sm font-medium text-primary mb-2">دقة الحركة</h3>
+                <p className="text-3xl font-bold">{analysis.performance?.technical || 82}%</p>
+                <p className="text-xs text-muted-foreground mt-1">تحسن بنسبة 4% عن التحليل السابق</p>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              <div className="bg-primary/5 p-4 rounded-lg">
+                <h3 className="text-sm font-medium text-primary mb-2">التوازن الحركي</h3>
+                <p className="text-3xl font-bold">{analysis.stats?.balance || 76}%</p>
+                <p className="text-xs text-muted-foreground mt-1">متوسط خلال الفترة الأخيرة</p>
+              </div>
+              <div className="bg-primary/5 p-4 rounded-lg">
+                <h3 className="text-sm font-medium text-primary mb-2">الكفاءة الحركية</h3>
+                <p className="text-3xl font-bold">{(analysis.stats?.agility || 0) + 5}%</p>
+                <p className="text-xs text-muted-foreground mt-1">تحسن ملحوظ في الكفاءة الحركية</p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-secondary/10 rounded-lg mt-6">
+              <h3 className="font-medium mb-2">التوصيات الفنية للحركة</h3>
+              <ul className="list-disc list-inside space-y-2 text-sm">
+                <li>تحسين التوازن أثناء تغيير الاتجاه بسرعة عالية</li>
+                <li>تطوير كفاءة الحركة لتقليل استهلاك الطاقة خلال المباراة</li>
+                <li>العمل على تحسين انفجارية التسارع في المسافات القصيرة</li>
+                <li>تطوير القدرة على الحفاظ على السرعة القصوى لفترات أطول</li>
+              </ul>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

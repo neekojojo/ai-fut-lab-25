@@ -1,66 +1,60 @@
 
 import * as React from 'react';
+import { LucideIcon } from 'lucide-react';
 
 export interface ChartConfigItem {
-  color?: string;
-  label?: string;
-  icon?: React.FC<React.SVGProps<SVGSVGElement>>;
-  curve?: string;
   theme?: {
-    light?: string;
-    dark?: string;
-  } | string;
+    light: string;
+    dark: string;
+  };
+  label?: string;
+  color?: string;
+  curve?: "linear" | "monotone" | "step" | "stepBefore" | "stepAfter" | "natural" | "basis";
+  icon?: LucideIcon;
 }
 
 export interface ChartConfig {
   [key: string]: ChartConfigItem;
 }
 
-// Define ChartContextProps for use in ChartContext.tsx
 export interface ChartContextProps {
   config: ChartConfig;
 }
 
-// Define the getPayloadConfigFromPayload function for Legend and Tooltip components
+// Helper function to get config from payload
 export const getPayloadConfigFromPayload = (
   config: ChartConfig,
-  payload: any,
+  item: any,
   key: string
 ): ChartConfigItem | undefined => {
-  // Look for a direct match in the config
-  if (config[key]) {
-    return config[key];
-  }
-
-  // Try to match with the payload name or dataKey
-  if (payload.dataKey && config[payload.dataKey]) {
-    return config[payload.dataKey];
-  }
-
-  if (payload.name && config[payload.name]) {
-    return config[payload.name];
-  }
-
-  // Try to match with the payload value
-  if (payload.value && config[payload.value]) {
-    return config[payload.value];
-  }
-
-  // If no match is found, return the payload itself as a basic config item
-  return {
-    label: payload.name || payload.dataKey || key,
-    color: payload.color || payload.fill
-  };
+  return (
+    config[key] ||
+    config[item?.name || ""] ||
+    config[item?.dataKey || ""] ||
+    undefined
+  );
 };
 
-// Add the THEMES constant needed by ChartStyle.tsx
+// Theme constants
 export const THEMES = {
-  light: {
-    DEFAULT_COLOR: "#000",
-    PREFIX: ".light"
+  blue: {
+    light: "#0085FF",
+    dark: "#0085FF",
   },
-  dark: {
-    DEFAULT_COLOR: "#fff",
-    PREFIX: ".dark"
-  }
+  green: {
+    light: "#22C55E",
+    dark: "#22C55E",
+  },
+  red: {
+    light: "#EF4444",
+    dark: "#EF4444",
+  },
+  yellow: {
+    light: "#F59E0B",
+    dark: "#F59E0B",
+  },
+  purple: {
+    light: "#8B5CF6",
+    dark: "#8B5CF6",
+  },
 };

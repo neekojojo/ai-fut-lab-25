@@ -2,40 +2,42 @@
 import * as React from "react";
 import { ChartConfig, THEMES } from "./types";
 
-export interface ChartStyleProps {
+export function ChartStyle({
+  id,
+  config,
+  ...props
+}: {
   id: string;
   config: ChartConfig;
-}
+} & React.HTMLAttributes<HTMLStyleElement>) {
+  // Generate dynamic CSS from the chart config
+  const css = React.useMemo(() => {
+    const cssRules: string[] = [];
 
-export const ChartStyle: React.FC<ChartStyleProps> = ({ id, config }) => {
-  const colorConfig = Object.entries(config).filter(
-    ([_, config]) => config.theme || config.color
-  );
+    Object.entries(config).forEach(([key, value]) => {
+      if (value.theme) {
+        const { light, dark } = value.theme;
+        cssRules.push(`
+          [data-chart="${id}"] [data-key="${key}"] {
+            color: ${light};
+            stroke: ${light};
+            fill: ${light};
+          }
+          .dark [data-chart="${id}"] [data-key="${key}"] {
+            color: ${dark};
+            stroke: ${dark};
+            fill: ${dark};
+          }
+        `);
+      }
+    });
 
-  if (!colorConfig.length) {
+    return cssRules.join("\n");
+  }, [id, config]);
+
+  if (!css) {
     return null;
   }
 
-  return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color =
-      itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
-  })
-  .join("\n")}
+  return <style {...props} dangerouslySetInnerHTML={{ __html: css }} />;
 }
-`
-          )
-          .join("\n"),
-      }}
-    />
-  );
-};

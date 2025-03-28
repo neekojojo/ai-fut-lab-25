@@ -9,53 +9,55 @@ export const ChartLegend = RechartsPrimitive.Legend;
 
 export const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<"div"> &
-    Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
-      hideIcon?: boolean;
-      nameKey?: string;
-    }
+  React.ComponentProps<typeof RechartsPrimitive.Legend> & {
+    className?: string;
+    itemClassName?: string;
+    orientation?: "horizontal" | "vertical";
+  }
 >(
   (
-    { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey },
+    { className, itemClassName, payload, orientation = "horizontal", ...props },
     ref
   ) => {
     const { config } = useChart();
-
-    if (!payload?.length) {
-      return null;
-    }
 
     return (
       <div
         ref={ref}
         className={cn(
-          "flex items-center justify-center gap-4",
-          verticalAlign === "top" ? "pb-3" : "pt-3",
+          "flex flex-wrap items-center gap-4 text-xs",
+          orientation === "vertical" && "flex-col items-start",
           className
         )}
+        {...props}
       >
-        {payload.map((item) => {
-          const key = `${nameKey || item.dataKey || "value"}`;
-          const itemConfig = getPayloadConfigFromPayload(config, item, key);
+        {payload?.map((entry, index) => {
+          const key = entry.dataKey || entry.value || "";
+          const itemConfig = getPayloadConfigFromPayload(config, entry, key);
+          const iconColor = entry.color || "#888888";
 
           return (
             <div
-              key={item.value}
+              key={`item-${index}`}
               className={cn(
-                "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground"
+                "flex items-center gap-1.5 overflow-hidden",
+                itemClassName
               )}
             >
-              {itemConfig?.icon && !hideIcon ? (
-                <itemConfig.icon />
+              {itemConfig?.icon ? (
+                <itemConfig.icon
+                  className="h-3 w-3"
+                  style={{ color: iconColor }}
+                />
               ) : (
                 <div
-                  className="h-2 w-2 shrink-0 rounded-[2px]"
-                  style={{
-                    backgroundColor: item.color,
-                  }}
+                  className="h-3 w-3 rounded-[2px]"
+                  style={{ backgroundColor: iconColor }}
                 />
               )}
-              {itemConfig?.label}
+              <span className="truncate text-muted-foreground">
+                {itemConfig?.label || entry.value}
+              </span>
             </div>
           );
         })}
@@ -64,4 +66,4 @@ export const ChartLegendContent = React.forwardRef<
   }
 );
 
-ChartLegendContent.displayName = "ChartLegend";
+ChartLegendContent.displayName = "ChartLegendContent";
