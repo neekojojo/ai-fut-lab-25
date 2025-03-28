@@ -1,4 +1,3 @@
-
 import type { PlayerAnalysis } from "@/components/AnalysisReport.d";
 import { ANALYSIS_STAGES } from "./constants";
 import { generateEnhancedAnalysis } from "./analysisMockGenerator";
@@ -30,11 +29,14 @@ const DETAILED_STAGES = [
 // Cache to store analysis results by video hash
 const analysisCache = new Map<string, PlayerAnalysis>();
 
+// Type definition for the return value of analyzeFootballVideo
+export interface FootballVideoAnalysisResult {
+  analysis: PlayerAnalysis;
+  progressUpdates: (callback: (progress: number, stage: string) => void) => void;
+}
+
 // Analyze the football video with a combination of real detection and synthetic data
-export const analyzeFootballVideo = async (videoFile: File): Promise<{
-  analysis: PlayerAnalysis, 
-  progressUpdates: (callback: (progress: number, stage: string) => void) => void
-}> => {
+export const analyzeFootballVideo = async (videoFile: File): Promise<FootballVideoAnalysisResult> => {
   // Setup progress tracking variables
   let currentProgress = 0;
   let currentStage = DETAILED_STAGES[0];

@@ -65,17 +65,20 @@ export const analyzeVideo = async (
     // Set initial analysis result
     setAnalysis(result.analysis);
     
+    // Track current progress and stage
+    let currentProgress = 0;
+    let currentStage = "بدء تحليل الفيديو";
+    
     // Setup heartbeat to ensure UI progress updates
     let lastProgressUpdate = 0;
     const heartbeatInterval = window.setInterval(() => {
       // If progress hasn't changed for 30 seconds, nudge it forward slightly
       const now = Date.now();
       if (now - lastProgressUpdate > 30000 && lastProgressUpdate > 0) {
-        const currentProgress = result.getCurrentProgress();
         if (currentProgress < 95) {
           console.log("Heartbeat nudging progress forward");
           setProgress(currentProgress + 1);
-          setStage(result.getCurrentStage() + ' (مستمر...)');
+          setStage(currentStage + ' (مستمر...)');
         }
       }
     }, 15000);
@@ -84,6 +87,10 @@ export const analyzeVideo = async (
     result.progressUpdates((progress, stage) => {
       console.log(`Progress update received: ${progress}%, stage: ${stage}`);
       lastProgressUpdate = Date.now();
+      
+      // Store current progress and stage for heartbeat
+      currentProgress = progress;
+      currentStage = stage;
       
       // Always update UI with latest progress
       setProgress(progress);
