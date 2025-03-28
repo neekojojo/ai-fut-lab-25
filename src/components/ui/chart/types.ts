@@ -12,6 +12,8 @@ export interface PayloadConfig {
     light: string;
     dark: string;
   };
+  curve?: string;
+  icon?: React.ComponentType<any>;
 }
 
 export interface ChartConfig {
@@ -45,3 +47,33 @@ export const THEMES = {
     dark: '#9ca3af',
   },
 };
+
+// Utility function to get payload config from a payload item
+export function getPayloadConfigFromPayload(
+  config: ChartConfig,
+  payload: {
+    dataKey?: string;
+    name?: string;
+    color?: string;
+    value?: string;
+    type?: string;
+  },
+  dataKey: string
+): PayloadConfig | undefined {
+  // Try to find a config for the dataKey directly
+  if (config[dataKey]) return config[dataKey];
+  
+  // If not found, try with the name
+  const name = payload.name || payload.value || "";
+  if (config[name]) return config[name];
+  
+  // If still not found, return a simple config with the color from the payload
+  if (payload.color) {
+    return {
+      color: payload.color,
+      label: name,
+    };
+  }
+  
+  return undefined;
+}
