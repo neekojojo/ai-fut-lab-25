@@ -26,12 +26,12 @@ const ChartConfigAdapter: React.FC<ChartConfigAdapterProps> = ({
     return acc;
   }, {} as ChartConfig);
 
-  // Pass the adapted config to children
+  // Pass the adapted config to children using cloneElement
   return (
     <>
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
-          // Use the spread operator to merge props safely
+          // Clone the element with the new props correctly merged
           return React.cloneElement(child, {
             ...child.props,
             config: adaptedConfig

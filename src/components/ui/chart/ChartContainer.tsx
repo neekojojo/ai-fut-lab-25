@@ -29,8 +29,8 @@ export const ChartContainer = React.forwardRef<
       >
         <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer>
-          {/* Ensure children is a valid React element */}
-          {React.Children.only(children)}
+          {/* Make sure children is valid for ResponsiveContainer */}
+          {React.isValidElement(children) ? children : null}
         </RechartsPrimitive.ResponsiveContainer>
       </div>
     </ChartContext.Provider>

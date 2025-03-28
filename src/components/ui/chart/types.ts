@@ -1,40 +1,25 @@
 
-import * as React from "react";
-import { CurveType } from "recharts/types/shape/Curve";
+export interface ChartConfigItem {
+  color: string;
+  label: string;
+  icon?: React.FC<React.SVGProps<SVGSVGElement>>;
+  curve?: string;
+  theme?: string;
+}
 
-export type IconType = React.ElementType;
-
-export type ChartConfig = Record<
-  string,
-  {
-    color?: string;
-    label?: string;
-    icon?: IconType;
-    curve?: CurveType;
-    theme?: Record<string, string>;
-  }
->;
+export interface ChartConfig {
+  [key: string]: ChartConfigItem;
+}
 
 export interface ChartContextProps {
   config: ChartConfig;
 }
 
-// Helper function to get payload config from payload
 export function getPayloadConfigFromPayload(
   config: ChartConfig,
-  payload: any,
-  key: string
+  item: any,
+  fallbackKey = ""
 ) {
-  return (
-    config[key] ||
-    config[payload.dataKey || ""] ||
-    config[payload.name || ""] ||
-    config[payload.type || ""] ||
-    config.default
-  );
+  const key = item?.name || item?.dataKey || fallbackKey;
+  return config[key] as ChartConfigItem;
 }
-
-export const THEMES = {
-  light: "",
-  dark: ".dark",
-};

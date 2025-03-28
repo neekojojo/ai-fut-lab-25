@@ -8,7 +8,6 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  Cell,
 } from "recharts";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { getMaxYValue } from "./utils";
@@ -45,24 +44,27 @@ const BarChartComponent: React.FC<BarChartProps> = ({ data, config }) => {
           />
           <Tooltip content={renderTooltipContent} />
           <Legend />
-          <Bar dataKey="current" name="Current" radius={[4, 4, 0, 0]}>
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={config.current.color} />
-            ))}
-          </Bar>
+          <Bar
+            dataKey="current"
+            name="Current"
+            fill={config.current.color}
+            radius={[4, 4, 0, 0]}
+          />
           {data.some((d) => d.previous !== undefined) && (
-            <Bar dataKey="previous" name="Previous" radius={[4, 4, 0, 0]}>
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={config.previous.color} />
-              ))}
-            </Bar>
+            <Bar
+              dataKey="previous"
+              name="Previous"
+              fill={config.previous.color}
+              radius={[4, 4, 0, 0]}
+            />
           )}
           {data.some((d) => d.alternative !== undefined) && (
-            <Bar dataKey="alternative" name="Alternative" radius={[4, 4, 0, 0]}>
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={config.alternative.color} />
-              ))}
-            </Bar>
+            <Bar
+              dataKey="alternative"
+              name="Alternative"
+              fill={config.alternative.color}
+              radius={[4, 4, 0, 0]}
+            />
           )}
         </RechartsBarChart>
       </ChartContainer>

@@ -1,7 +1,20 @@
 
-import { DataPoint } from '../DataTypes';
-import { ChartConfig as UIChartConfig } from "@/components/ui/chart/types";
-import { ElementType } from 'react';
+import { ReactNode } from "react";
+
+export interface ChartConfigValue {
+  color: string;
+  label: string;
+  icon?: React.FC<React.SVGProps<SVGSVGElement>>;
+  curve?: string;
+  theme?: string;
+}
+
+export interface ChartConfigType {
+  current: ChartConfigValue;
+  previous: ChartConfigValue;
+  alternative: ChartConfigValue;
+  [key: string]: ChartConfigValue;
+}
 
 export interface NumberMovementProps {
   title: string;
@@ -15,37 +28,17 @@ export interface NumberMovementProps {
   description?: string;
 }
 
-// Define CurveType locally since it's not exported from UI library
-export type CurveType = "linear" | "monotone" | "natural" | "step" | "basis";
+export interface DataPoint {
+  name: string;
+  current: number;
+  previous?: number;
+  alternative?: number;
+  [key: string]: any;
+}
 
-// Interface for our chart config that will be adapted to UI library's format
-export interface ChartConfigType {
-  current: { 
-    color: string; 
-    label: string; 
-    icon?: ElementType; 
-    curve?: CurveType; 
-    theme?: Record<string, string>;
-  };
-  previous: { 
-    color: string; 
-    label: string; 
-    icon?: ElementType; 
-    curve?: CurveType; 
-    theme?: Record<string, string>;
-  };
-  alternative: { 
-    color: string; 
-    label: string; 
-    icon?: ElementType; 
-    curve?: CurveType; 
-    theme?: Record<string, string>;
-  };
-  [key: string]: { 
-    color: string; 
-    label: string; 
-    icon?: ElementType; 
-    curve?: CurveType; 
-    theme?: Record<string, string>;
-  };
+export interface ChartInfoProps {
+  title: string;
+  improvement?: number | string;
+  description?: string;
+  children?: ReactNode;
 }
