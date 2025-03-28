@@ -1,8 +1,9 @@
 
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
-import { AuthProvider } from "@/components/auth/AuthContext";
+import { AuthProvider, useAuth } from "@/components/auth/AuthContext";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
@@ -11,7 +12,6 @@ import ProfessionalTips from "./pages/ProfessionalTips";
 import StressManagement from "./pages/StressManagement";
 import SignIn from "./components/auth/SignIn";
 import SignUp from "./components/auth/SignUp";
-import { useAuth } from "@/components/auth/AuthContext";
 
 // Auth protection wrapper component
 const AuthRoute = ({ children }: { children: React.ReactNode }) => {
