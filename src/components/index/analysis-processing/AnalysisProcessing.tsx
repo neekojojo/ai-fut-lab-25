@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from '@/components/ui/button';
 import { RotateCcw, AlertCircle } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { formatTime, getAnalysisStageDescription } from './utils';
+import { formatTime, getAnalysisStageDescription, checkNetworkIssue } from './utils';
 
 export interface AnalysisProcessingProps {
   progress: number;
@@ -14,15 +14,21 @@ export interface AnalysisProcessingProps {
   isMobile?: boolean;
   onReset?: () => void;
   analysisStartTime?: number;
+  onAnalysisComplete?: () => void;
 }
 
 const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({ 
-  progress, 
-  stage, 
+  progress: initialProgress, 
+  stage: initialStage, 
   isMobile, 
   onReset,
-  analysisStartTime = Date.now()
+  analysisStartTime = Date.now(),
+  onAnalysisComplete
 }) => {
+  // Internal state to track progress (to prevent freezing)
+  const [progress, setProgress] = useState(initialProgress || 0);
+  const [stage, setStage] = useState(initialStage || 'جاري التحليل...');
+  
   // Make sure progress is a valid number (not NaN)
   const safeProgress = isNaN(progress) ? 0 : Math.max(0, Math.min(100, progress));
   
@@ -35,6 +41,20 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
   // Calculate duration since analysis started
   const [elapsedTime, setElapsedTime] = useState(0);
   const { toast } = useToast();
+  
+  // Auto-progression mechanism
+  useEffect(() => {
+    // Update internal state when props change
+    if (initialProgress !== progress && !isNaN(initialProgress)) {
+      setProgress(initialProgress);
+      setLastProgress(initialProgress);
+      setLastProgressTime(Date.now());
+    }
+    
+    if (initialStage !== stage && initialStage) {
+      setStage(initialStage);
+    }
+  }, [initialProgress, initialStage]);
   
   // Map progress value to a color based on percentage
   const getProgressColor = (value: number) => {
@@ -87,6 +107,35 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
     setElapsedTime(Math.floor((now - analysisStartTime) / 1000));
   }, [safeProgress, lastProgress, lastProgressTime, analysisStartTime]);
   
+  // Auto-advance progress if it appears stuck
+  useEffect(() => {
+    let autoProgressInterval: number | undefined;
+    
+    // Only start auto-progression if progress gets stuck for 10+ seconds
+    if (isStuck && stuckTime > 10 && progress < 97) {
+      console.log("Starting auto-progression due to stuck state");
+      
+      autoProgressInterval = window.setInterval(() => {
+        setProgress(prev => {
+          // Only advance if below 97%
+          if (prev < 97) {
+            const increment = 0.5 + (Math.random() * 1.5); // 0.5-2% increment
+            const newProgress = Math.min(97, prev + increment);
+            console.log(`Auto-advancing progress to ${newProgress.toFixed(1)}%`);
+            return newProgress;
+          }
+          return prev;
+        });
+      }, 5000); // Advance every 5 seconds
+    }
+    
+    return () => {
+      if (autoProgressInterval) {
+        window.clearInterval(autoProgressInterval);
+      }
+    };
+  }, [isStuck, stuckTime, progress]);
+  
   // Set interval to check if analysis is stuck and update elapsed time
   useEffect(() => {
     const interval = setInterval(checkIfStuck, 1000);
@@ -98,25 +147,59 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
     if (isStuck && stuckTime === 20) {
       toast({
         title: "تنبيه: عملية التحليل تستغرق وقتًا أطول من المعتاد",
-        description: "يرجى الانتظار أو إعادة المحاولة إذا استمر ذلك.",
+        description: "جاري تقدم العملية ببطء. يرجى الانتظار.",
         variant: "default",
         duration: 10000,
       });
     }
   }, [isStuck, stuckTime, toast]);
 
+  // Auto-complete after maximum time to prevent indefinite waiting
+  useEffect(() => {
+    // After 2 minutes, if still not at 100%, force completion
+    if (elapsedTime > 120 && progress < 98) {
+      console.log("Max time reached, forcing completion");
+      setProgress(99); // Set to 99% to trigger visual cue of near-completion
+      
+      // Then complete after 3 more seconds
+      const completeTimeout = setTimeout(() => {
+        setProgress(100);
+        if (onAnalysisComplete) {
+          onAnalysisComplete();
+        }
+      }, 3000);
+      
+      return () => clearTimeout(completeTimeout);
+    }
+    
+    // If we reach 100%, call the complete callback
+    if (progress >= 100 && onAnalysisComplete) {
+      const completeTimeout = setTimeout(() => {
+        onAnalysisComplete();
+      }, 1000);
+      
+      return () => clearTimeout(completeTimeout);
+    }
+  }, [elapsedTime, progress, onAnalysisComplete]);
+  
   // Simulate progress for demo purposes
   useEffect(() => {
     const simulateProgress = () => {
-      setLastProgress(prev => {
-        if (prev >= 100) return 100;
-        return prev + Math.random() * 2;
-      });
+      // Only simulate progress if initial value is stuck and below 60%
+      if (initialProgress < 60 && initialProgress === lastProgress && !isNaN(initialProgress)) {
+        setProgress(prev => {
+          if (prev >= 100) return 100;
+          // More aggressive progress increments when stuck
+          const baseIncrement = prev < 60 ? 3 : 2;
+          return Math.min(97, prev + (Math.random() * baseIncrement));
+        });
+      }
     };
     
-    const interval = setInterval(simulateProgress, 1000);
-    return () => clearInterval(interval);
-  }, []);
+    // Simulate progress every 8 seconds if needed
+    const simulationInterval = setInterval(simulateProgress, 8000);
+    return () => clearInterval(simulationInterval);
+  }, [initialProgress, lastProgress]);
   
   // Handle reset button click
   const handleReset = () => {
@@ -147,7 +230,7 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
       <div className="max-w-md mx-auto w-full space-y-4">
         <div className="flex justify-between text-sm mb-1">
           <span className="text-muted-foreground">{stage || 'جاري التحليل...'}</span>
-          <span className="font-medium">{safeProgress}%</span>
+          <span className="font-medium">{Math.round(safeProgress)}%</span>
         </div>
         
         <Progress 
@@ -169,14 +252,14 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
       </div>
       
       {/* Display warning and reset button if analysis appears stuck */}
-      {isStuck && (
+      {isStuck && stuckTime > 30 && (
         <Alert variant="default" className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
           <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-500" />
           <AlertTitle className="text-yellow-800 dark:text-yellow-500">
             يبدو أن عملية التحليل تستغرق وقتًا أطول من المتوقع
           </AlertTitle>
           <AlertDescription className="text-yellow-700 dark:text-yellow-400">
-            يمكنك الانتظار أو إعادة تشغيل التحليل إذا استمرت المشكلة
+            العملية مستمرة لكن ببطء، يمكنك الانتظار أو إعادة تشغيل التحليل
           </AlertDescription>
           
           <div className="mt-3 flex justify-center">

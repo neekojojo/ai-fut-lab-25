@@ -12,25 +12,22 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ progress, stage }) 
   
   // Define more detailed substages for analysis
   const getSubstage = () => {
-    if (stage.includes("movements")) {
+    if (stage.includes("movements") || stage.includes("حركة")) {
       return "Tracking player positioning and movement patterns";
-    } else if (stage.includes("technical")) {
+    } else if (stage.includes("technical") || stage.includes("فنية") || stage.includes("مهارات")) {
       return "Analyzing dribbling, passing accuracy and shooting technique";
-    } else if (stage.includes("tactical")) {
+    } else if (stage.includes("tactical") || stage.includes("تكتيكية")) {
       return "Evaluating decision making and positional awareness";
-    } else if (stage.includes("physical")) {
+    } else if (stage.includes("physical") || stage.includes("بدنية")) {
       return "Measuring speed, endurance and strength indicators";
-    } else if (stage.includes("market")) {
+    } else if (stage.includes("market") || stage.includes("مقارنة")) {
       return "Comparing with professional player database";
-    } else if (stage.includes("report")) {
+    } else if (stage.includes("report") || stage.includes("تقرير")) {
       return "Creating personalized improvement recommendations";
     } else {
       return "Processing video frames using neural network analysis";
     }
   };
-
-  // إضافة سجلات للتصحيح
-  console.log("Loading Animation - Progress:", safeProgress, "Stage:", stage);
 
   return (
     <div className="flex flex-col items-center justify-center space-y-6 py-12 animate-fade-in">
@@ -55,7 +52,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ progress, stage }) 
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-2xl font-medium">{safeProgress}%</span>
+          <span className="text-2xl font-medium">{Math.round(safeProgress)}%</span>
         </div>
       </div>
       

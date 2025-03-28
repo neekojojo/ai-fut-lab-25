@@ -15,6 +15,8 @@ export interface FileWithPreview extends File {
 const IndexContent: React.FC = () => {
   const [videoFile, setVideoFile] = useState<FileWithPreview | null>(null);
   const [analysisStarted, setAnalysisStarted] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [analysisStage, setAnalysisStage] = useState('بدء تحليل الفيديو');
   const { toast } = useToast();
 
   const handleFileSelected = (file: FileWithPreview) => {
@@ -24,24 +26,83 @@ const IndexContent: React.FC = () => {
   const handleStartAnalysis = () => {
     if (!videoFile) {
       toast({
-        title: "No video selected",
-        description: "Please upload a video file to continue",
+        title: "لم يتم اختيار فيديو",
+        description: "الرجاء تحميل ملف فيديو للمتابعة",
         variant: "destructive",
       });
       return;
     }
 
     setAnalysisStarted(true);
+    setAnalysisProgress(5); // Start at 5% instead of 0%
+    setAnalysisStage('بدء تحليل الفيديو');
+    
     toast({
-      title: "Analysis started",
-      description: "Your football video is being analyzed",
+      title: "بدأ التحليل",
+      description: "جاري تحليل فيديو كرة القدم الخاص بك",
     });
+    
+    // Simulate progressive updates for better UX
+    simulateAnalysisProgress();
+  };
+
+  const simulateAnalysisProgress = () => {
+    // Set up multiple intervals to create a more natural progression pattern
+    const initialInterval = setInterval(() => {
+      setAnalysisProgress(prev => {
+        const newValue = prev + (Math.random() * 2 + 1); // 1-3% increment
+        if (newValue >= 30) {
+          clearInterval(initialInterval);
+          setAnalysisStage('استخراج معلومات اللاعب');
+          return 30;
+        }
+        return newValue;
+      });
+    }, 3000);
+    
+    // Second phase of analysis
+    setTimeout(() => {
+      const secondInterval = setInterval(() => {
+        setAnalysisProgress(prev => {
+          const newValue = prev + (Math.random() * 1.5 + 0.5); // 0.5-2% increment
+          if (newValue >= 60) {
+            clearInterval(secondInterval);
+            setAnalysisStage('تحليل المهارات والحركة');
+            return 60;
+          }
+          return newValue;
+        });
+      }, 4000);
+      
+      // Third phase
+      setTimeout(() => {
+        const thirdInterval = setInterval(() => {
+          setAnalysisProgress(prev => {
+            const newValue = prev + (Math.random() * 1 + 0.2); // 0.2-1.2% increment
+            if (newValue >= 85) {
+              clearInterval(thirdInterval);
+              setAnalysisStage('إنشاء تقرير التحليل');
+              return 85;
+            }
+            return newValue;
+          });
+        }, 5000);
+        
+        // Ensure we complete the analysis
+        setTimeout(() => {
+          setAnalysisProgress(100);
+          setAnalysisStage('اكتمل التحليل');
+        }, 45000); // Ensure completion after ~45 seconds regardless
+        
+      }, 40000); // Start third phase after ~40 seconds
+      
+    }, 20000); // Start second phase after ~20 seconds
   };
 
   const handleAnalysisComplete = () => {
     toast({
-      title: "Analysis complete",
-      description: "Your football video analysis is ready",
+      title: "اكتمل التحليل",
+      description: "تحليل فيديو كرة القدم الخاص بك جاهز",
     });
     window.location.href = '/dashboard';
   };
@@ -49,16 +110,17 @@ const IndexContent: React.FC = () => {
   const handleResetAnalysis = () => {
     setVideoFile(null);
     setAnalysisStarted(false);
+    setAnalysisProgress(0);
   };
 
   if (analysisStarted) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        {/* Use the proper props for AnalysisProcessing component */}
         <AnalysisProcessing 
-          progress={50} 
-          stage="Processing video" 
+          progress={analysisProgress} 
+          stage={analysisStage} 
           onReset={handleResetAnalysis}
+          onAnalysisComplete={handleAnalysisComplete}
         />
       </div>
     );
@@ -70,20 +132,19 @@ const IndexContent: React.FC = () => {
       <div className="space-y-8 md:space-y-12">
         <div className="max-w-3xl mx-auto text-center space-y-3 md:space-y-4 animate-fade-in">
           <div className="inline-block px-3 py-1 text-xs font-medium bg-secondary text-secondary-foreground rounded-full">
-            AI-Powered Analysis
+            تحليل بالذكاء الاصطناعي
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
             FUT LAB Analyzer
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            <span className="text-primary font-semibold">AI-powered</span> football talent assessment and development platform
+            <span className="text-primary font-semibold">تحليل</span> أداء لاعبي كرة القدم وتقييم المواهب بالذكاء الاصطناعي
           </p>
         </div>
       </div>
       
       {!videoFile ? (
         <>
-          {/* Fix VideoUpload props to match component definition */}
           <VideoUpload onUpload={handleFileSelected} />
           
           <div className="mt-12">
@@ -127,7 +188,6 @@ const IndexContent: React.FC = () => {
           </div>
         </>
       ) : (
-        /* Fix AnalysisOptions props */
         <AnalysisOptions
           videoFile={videoFile}
           onSelectModel={() => {}}
