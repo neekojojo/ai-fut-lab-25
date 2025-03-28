@@ -3,6 +3,7 @@ import React from 'react';
 import { User } from '@supabase/supabase-js';
 import VideoUpload from '@/components/VideoUpload';
 import { FeaturesGrid } from '@/components/landing/FeaturesGrid';
+import PlatformSummary from '@/components/landing/PlatformSummary';
 
 interface HeroContentProps {
   user: User | null;
@@ -30,9 +31,11 @@ const HeroContent: React.FC<HeroContentProps> = ({
             FootballAI Analyzer
           </h1>
           <p className={`${isMobile ? 'text-base' : 'text-lg'} text-muted-foreground max-w-2xl mx-auto`}>
-            <span className="text-primary font-semibold">AI-powered</span> football talent assessment
+            <span className="text-primary font-semibold">AI-powered</span> football talent assessment and development platform
           </p>
         </div>
+        
+        <PlatformSummary isMobile={isMobile} />
         
         <div className={`flex ${isMobile ? 'flex-col' : 'flex-col md:flex-row'} gap-4 justify-center`}>
           <VideoUpload onUpload={onVideoUpload} />

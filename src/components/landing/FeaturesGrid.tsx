@@ -10,7 +10,7 @@ export const FeaturesGrid: React.FC<FeaturesGridProps> = ({ isMobile }) => {
     <div className={`grid grid-cols-1 ${isMobile ? 'gap-6' : 'md:grid-cols-3 gap-8'} max-w-4xl mx-auto animate-slide-up`}>
       <FeatureCard 
         title="Technical Analysis"
-        description="Our AI evaluates passing, shooting, dribbling, and other technical skills with precision."
+        description="Our AI evaluates passing accuracy, shooting power, dribbling skills, and positioning with professional precision."
         icon={
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -31,7 +31,7 @@ export const FeaturesGrid: React.FC<FeaturesGridProps> = ({ isMobile }) => {
       
       <FeatureCard 
         title="Market Valuation"
-        description="Get an accurate estimate of a player's market value based on performance metrics."
+        description="Get accurate player market value estimates based on comprehensive performance metrics and global player comparisons."
         icon={
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -54,7 +54,7 @@ export const FeaturesGrid: React.FC<FeaturesGridProps> = ({ isMobile }) => {
       
       <FeatureCard 
         title="Detailed Reporting"
-        description="Receive comprehensive reports with actionable insights for player improvement."
+        description="Receive comprehensive data-driven reports with actionable insights for player development and recruitment decisions."
         icon={
           <svg
             xmlns="http://www.w3.org/2000/svg"
