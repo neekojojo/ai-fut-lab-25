@@ -28,7 +28,7 @@ const HeroContent: React.FC<HeroContentProps> = ({
             AI-Powered Analysis
           </div>
           <h1 className={`${isMobile ? 'text-3xl' : 'text-4xl md:text-5xl'} font-bold tracking-tight`}>
-            FootballAI Analyzer
+            FUT LAB Analyzer
           </h1>
           <p className={`${isMobile ? 'text-base' : 'text-lg'} text-muted-foreground max-w-2xl mx-auto`}>
             <span className="text-primary font-semibold">AI-powered</span> football talent assessment and development platform

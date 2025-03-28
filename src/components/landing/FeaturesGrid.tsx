@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { DollarSign } from 'lucide-react';
+import { LineChart, Book } from 'lucide-react';
 
 interface FeaturesGridProps {
   isMobile?: boolean;
@@ -52,9 +52,9 @@ export const FeaturesGrid: React.FC<FeaturesGridProps> = ({ isMobile }) => {
       />
 
       <FeatureCard 
-        title="Market Valuation"
-        description="AI-powered market value prediction based on comprehensive performance metrics and comparison with similar players."
-        icon={<DollarSign className="w-6 h-6 text-primary" />}
+        title="Skills Development"
+        description="AI-powered training recommendations to help players improve their skills and reach their full potential."
+        icon={<Book className="w-6 h-6 text-primary" />}
         isMobile={isMobile}
       />
     </div>

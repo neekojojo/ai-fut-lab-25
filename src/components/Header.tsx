@@ -50,7 +50,7 @@ const Header = () => {
       <div className="container mx-auto flex justify-between items-center p-4">
         <div className="flex items-center">
           <Link to="/" className="font-bold text-xl">
-            FootballAI
+            FUT LAB
           </Link>
         </div>
 
