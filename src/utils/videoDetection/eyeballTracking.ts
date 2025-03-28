@@ -1,312 +1,209 @@
 
-import { detectPeopleInVideo } from './detectionService';
 import type { DetectionResult } from './types';
 
 /**
- * واجهة لبيانات تتبع حركة العين
+ * نمط البيانات لنتائج تتبع حركة العين
  */
 export interface EyeTrackingData {
+  frameNumber: number;
   timestamp: number;
   leftEye: {
     x: number;
     y: number;
     confidence: number;
-    openness: number; // 0-1 مقياس لمدى فتح العين
-    direction: string; // اتجاه النظر: "forward", "left", "right", "up", "down"
+    direction: number;
+    gazeDuration: number;
   };
   rightEye: {
     x: number;
     y: number;
     confidence: number;
-    openness: number;
-    direction: string;
+    direction: number;
+    gazeDuration: number;
   };
-  gazeDirection: {
-    x: number; // اتجاه النظر بالدرجات
-    y: number;
-    confidence: number;
-  };
-  focusPoint: {
-    x: number; // نقطة التركيز المتوقعة في الملعب
-    y: number;
-    confidence: number;
-    durationMs: number; // مدة التركيز
-  };
+  gazeDirection: number; // زاوية اتجاه النظر (بالدرجات)
+  gazeTarget: string;   // ما ينظر إليه ('ball', 'player', 'space', 'goal', etc.)
+  anticipationScore: number; // درجة توقع تطورات اللعب (0-100)
+  scanningFrequency: number; // عدد مرات مسح الملعب
+  decisionTime: number;      // الوقت (بالمللي ثانية) لاتخاذ القرار
 }
 
 /**
- * واجهة لنتائج تحليل حركة العين
+ * نمط البيانات لتحليل حركة العين
  */
 export interface EyeTrackingAnalysis {
-  averageReactionTimeMs: number; // متوسط وقت رد الفعل
-  fieldAwarenessScore: number; // 0-100 درجة الوعي بالملعب
-  decisionSpeed: number; // 0-100 سرعة اتخاذ القرار
-  anticipationScore: number; // 0-100 القدرة على التوقع
-  visionCoverage: number; // 0-100 مدى تغطية الرؤية للملعب
-  focusDurations: number[]; // مدة التركيز في نقاط مختلفة
-  scanningPatterns: {
-    efficiency: number; // 0-100 كفاءة أنماط المسح
-    frequency: number; // عدد مرات مسح الملعب في الدقيقة
-    coverage: number; // نسبة تغطية الملعب
+  trackingData: EyeTrackingData[];
+  summary: {
+    averageGazeDuration: number;  // متوسط مدة النظر في نقطة واحدة
+    scanningFrequency: number;    // معدل مسح الملعب
+    reactionTime: number;         // سرعة رد الفعل (بالمللي ثانية)
+    decisionSpeed: number;        // سرعة اتخاذ القرار (0-100)
+    visualAwareness: number;      // الوعي البصري (0-100)
+    fieldAwarenessScore: number;  // درجة الوعي بالملعب (0-100)
+    anticipationScore: number;    // درجة التوقع (0-100)
   };
-  trackingData: EyeTrackingData[]; // بيانات التتبع الأصلية
+  patterns: {
+    name: string;      // اسم النمط
+    description: string; // وصف النمط
+    frequency: number;   // تكرار حدوث النمط
+    significance: number; // أهمية النمط (0-100)
+  }[];
+  insights: string[];  // استنتاجات من تحليل حركة العين
 }
 
-// Cache لتخزين نتائج التحليل السابقة
-const analysisCache = new Map<string, EyeTrackingAnalysis>();
-
 /**
- * دالة لتتبع حركة العين في الفيديو وتحليل نمط النظر
- * @param videoFile ملف الفيديو للتحليل
+ * تحليل حركة العين في فيديو
+ * نستخدم بيانات اكتشاف اللاعبين لتحديد مناطق العين ومتابعة حركتها
  */
 export const analyzeEyeMovement = async (
   videoFile: File,
   detectionResult?: DetectionResult
 ): Promise<EyeTrackingAnalysis> => {
-  // التحقق من وجود نتائج سابقة في الـ cache
-  const fileId = `${videoFile.name}-${videoFile.size}`;
-  if (analysisCache.has(fileId)) {
-    console.log('Using cached eye tracking analysis');
-    return analysisCache.get(fileId)!;
-  }
-
-  // الحصول على نتائج اكتشاف الوجه واللاعب إذا لم تكن متوفرة
-  const detection = detectionResult || await detectPeopleInVideo(videoFile);
+  // في نسخة الإنتاج، سنستخدم نموذج حقيقي للتعرف على حركة العين
+  // حالياً، نعود ببيانات وهمية لأغراض العرض
   
-  // بيانات تتبع حركة العين (محاكاة)
+  // إنشاء بيانات وهمية عشوائية لتتبع حركة العين
   const trackingData: EyeTrackingData[] = [];
+  const frameDuration = 33.33; // ~30fps
+  const frameCount = 150; // ~5 seconds
   
-  // محاكاة لنتائج تتبع العين باستخدام بيانات الوجه من تحليل الفيديو
-  if (detection.playerPositions && detection.playerPositions.length > 0) {
-    for (const position of detection.playerPositions) {
-      if (position.keypoints) {
-        // البحث عن نقاط العين في البيانات المكتشفة
-        const leftEye = position.keypoints.find(kp => kp.part === 'left_eye');
-        const rightEye = position.keypoints.find(kp => kp.part === 'right_eye');
-        const nose = position.keypoints.find(kp => kp.part === 'nose');
-        
-        if (leftEye && rightEye && nose) {
-          // إنشاء بيانات تتبع العين بناءً على نقاط الوجه المكتشفة
-          // في التطبيق الحقيقي، سيتم استخدام خوارزميات أكثر تطوراً للكشف عن اتجاه النظر
-          
-          // محاكاة اتجاه النظر باستخدام العلاقة بين موضع الأنف والعينين
-          const eyeCenterX = (leftEye.x + rightEye.x) / 2;
-          const eyeCenterY = (leftEye.y + rightEye.y) / 2;
-          const eyeToNoseX = nose.x - eyeCenterX;
-          const eyeToNoseY = nose.y - eyeCenterY;
-          
-          // تحديد اتجاه النظر بناءً على موضع الأنف بالنسبة لمركز العينين
-          const direction = getEyeDirection(eyeToNoseX, eyeToNoseY);
-          
-          // محاكاة نقطة التركيز في الملعب
-          const focusX = 50 + Math.sin(position.timestamp / 500) * 30; // محاكاة لحركة العين في الملعب
-          const focusY = 50 + Math.cos(position.timestamp / 700) * 20;
-          
-          // محاكاة مدة التركيز
-          const focusDuration = 200 + Math.random() * 500; // 200-700ms
-          
-          trackingData.push({
-            timestamp: position.timestamp,
-            leftEye: {
-              x: leftEye.x,
-              y: leftEye.y,
-              confidence: leftEye.confidence || 0.7,
-              openness: 0.7 + Math.random() * 0.3, // محاكاة لفتح العين
-              direction: direction
-            },
-            rightEye: {
-              x: rightEye.x,
-              y: rightEye.y,
-              confidence: rightEye.confidence || 0.7,
-              openness: 0.7 + Math.random() * 0.3,
-              direction: direction
-            },
-            gazeDirection: {
-              x: eyeToNoseX,
-              y: eyeToNoseY,
-              confidence: (leftEye.confidence + rightEye.confidence) / 2 || 0.7
-            },
-            focusPoint: {
-              x: focusX,
-              y: focusY,
-              confidence: 0.6 + Math.random() * 0.3,
-              durationMs: focusDuration
-            }
-          });
-        }
-      }
+  for (let i = 0; i < frameCount; i++) {
+    // قيم عشوائية مع بعض النمط للحفاظ على الواقعية
+    const timestamp = i * frameDuration;
+    const gazeDirection = 45 + (Math.sin(i / 15) * 30) + (Math.random() * 10 - 5);
+    const gazeDuration = 200 + Math.sin(i / 20) * 100 + (Math.random() * 50);
+    const targets = ['ball', 'player', 'space', 'goal', 'teammate'];
+    const gazeTarget = targets[Math.floor(Math.sin(i / 10) * 2 + 2.5)];
+    
+    // قيم مختلفة قليلاً للعينين لواقعية أكبر
+    trackingData.push({
+      frameNumber: i,
+      timestamp,
+      leftEye: {
+        x: 100 + Math.sin(i / 10) * 5 + (Math.random() * 2 - 1),
+        y: 100 + Math.cos(i / 12) * 5 + (Math.random() * 2 - 1),
+        confidence: 0.8 + (Math.random() * 0.15),
+        direction: gazeDirection - 1 + (Math.random() * 2 - 1),
+        gazeDuration
+      },
+      rightEye: {
+        x: 110 + Math.sin(i / 10) * 5 + (Math.random() * 2 - 1),
+        y: 100 + Math.cos(i / 12) * 5 + (Math.random() * 2 - 1),
+        confidence: 0.8 + (Math.random() * 0.15),
+        direction: gazeDirection + 1 + (Math.random() * 2 - 1),
+        gazeDuration
+      },
+      gazeDirection,
+      gazeTarget,
+      anticipationScore: 60 + Math.sin(i / 30) * 20 + (Math.random() * 10 - 5),
+      scanningFrequency: 3 + Math.sin(i / 40) * 2,
+      decisionTime: 250 + Math.cos(i / 15) * 100 + (Math.random() * 50 - 25)
+    });
+  }
+  
+  // حساب متوسطات التحليل
+  const averageGazeDuration = trackingData.reduce((sum, data) => 
+    sum + (data.leftEye.gazeDuration + data.rightEye.gazeDuration) / 2, 0) / trackingData.length;
+  
+  const scanningFrequency = trackingData.reduce((sum, data) => 
+    sum + data.scanningFrequency, 0) / trackingData.length;
+    
+  const decisionSpeed = calculateDecisionSpeed(trackingData);
+  const visualAwareness = calculateVisualAwareness(trackingData);
+  const fieldAwarenessScore = calculateFieldAwarenessScore(trackingData);
+  const anticipationScore = trackingData.reduce((sum, data) => 
+    sum + data.anticipationScore, 0) / trackingData.length;
+  
+  // تحليل أنماط النظر
+  const patterns = [
+    {
+      name: "مسح سريع للملعب",
+      description: "يقوم اللاعب بمسح سريع للملعب قبل استلام الكرة لمعرفة موقع زملائه",
+      frequency: 85,
+      significance: 90
+    },
+    {
+      name: "التركيز على المساحات",
+      description: "يركز اللاعب على المساحات الفارغة أكثر من التركيز على اللاعبين مباشرة",
+      frequency: 70,
+      significance: 85
+    },
+    {
+      name: "توقع حركة الخصم",
+      description: "ينظر اللاعب إلى اتجاه تحرك المدافعين قبل اتخاذ القرار",
+      frequency: 65,
+      significance: 75
     }
-  }
+  ];
   
-  // دالة مساعدة لتحديد اتجاه النظر
-  function getEyeDirection(x: number, y: number): string {
-    const angle = Math.atan2(y, x) * (180 / Math.PI);
-    if (angle > -45 && angle < 45) return "right";
-    if (angle >= 45 && angle < 135) return "down";
-    if (angle >= 135 || angle < -135) return "left";
-    return "up";
-  }
+  // استنتاجات من تحليل حركة العين
+  const insights = [
+    "يتمتع اللاعب بوعي عالٍ بالمساحات المتاحة في الملعب",
+    "سرعة مسح الملعب تشير إلى قدرة جيدة على القراءة التكتيكية",
+    "يميل اللاعب إلى التركيز أكثر على المساحات بدلاً من اللاعبين، مما يدل على تفكير استراتيجي متقدم"
+  ];
   
-  // تحليل البيانات المجمعة
-  const analysis = analyzeEyeTrackingData(trackingData);
-  
-  // تخزين النتائج في الـ cache
-  analysisCache.set(fileId, analysis);
-  
-  return analysis;
+  return {
+    trackingData,
+    summary: {
+      averageGazeDuration,
+      scanningFrequency,
+      reactionTime: 280, // قيمة عشوائية واقعية
+      decisionSpeed,
+      visualAwareness,
+      fieldAwarenessScore,
+      anticipationScore
+    },
+    patterns,
+    insights
+  };
 };
 
 /**
- * تحليل بيانات تتبع العين وتقدير مؤشرات الذكاء التكتيكي
+ * حساب سرعة اتخاذ القرار بناءً على بيانات تتبع العين
  */
-function analyzeEyeTrackingData(trackingData: EyeTrackingData[]): EyeTrackingAnalysis {
-  // التأكد من وجود بيانات كافية للتحليل
-  if (trackingData.length < 5) {
-    return createDefaultAnalysis(trackingData);
-  }
+const calculateDecisionSpeed = (trackingData: EyeTrackingData[]): number => {
+  const avgDecisionTime = trackingData.reduce((sum, data) => sum + data.decisionTime, 0) / trackingData.length;
+  // تحويل الوقت إلى درجة من 0-100 (أقل وقت = درجة أعلى)
+  // نفترض أن 100ms هو الحد الأدنى و600ms هو الحد الأقصى
+  return Math.max(0, Math.min(100, 100 - ((avgDecisionTime - 100) / 500) * 100));
+};
 
-  // حساب متوسط وقت رد الفعل (محاكاة)
-  // في التطبيق الحقيقي، سيتم قياس المدة بين تغير الموقف وتغير اتجاه النظر
-  const reactionTimes = [];
+/**
+ * حساب الوعي البصري بناءً على التنوع في اتجاهات النظر والأهداف
+ */
+const calculateVisualAwareness = (trackingData: EyeTrackingData[]): number => {
+  // نحسب تنوع الأهداف التي ينظر إليها
+  const uniqueTargets = new Set(trackingData.map(data => data.gazeTarget)).size;
+  // نحسب تغير زاوية النظر
+  let directionChanges = 0;
   for (let i = 1; i < trackingData.length; i++) {
-    if (trackingData[i].gazeDirection.x !== trackingData[i-1].gazeDirection.x) {
-      reactionTimes.push(
-        trackingData[i].timestamp - trackingData[i-1].timestamp
-      );
+    const diff = Math.abs(trackingData[i].gazeDirection - trackingData[i-1].gazeDirection);
+    if (diff > 20) { // تغيير كبير في الاتجاه
+      directionChanges++;
     }
   }
   
-  const averageReactionTimeMs = reactionTimes.length > 0 
-    ? reactionTimes.reduce((sum, time) => sum + time, 0) / reactionTimes.length 
-    : 300; // قيمة افتراضية
+  // نحسب الدرجة بناءً على تنوع الأهداف وتغييرات الاتجاه
+  const targetScore = (uniqueTargets / 5) * 50; // 5 هو العدد الأقصى المفترض للأهداف المختلفة
+  const changeScore = Math.min(50, (directionChanges / trackingData.length) * 200);
   
-  // حساب متوسط مدة التركيز
-  const focusDurations = trackingData.map(data => data.focusPoint.durationMs);
-  
-  // حساب عدد مرات تغيير التركيز في الدقيقة
-  const totalTrackingTimeMs = trackingData[trackingData.length-1].timestamp - trackingData[0].timestamp;
-  const totalFocusShifts = trackingData.length - 1;
-  const focusShiftsPerMinute = (totalFocusShifts / totalTrackingTimeMs) * 60000;
-  
-  // تقدير كفاءة أنماط المسح
-  // يعتمد على تنوع نقاط التركيز وتغطية مساحة الملعب
-  const uniqueAreas = new Set<string>();
-  trackingData.forEach(data => {
-    // تقسيم الملعب إلى شبكة 10×10
-    const gridX = Math.floor(data.focusPoint.x / 10);
-    const gridY = Math.floor(data.focusPoint.y / 10);
-    uniqueAreas.add(`${gridX},${gridY}`);
-  });
-  
-  // نسبة تغطية الملعب (100 منطقة محتملة في شبكة 10×10)
-  const fieldCoverage = uniqueAreas.size / 100;
-  
-  // حساب درجة الوعي بالملعب (بناءً على تغطية الملعب وعدد مرات تغيير التركيز)
-  const fieldAwarenessScore = Math.min(100, 
-    (fieldCoverage * 50) + (Math.min(60, focusShiftsPerMinute) / 60 * 50)
-  );
-  
-  // تقدير سرعة اتخاذ القرار
-  // أوقات رد فعل أقصر = درجة أعلى
-  const decisionSpeed = Math.max(30, Math.min(100, 
-    100 - (averageReactionTimeMs / 10)
-  ));
-  
-  // تقدير القدرة على التوقع
-  // يعتمد على نسبة نقاط التركيز عالية الثقة وسرعة الاستجابة
-  const highConfidenceFocus = trackingData.filter(
-    data => data.focusPoint.confidence > 0.8
-  ).length / trackingData.length;
-  
-  const anticipationScore = Math.min(100,
-    (highConfidenceFocus * 50) + (decisionSpeed * 0.5)
-  );
-  
-  // تجميع التحليل النهائي
-  return {
-    averageReactionTimeMs,
-    fieldAwarenessScore,
-    decisionSpeed,
-    anticipationScore,
-    visionCoverage: fieldCoverage * 100,
-    focusDurations,
-    scanningPatterns: {
-      efficiency: fieldAwarenessScore,
-      frequency: focusShiftsPerMinute,
-      coverage: fieldCoverage * 100
-    },
-    trackingData
-  };
-}
-
-/**
- * إنشاء تحليل افتراضي عندما لا توجد بيانات كافية
- */
-function createDefaultAnalysis(trackingData: EyeTrackingData[]): EyeTrackingAnalysis {
-  return {
-    averageReactionTimeMs: 350,
-    fieldAwarenessScore: 75,
-    decisionSpeed: 70,
-    anticipationScore: 68,
-    visionCoverage: 65,
-    focusDurations: trackingData.map(() => 400 + Math.random() * 300),
-    scanningPatterns: {
-      efficiency: 72,
-      frequency: 35,
-      coverage: 60
-    },
-    trackingData
-  };
-}
-
-/**
- * دالة لتحويل نتائج تحليل حركة العين إلى اقتراحات للتطوير
- */
-export const generateEyeTrackingInsights = (analysis: EyeTrackingAnalysis): string[] => {
-  const insights: string[] = [];
-  
-  // إضافة رؤى وتوصيات بناءً على نتائج التحليل
-  if (analysis.fieldAwarenessScore < 60) {
-    insights.push("الحاجة إلى تحسين الوعي بالملعب من خلال تمارين المسح البصري المنتظم");
-  } else if (analysis.fieldAwarenessScore > 85) {
-    insights.push("مستوى ممتاز من الوعي بالملعب والقدرة على مسح المساحات");
-  }
-  
-  if (analysis.decisionSpeed < 65) {
-    insights.push("العمل على تحسين سرعة اتخاذ القرار من خلال تمارين محاكاة المواقف التكتيكية");
-  } else if (analysis.decisionSpeed > 90) {
-    insights.push("سرعة استثنائية في اتخاذ القرارات تشير إلى ذكاء تكتيكي عالي");
-  }
-  
-  if (analysis.anticipationScore < 70) {
-    insights.push("تطوير القدرة على توقع تحركات اللاعبين من خلال دراسة أنماط اللعب");
-  } else if (analysis.anticipationScore > 85) {
-    insights.push("قدرة ممتازة على توقع تطورات اللعب واستباق الخصم");
-  }
-  
-  if (analysis.scanningPatterns.frequency < 30) {
-    insights.push("زيادة تكرار عمليات مسح الملعب لتحسين الوعي التكتيكي");
-  } else if (analysis.scanningPatterns.frequency > 50) {
-    insights.push("تكرار ممتاز لعمليات مسح الملعب يعزز من الوعي التكتيكي");
-  }
-  
-  // إضافة توصية عامة دائمًا
-  insights.push("استمر في تطوير مهارات القراءة البصرية للملعب من خلال تمارين خاصة بتتبع الكرة وتحركات اللاعبين");
-  
-  return insights;
+  return targetScore + changeScore;
 };
 
 /**
- * تقدير درجة الموهبة بناءً على تحليل حركة العين
+ * حساب درجة الوعي بالملعب بناءً على تكرار المسح وتنوع اتجاهات النظر
  */
-export const estimateTalentFromEyeTracking = (analysis: EyeTrackingAnalysis): number => {
-  // حساب درجة الموهبة من 0-100 بناءً على مؤشرات تحليل حركة العين
-  const talentScore = (
-    analysis.fieldAwarenessScore * 0.3 +
-    analysis.decisionSpeed * 0.3 +
-    analysis.anticipationScore * 0.25 +
-    analysis.scanningPatterns.efficiency * 0.15
-  );
+const calculateFieldAwarenessScore = (trackingData: EyeTrackingData[]): number => {
+  const avgScanningFreq = trackingData.reduce((sum, data) => sum + data.scanningFrequency, 0) / trackingData.length;
   
-  return Math.round(talentScore);
+  // نحسب تنوع اتجاهات النظر (كلما زاد التنوع، زادت درجة الوعي بالملعب)
+  const directions = trackingData.map(data => Math.floor(data.gazeDirection / 30) * 30); // تقريب لأقرب 30 درجة
+  const uniqueDirections = new Set(directions).size;
+  
+  // نحسب الدرجة النهائية
+  const scanScore = Math.min(50, avgScanningFreq * 10); // 5 مسحات في الثانية تعطي 50 نقطة
+  const directionScore = (uniqueDirections / 12) * 50; // 12 اتجاه مختلف (كل 30 درجة) يعطي 50 نقطة
+  
+  return scanScore + directionScore;
 };
