@@ -9,7 +9,16 @@ import ClubCompatibilityPanel from './ClubCompatibilityPanel';
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 
-const AnalysisContent = ({ 
+interface AnalysisContentProps {
+  activeTab: string;
+  playerStats: any;
+  mockAnalysis: { analysis: any };
+  trainingRecommendations: any;
+  playerComparison: any[];
+  onViewAdvanced: () => void;
+}
+
+const AnalysisContent: React.FC<AnalysisContentProps> = ({ 
   activeTab, 
   playerStats, 
   mockAnalysis, 
