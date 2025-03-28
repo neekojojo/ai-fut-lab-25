@@ -4,7 +4,11 @@ import {
   identifyPlayerFromKaggle, 
   identifyTeamFromKaggle, 
   getCombinedPlayerIdentification,
-  getCombinedTeamIdentification
+  getCombinedTeamIdentification,
+  getSportsVideoAnalysisDataByPlayerId,
+  getSportsVideoAnalysisByPlayerName,
+  getSportsVideoAnalysisByTeam,
+  analyzePlayerMovementFromVideoData
 } from './kaggleDataImport';
 
 /**
@@ -167,6 +171,21 @@ export interface IdentifiedTeam {
 }
 
 /**
+ * نوع البيانات الذي يمثل تحليل بيانات الفيديو الرياضي
+ */
+export interface VideoAnalysisResult {
+  playerId: string;
+  playerName: string;
+  teamName: string;
+  movement: {
+    avgSpeed: number;
+    successRate: number;
+    confidenceScore: number;
+  };
+  events: { type: string; count: number }[];
+}
+
+/**
  * دالة تعمل على تحليل نتائج تتبع حركة اللاعب لمحاولة التعرف على هوية اللاعب
  * بناءً على أنماط الحركة والخصائص الجسدية
  * 
@@ -246,4 +265,54 @@ export const getEnhancedPlayerIdentification = (result: DetectionResult): Identi
  */
 export const getEnhancedTeamIdentification = (result: DetectionResult): IdentifiedTeam[] => {
   return getCombinedTeamIdentification(result);
+};
+
+/**
+ * دالة تحلل بيانات حركة اللاعب من مجموعات بيانات تحليل الفيديو
+ */
+export const analyzePlayerFromVideoDatasets = (playerId: string): VideoAnalysisResult | null => {
+  const playerData = getSportsVideoAnalysisDataByPlayerId(playerId);
+  
+  if (playerData.length === 0) {
+    return null;
+  }
+  
+  const analysis = analyzePlayerMovementFromVideoData(playerId);
+  const firstPlayerData = playerData[0];
+  
+  return {
+    playerId: firstPlayerData.player_id,
+    playerName: firstPlayerData.player_name,
+    teamName: firstPlayerData.team_name,
+    movement: {
+      avgSpeed: analysis.avgSpeed,
+      successRate: analysis.successRate,
+      confidenceScore: analysis.confidenceScore
+    },
+    events: analysis.events
+  };
+};
+
+/**
+ * دالة للبحث عن بيانات تحليل الفيديو حسب اسم اللاعب
+ */
+export const findVideoAnalysisByPlayerName = (playerName: string): VideoAnalysisResult[] => {
+  const playerDataList = getSportsVideoAnalysisByPlayerName(playerName);
+  const uniquePlayerIds = [...new Set(playerDataList.map(data => data.player_id))];
+  
+  return uniquePlayerIds
+    .map(playerId => analyzePlayerFromVideoDatasets(playerId))
+    .filter((result): result is VideoAnalysisResult => result !== null);
+};
+
+/**
+ * دالة للبحث عن بيانات تحليل الفيديو حسب اسم الفريق
+ */
+export const findVideoAnalysisByTeamName = (teamName: string): VideoAnalysisResult[] => {
+  const teamDataList = getSportsVideoAnalysisByTeam(teamName);
+  const uniquePlayerIds = [...new Set(teamDataList.map(data => data.player_id))];
+  
+  return uniquePlayerIds
+    .map(playerId => analyzePlayerFromVideoDatasets(playerId))
+    .filter((result): result is VideoAnalysisResult => result !== null);
 };

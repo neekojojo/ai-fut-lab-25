@@ -1,4 +1,3 @@
-
 import { IdentifiedPlayer, IdentifiedTeam } from './playerIdentification';
 import type { DetectionResult } from './types';
 
@@ -26,6 +25,22 @@ export interface KagglePlayerData {
   dribbling: number;
   defending: number;
   physic: number;
+}
+
+// نوع جديد للبيانات المستوردة من مجموعات بيانات تحليل الفيديو الرياضي
+export interface SportsVideoAnalysisData {
+  analysis_id: string;
+  match_id: string;
+  player_id: string;
+  player_name: string;
+  team_name: string;
+  event_type: string;
+  timestamp: number;
+  field_position_x: number;
+  field_position_y: number;
+  movement_speed: number;
+  success_rate: number;
+  confidence_score: number;
 }
 
 // قاعدة بيانات Kaggle للاعبين (سيتم استبدالها بالاستيراد الحقيقي لاحقاً)
@@ -224,6 +239,94 @@ const kaggleTeamDatabase = [
   }
 ];
 
+// مجموعة بيانات تحليل الفيديو الرياضي (بيانات تجريبية)
+const sportsVideoAnalysisDatabase: SportsVideoAnalysisData[] = [
+  {
+    analysis_id: "sva001",
+    match_id: "m2023_01",
+    player_id: "k001",
+    player_name: "محمد صلاح",
+    team_name: "ليفربول",
+    event_type: "تمريرة",
+    timestamp: 1235,
+    field_position_x: 75.5,
+    field_position_y: 32.1,
+    movement_speed: 21.3,
+    success_rate: 0.92,
+    confidence_score: 0.95
+  },
+  {
+    analysis_id: "sva002",
+    match_id: "m2023_01",
+    player_id: "k002",
+    player_name: "كريم بنزيما",
+    team_name: "الاتحاد",
+    event_type: "تسديدة",
+    timestamp: 2145,
+    field_position_x: 85.3,
+    field_position_y: 50.2,
+    movement_speed: 18.7,
+    success_rate: 0.78,
+    confidence_score: 0.89
+  },
+  {
+    analysis_id: "sva003",
+    match_id: "m2023_02",
+    player_id: "k003",
+    player_name: "رونالدو",
+    team_name: "النصر",
+    event_type: "عرضية",
+    timestamp: 1892,
+    field_position_x: 82.6,
+    field_position_y: 12.4,
+    movement_speed: 22.5,
+    success_rate: 0.85,
+    confidence_score: 0.91
+  },
+  {
+    analysis_id: "sva004",
+    match_id: "m2023_02",
+    player_id: "k004",
+    player_name: "نيمار",
+    team_name: "الهلال",
+    event_type: "مراوغة",
+    timestamp: 2356,
+    field_position_x: 65.8,
+    field_position_y: 22.7,
+    movement_speed: 24.1,
+    success_rate: 0.95,
+    confidence_score: 0.97
+  },
+  {
+    analysis_id: "sva005",
+    match_id: "m2023_03",
+    player_id: "k005",
+    player_name: "سالم الدوسري",
+    team_name: "الهلال",
+    event_type: "استحواذ",
+    timestamp: 1457,
+    field_position_x: 45.2,
+    field_position_y: 38.9,
+    movement_speed: 19.6,
+    success_rate: 0.88,
+    confidence_score: 0.93
+  },
+  {
+    analysis_id: "sva006",
+    match_id: "m2023_03",
+    player_id: "k006",
+    player_name: "سعود عبدالحميد",
+    team_name: "النصر",
+    event_type: "تصدي",
+    timestamp: 2567,
+    field_position_x: 12.3,
+    field_position_y: 50.1,
+    movement_speed: 15.2,
+    success_rate: 0.91,
+    confidence_score: 0.94
+  }
+];
+
 /**
  * تحويل بيانات لاعب Kaggle إلى تنسيق IdentifiedPlayer
  */
@@ -329,6 +432,80 @@ export const identifyTeamFromKaggle = (result: DetectionResult): IdentifiedTeam[
     });
   
   return candidates;
+};
+
+/**
+ * البحث عن بيانات تحليل فيديو رياضي استناداً إلى معرف اللاعب
+ */
+export const getSportsVideoAnalysisDataByPlayerId = (playerId: string): SportsVideoAnalysisData[] => {
+  return sportsVideoAnalysisDatabase.filter(data => data.player_id === playerId);
+};
+
+/**
+ * البحث عن بيانات تحليل فيديو رياضي استناداً إلى اسم اللاعب
+ */
+export const getSportsVideoAnalysisByPlayerName = (playerName: string): SportsVideoAnalysisData[] => {
+  return sportsVideoAnalysisDatabase.filter(data => 
+    data.player_name.toLowerCase().includes(playerName.toLowerCase())
+  );
+};
+
+/**
+ * البحث عن بيانات تحليل فيديو رياضي استناداً إلى اسم الفريق
+ */
+export const getSportsVideoAnalysisByTeam = (teamName: string): SportsVideoAnalysisData[] => {
+  return sportsVideoAnalysisDatabase.filter(data => 
+    data.team_name.toLowerCase().includes(teamName.toLowerCase())
+  );
+};
+
+/**
+ * تحليل حركة اللاعب باستخدام بيانات تحليل الفيديو الرياضي
+ */
+export const analyzePlayerMovementFromVideoData = (playerId: string): {
+  avgSpeed: number;
+  successRate: number;
+  confidenceScore: number;
+  events: { type: string; count: number }[]
+} => {
+  const playerData = getSportsVideoAnalysisDataByPlayerId(playerId);
+  
+  if (playerData.length === 0) {
+    return {
+      avgSpeed: 0,
+      successRate: 0,
+      confidenceScore: 0,
+      events: []
+    };
+  }
+  
+  // حساب متوسط السرعة
+  const avgSpeed = playerData.reduce((sum, data) => sum + data.movement_speed, 0) / playerData.length;
+  
+  // حساب متوسط معدل النجاح
+  const avgSuccessRate = playerData.reduce((sum, data) => sum + data.success_rate, 0) / playerData.length;
+  
+  // حساب متوسط مستوى الثقة
+  const avgConfidence = playerData.reduce((sum, data) => sum + data.confidence_score, 0) / playerData.length;
+  
+  // تجميع الأحداث وعددها
+  const eventCounts: Record<string, number> = {};
+  playerData.forEach(data => {
+    if (eventCounts[data.event_type]) {
+      eventCounts[data.event_type]++;
+    } else {
+      eventCounts[data.event_type] = 1;
+    }
+  });
+  
+  const events = Object.entries(eventCounts).map(([type, count]) => ({ type, count }));
+  
+  return {
+    avgSpeed,
+    successRate: avgSuccessRate,
+    confidenceScore: avgConfidence,
+    events
+  };
 };
 
 /**
