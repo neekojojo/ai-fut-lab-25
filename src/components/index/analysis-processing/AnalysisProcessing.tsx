@@ -42,9 +42,8 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
   const [elapsedTime, setElapsedTime] = useState(0);
   const { toast } = useToast();
   
-  // Auto-progression mechanism
+  // Update internal state when props change
   useEffect(() => {
-    // Update internal state when props change
     if (initialProgress !== progress && !isNaN(initialProgress)) {
       setProgress(initialProgress);
       setLastProgress(initialProgress);
@@ -54,7 +53,17 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
     if (initialStage !== stage && initialStage) {
       setStage(initialStage);
     }
-  }, [initialProgress, initialStage]);
+    
+    // Check for completion to trigger the callback
+    if (initialProgress >= 100 && onAnalysisComplete) {
+      // Add small delay to make the transition smoother
+      const completeTimeout = setTimeout(() => {
+        onAnalysisComplete();
+      }, 1000);
+      
+      return () => clearTimeout(completeTimeout);
+    }
+  }, [initialProgress, initialStage, onAnalysisComplete, progress, stage]);
   
   // Map progress value to a color based on percentage
   const getProgressColor = (value: number) => {
@@ -107,35 +116,6 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
     setElapsedTime(Math.floor((now - analysisStartTime) / 1000));
   }, [safeProgress, lastProgress, lastProgressTime, analysisStartTime]);
   
-  // Auto-advance progress if it appears stuck
-  useEffect(() => {
-    let autoProgressInterval: number | undefined;
-    
-    // Only start auto-progression if progress gets stuck for 10+ seconds
-    if (isStuck && stuckTime > 10 && progress < 97) {
-      console.log("Starting auto-progression due to stuck state");
-      
-      autoProgressInterval = window.setInterval(() => {
-        setProgress(prev => {
-          // Only advance if below 97%
-          if (prev < 97) {
-            const increment = 0.5 + (Math.random() * 1.5); // 0.5-2% increment
-            const newProgress = Math.min(97, prev + increment);
-            console.log(`Auto-advancing progress to ${newProgress.toFixed(1)}%`);
-            return newProgress;
-          }
-          return prev;
-        });
-      }, 5000); // Advance every 5 seconds
-    }
-    
-    return () => {
-      if (autoProgressInterval) {
-        window.clearInterval(autoProgressInterval);
-      }
-    };
-  }, [isStuck, stuckTime, progress]);
-  
   // Set interval to check if analysis is stuck and update elapsed time
   useEffect(() => {
     const interval = setInterval(checkIfStuck, 1000);
@@ -154,53 +134,6 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({
     }
   }, [isStuck, stuckTime, toast]);
 
-  // Auto-complete after maximum time to prevent indefinite waiting
-  useEffect(() => {
-    // After 2 minutes, if still not at 100%, force completion
-    if (elapsedTime > 120 && progress < 98) {
-      console.log("Max time reached, forcing completion");
-      setProgress(99); // Set to 99% to trigger visual cue of near-completion
-      
-      // Then complete after 3 more seconds
-      const completeTimeout = setTimeout(() => {
-        setProgress(100);
-        if (onAnalysisComplete) {
-          onAnalysisComplete();
-        }
-      }, 3000);
-      
-      return () => clearTimeout(completeTimeout);
-    }
-    
-    // If we reach 100%, call the complete callback
-    if (progress >= 100 && onAnalysisComplete) {
-      const completeTimeout = setTimeout(() => {
-        onAnalysisComplete();
-      }, 1000);
-      
-      return () => clearTimeout(completeTimeout);
-    }
-  }, [elapsedTime, progress, onAnalysisComplete]);
-  
-  // Simulate progress for demo purposes
-  useEffect(() => {
-    const simulateProgress = () => {
-      // Only simulate progress if initial value is stuck and below 60%
-      if (initialProgress < 60 && initialProgress === lastProgress && !isNaN(initialProgress)) {
-        setProgress(prev => {
-          if (prev >= 100) return 100;
-          // More aggressive progress increments when stuck
-          const baseIncrement = prev < 60 ? 3 : 2;
-          return Math.min(97, prev + (Math.random() * baseIncrement));
-        });
-      }
-    };
-    
-    // Simulate progress every 8 seconds if needed
-    const simulationInterval = setInterval(simulateProgress, 8000);
-    return () => clearInterval(simulationInterval);
-  }, [initialProgress, lastProgress]);
-  
   // Handle reset button click
   const handleReset = () => {
     if (onReset) {

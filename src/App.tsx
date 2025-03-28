@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/components/auth/AuthContext";
@@ -12,6 +12,22 @@ import ProfessionalTips from "./pages/ProfessionalTips";
 import StressManagement from "./pages/StressManagement";
 import SignIn from "./components/auth/SignIn";
 import SignUp from "./components/auth/SignUp";
+import { useAuth } from "@/components/auth/AuthContext";
+
+// Auth protection wrapper component
+const AuthRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return <div className="flex min-h-screen items-center justify-center">جاري التحميل...</div>;
+  }
+  
+  if (!user) {
+    return <Navigate to="/sign-in" replace />;
+  }
+  
+  return <>{children}</>;
+};
 
 function App() {
   return (
@@ -19,13 +35,34 @@ function App() {
       <AuthProvider>
         <Router>
           <Routes>
+            {/* Public routes */}
             <Route path="/" element={<Index />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/advanced-analysis" element={<AdvancedAnalysis />} />
-            <Route path="/professional-tips" element={<ProfessionalTips />} />
-            <Route path="/stress-management" element={<StressManagement />} />
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/sign-up" element={<SignUp />} />
+            
+            {/* Protected routes */}
+            <Route path="/dashboard" element={
+              <AuthRoute>
+                <Dashboard />
+              </AuthRoute>
+            } />
+            <Route path="/advanced-analysis" element={
+              <AuthRoute>
+                <AdvancedAnalysis />
+              </AuthRoute>
+            } />
+            <Route path="/professional-tips" element={
+              <AuthRoute>
+                <ProfessionalTips />
+              </AuthRoute>
+            } />
+            <Route path="/stress-management" element={
+              <AuthRoute>
+                <StressManagement />
+              </AuthRoute>
+            } />
+            
+            {/* Fallback route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>

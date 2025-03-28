@@ -33,7 +33,7 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
       description: "استكشف أنماط الحركة التفصيلية ومقاييس الأداء عبر علامات التبويب المختلفة، بما في ذلك توافق اللاعب مع الأندية.",
       className: "bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border-primary/20",
     });
-  }, []);
+  }, [toast]);
 
   if (viewMode === 'advanced') {
     return (

@@ -7,23 +7,27 @@ import VideoUpload from '../VideoUpload';
 import { ANALYSIS_STAGES } from '@/utils/analysis/constants';
 import { Separator } from '@/components/ui/separator';
 import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, Globe } from 'lucide-react';
-
-export interface FileWithPreview extends File {
-  preview: string;
-}
+import AnalysisProcessing from './analysis-processing/AnalysisProcessing';
+import AnalysisOptions from '@/components/analysis/ModelSelection';
+import { analyzeFootballVideo } from '@/utils/analysis';
+import AnalysisResults from '@/components/analysis/AnalysisResults';
+import type { PlayerAnalysis } from '@/components/AnalysisReport.d';
+import type { FileWithPreview } from '@/types';
 
 const IndexContent: React.FC = () => {
   const [videoFile, setVideoFile] = useState<FileWithPreview | null>(null);
   const [analysisStarted, setAnalysisStarted] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [analysisStage, setAnalysisStage] = useState('بدء تحليل الفيديو');
+  const [analysisCompleted, setAnalysisCompleted] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<PlayerAnalysis | null>(null);
   const { toast } = useToast();
 
   const handleFileSelected = (file: FileWithPreview) => {
     setVideoFile(file);
   };
 
-  const handleStartAnalysis = () => {
+  const handleStartAnalysis = async () => {
     if (!videoFile) {
       toast({
         title: "لم يتم اختيار فيديو",
@@ -42,93 +46,68 @@ const IndexContent: React.FC = () => {
       description: "جاري تحليل فيديو كرة القدم الخاص بك",
     });
     
-    // Simulate progressive updates for better UX
-    simulateAnalysisProgress();
-  };
-
-  const simulateAnalysisProgress = () => {
-    // Set up multiple intervals to create a more natural progression pattern
-    const initialInterval = setInterval(() => {
-      setAnalysisProgress(prev => {
-        const newValue = prev + (Math.random() * 2 + 1); // 1-3% increment
-        if (newValue >= 30) {
-          clearInterval(initialInterval);
-          setAnalysisStage('استخراج معلومات اللاعب');
-          return 30;
+    try {
+      // Begin analysis and register progress callback
+      const analysisData = await analyzeFootballVideo(videoFile);
+      
+      // Register the progress updates callback
+      analysisData.progressUpdates((progress, stage) => {
+        setAnalysisProgress(progress);
+        if (stage) {
+          setAnalysisStage(stage);
         }
-        return newValue;
-      });
-    }, 3000);
-    
-    // Second phase of analysis
-    setTimeout(() => {
-      const secondInterval = setInterval(() => {
-        setAnalysisProgress(prev => {
-          const newValue = prev + (Math.random() * 1.5 + 0.5); // 0.5-2% increment
-          if (newValue >= 60) {
-            clearInterval(secondInterval);
-            setAnalysisStage('تحليل المهارات والحركة');
-            return 60;
-          }
-          return newValue;
-        });
-      }, 4000);
-      
-      // Third phase
-      setTimeout(() => {
-        const thirdInterval = setInterval(() => {
-          setAnalysisProgress(prev => {
-            const newValue = prev + (Math.random() * 1 + 0.2); // 0.2-1.2% increment
-            if (newValue >= 85) {
-              clearInterval(thirdInterval);
-              setAnalysisStage('إنشاء تقرير التحليل');
-              return 85;
-            }
-            return newValue;
-          });
-        }, 5000);
         
-        // Final phase - Integration with external systems
-        setTimeout(() => {
-          const finalInterval = setInterval(() => {
-            setAnalysisProgress(prev => {
-              const newValue = prev + (Math.random() * 0.8 + 0.2); // 0.2-1% increment
-              if (newValue >= 98) {
-                clearInterval(finalInterval);
-                setAnalysisStage('تكامل مع الأنظمة الخارجية');
-                
-                // Ensure we complete the analysis
-                setTimeout(() => {
-                  setAnalysisProgress(100);
-                  setAnalysisStage('اكتمل التحليل');
-                }, 3000);
-                
-                return 98;
-              }
-              return newValue;
+        // When analysis reaches 100%, set completed state after a short delay
+        if (progress >= 100) {
+          setTimeout(() => {
+            setAnalysisCompleted(true);
+            setAnalysisResult(analysisData.analysis);
+            
+            toast({
+              title: "اكتمل التحليل",
+              description: "تحليل فيديو كرة القدم الخاص بك جاهز",
             });
-          }, 4000);
-        }, 20000); // Start final phase after ~20 seconds
-        
-      }, 40000); // Start third phase after ~40 seconds
-      
-    }, 20000); // Start second phase after ~20 seconds
-  };
-
-  const handleAnalysisComplete = () => {
-    toast({
-      title: "اكتمل التحليل",
-      description: "تحليل فيديو كرة القدم الخاص بك جاهز",
-    });
-    window.location.href = '/dashboard';
+          }, 1500); // Give a small delay for better UX
+        }
+      });
+    } catch (error) {
+      console.error("Error analyzing video:", error);
+      toast({
+        title: "خطأ في التحليل",
+        description: "حدث خطأ أثناء تحليل الفيديو",
+        variant: "destructive",
+      });
+      handleResetAnalysis();
+    }
   };
 
   const handleResetAnalysis = () => {
     setVideoFile(null);
     setAnalysisStarted(false);
     setAnalysisProgress(0);
+    setAnalysisCompleted(false);
+    setAnalysisResult(null);
   };
 
+  const handleAdvancedAnalysis = () => {
+    // Implement advanced analysis view here
+    console.log("Opening advanced analysis view");
+  };
+
+  // Render analysis results if analysis has completed
+  if (analysisCompleted && analysisResult) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <AnalysisResults 
+          analysis={analysisResult}
+          onResetAnalysis={handleResetAnalysis}
+          onAdvancedAnalysis={handleAdvancedAnalysis}
+        />
+      </div>
+    );
+  }
+
+  // Render analysis processing screen if analysis has started
   if (analysisStarted) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -136,7 +115,12 @@ const IndexContent: React.FC = () => {
           progress={analysisProgress} 
           stage={analysisStage} 
           onReset={handleResetAnalysis}
-          onAnalysisComplete={handleAnalysisComplete}
+          onAnalysisComplete={() => {
+            // This function is called when the processing component detects analysis completion
+            if (analysisResult) {
+              setAnalysisCompleted(true);
+            }
+          }}
         />
       </div>
     );
@@ -254,9 +238,5 @@ const StageCard: React.FC<StageCardProps> = ({ number, title, description, icon,
     </Card>
   );
 };
-
-// Import the correct component types
-import AnalysisProcessing from './analysis-processing/AnalysisProcessing';
-import AnalysisOptions from '@/components/analysis/ModelSelection';
 
 export default IndexContent;
