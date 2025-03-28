@@ -61,3 +61,27 @@ export interface ProComparison {
     [key: string]: number;
   };
 }
+
+// New types for enhanced analysis
+export interface AdvancedAnalysisMetrics {
+  speedDistribution: number[];
+  accelerationProfile: number[];
+  bodyAlignment: number[];
+  movementEfficiency: number;
+  technicalConsistency: number;
+  decisionMakingTime: number;
+  fatigueResistance: number;
+  recoveryRate: number;
+  gameImpactScore: number;
+}
+
+export interface AdvancedPlayerComparison {
+  playerId: string;
+  playerName: string;
+  similarityScore: number;
+  strengthAreas: string[];
+  weaknessAreas: string[];
+  comparisonMetrics: {
+    [key: string]: number;
+  };
+}

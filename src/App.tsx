@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Index from './pages/Index';
 import Dashboard from './pages/Dashboard';
@@ -10,6 +9,7 @@ import StressManagement from './pages/StressManagement';
 import { Toaster } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/components/auth/AuthContext';
+import { Suspense } from 'react';
 
 // إنشاء عميل الاستعلام لإدارة حالة البيانات
 const queryClient = new QueryClient({
@@ -30,10 +30,11 @@ function App() {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/professional-tips" element={<ProfessionalTips />} />
+            <Route path="/tips" element={<ProfessionalTips />} />
             <Route path="/stress-management" element={<StressManagement />} />
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/sign-up" element={<SignUp />} />
+            <Route path="/advanced-analysis/:id" element={<AdvancedAnalysis />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Toaster />
