@@ -10,10 +10,10 @@ interface AnalysisProcessingProps {
 }
 
 const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({ progress, stage, isMobile }) => {
-  // تأكد من أن progress هو رقم صحيح (ليس NaN)
+  // Make sure progress is a valid number (not NaN)
   const safeProgress = isNaN(progress) ? 0 : Math.max(0, Math.min(100, progress));
   
-  // سجل قيم التقدم للتصحيح
+  // Log values for debugging
   useEffect(() => {
     console.log(`AnalysisProcessing - Progress: ${safeProgress}%, Stage: ${stage || 'N/A'}`);
   }, [safeProgress, stage]);
@@ -31,7 +31,7 @@ const AnalysisProcessing: React.FC<AnalysisProcessingProps> = ({ progress, stage
         <LoadingAnimation progress={safeProgress} stage={stage} />
       </div>
       
-      {/* إضافة مؤشر خطي للتقدم */}
+      {/* Linear progress indicator */}
       <div className="max-w-md mx-auto w-full space-y-2">
         <Progress value={safeProgress} className="h-2" />
         <div className="flex justify-between text-xs text-muted-foreground">

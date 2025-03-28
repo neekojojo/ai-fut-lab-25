@@ -30,21 +30,25 @@ export const analyzeVideo = async (
     
     console.log("Starting video analysis...");
     
-    // Start real video analysis
+    // Start analysis with proper progress tracking
     const result = await analyzeFootballVideo(videoFile);
     
-    // Set analysis result immediately
+    // Set initial analysis result
     setAnalysis(result.analysis);
     
-    // Set up progress updates to track real analysis progress
+    // Register for progress updates
     result.progressUpdates((progress, stage) => {
-      console.log(`Progress update: ${progress}%, stage: ${stage}`);
+      console.log(`Progress update received: ${progress}%, stage: ${stage}`);
+      
+      // Always update UI with latest progress
       setProgress(progress);
       setStage(stage);
       
       // When analysis completes, transition to complete state
       if (progress >= 100) {
-        finishAnalysis(result.analysis, user, toast, setAnalysisState);
+        setTimeout(() => {
+          finishAnalysis(result.analysis, user, toast, setAnalysisState);
+        }, 500); // Small delay to ensure UI updates before transition
       }
     });
   } catch (error) {
@@ -66,6 +70,8 @@ const finishAnalysis = (
   toast: ToastFunctions['toast'],
   setAnalysisState: (state: 'idle' | 'model-selection' | 'processing' | 'complete' | 'detailed-analysis') => void
 ) => {
+  console.log("Analysis complete, transitioning to complete state");
+  
   // Set to complete state
   setAnalysisState('complete');
   
