@@ -1,5 +1,6 @@
 
 // Re-exporting from the new module structure
-export { analyzeFootballVideo, FootballVideoAnalysisResult } from "./analysis";
+export { analyzeFootballVideo } from "./analysis";
+export type { FootballVideoAnalysisResult } from "./analysis";
 export { compareWithPreviousAnalyses } from "./analysis/comparisonService";
-export { ANALYSIS_STAGES, DETAILED_STAGES } from "./analysis/progressTracker";
+export { DETAILED_STAGES } from "./analysis/progressTracker";
