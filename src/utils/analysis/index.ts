@@ -1,20 +1,22 @@
+
 import type { PlayerAnalysis } from "@/components/AnalysisReport.d";
 import { ANALYSIS_STAGES } from "./constants";
 import { generateEnhancedAnalysis } from "./analysisMockGenerator";
 import { compareWithPreviousAnalyses } from "./comparisonService";
 import { playerMLService } from "@/utils/ml/playerMLService";
 import { apiProxyService } from "@/services/apiProxyService";
-import { detectPeopleInVideo } from "@/utils/videoDetection";
+import { detectPeopleInVideo, analyzePlayerEyeMovement } from "@/utils/videoDetection";
 import { analyzePlayerMovements } from "@/utils/videoDetection/movementAnalysis";
 import { StatsCalculator } from "@/utils/dataProcessing/statsCalculator";
 import { extractVideoFrames } from "@/utils/videoDetection/frameExtraction";
 
-// Enhanced stages for more realistic analysis flow
+// Enhanced stages for more realistic analysis flow with eye tracking
 const DETAILED_STAGES = [
   'بدء تحليل الفيديو',                    // Start video analysis
   'استخراج إطارات الفيديو',               // Extract video frames
   'تحليل حركة اللاعب',                    // Player movement analysis
   'اكتشاف مواقع اللاعبين',                 // Player position detection
+  'تحليل حركة العين وتوقع الموهبة',         // Eye tracking and talent prediction (NEW)
   'تحليل الحركة والسرعة',                  // Speed and movement analysis
   'تحليل المهارات الفنية',                 // Technical skills analysis
   'قياس المؤشرات البدنية',                  // Physical metrics measurement
@@ -196,18 +198,26 @@ export const analyzeFootballVideo = async (videoFile: File): Promise<FootballVid
       };
       await simulateProcessingDelay(600, 900);
       
-      // Step 5 - Speed and movement analysis (50%)
-      updateProgress(50, 4);
+      // Step 5 - Eye movement analysis (NEW) (45%)
+      updateProgress(45, 4);
+      console.log("Analyzing eye movement and predicting talent...");
+      // Perform eye tracking analysis
+      const eyeTrackingResult = await analyzePlayerEyeMovement(videoFile, detectionResult);
+      console.log("Eye tracking analysis complete:", eyeTrackingResult);
+      await simulateProcessingDelay(1000, 1500); // Longer delay for complex analysis
+      
+      // Step 6 - Speed and movement analysis (55%)
+      updateProgress(55, 5);
       console.log("Analyzing player speed and movement patterns...");
       await simulateProcessingDelay(700, 1000);
       
-      // Step 6 - Technical skills analysis (60%)
-      updateProgress(60, 5);
+      // Step 7 - Technical skills analysis (65%)
+      updateProgress(65, 6);
       console.log("Analyzing technical skills...");
       await simulateProcessingDelay(800, 1200);
       
-      // Step 7 - Physical metrics measurement (70%)
-      updateProgress(70, 6);
+      // Step 8 - Physical metrics measurement (75%)
+      updateProgress(75, 7);
       const movementAnalysis = {
         averageSpeed: 12 + (Math.random() * 8 - 4), // 8-16 range
         totalDistance: 500 + Math.random() * 300, // 500-800 range
@@ -215,40 +225,42 @@ export const analyzeFootballVideo = async (videoFile: File): Promise<FootballVid
       };
       await simulateProcessingDelay(500, 800);
       
-      // Step 8 - Identifying strengths and weaknesses (75%)
-      updateProgress(75, 7);
+      // Step 9 - Identifying strengths and weaknesses (80%)
+      updateProgress(80, 8);
       console.log("Identifying player strengths and weaknesses...");
       await simulateProcessingDelay(600, 900);
       
-      // Step 9 - Comparison with benchmark data (80%)
-      updateProgress(80, 8);
+      // Step 10 - Comparison with benchmark data (85%)
+      updateProgress(85, 9);
       console.log("Comparing with benchmark data...");
       await simulateProcessingDelay(500, 700);
       
-      // Step 10 - Calculate tactical indicators (85%)
-      updateProgress(85, 9);
+      // Step 11 - Calculate tactical indicators (90%)
+      updateProgress(90, 10);
       console.log("Calculating tactical indicators...");
       await simulateProcessingDelay(600, 800);
       
-      // Step 11 - Overall performance evaluation (90%)
-      updateProgress(90, 10);
+      // Step 12 - Overall performance evaluation (93%)
+      updateProgress(93, 11);
       console.log("Evaluating overall performance...");
       
       // Create enhanced analysis by combining baseline with more "realistic" data
+      // Now including eye tracking data
       const videoProperties = await getVideoProperties(videoFile);
       const enhancedAnalysis: PlayerAnalysis = createEnhancedAnalysis(
         baselineAnalysis,
         detectionResult, 
         movementAnalysis,
-        videoProperties
+        videoProperties,
+        eyeTrackingResult
       );
       
       // Update the analysis in the result
       resultObj.analysis = enhancedAnalysis;
       await simulateProcessingDelay(700, 1000);
       
-      // Step 12 - Final formatting (95%)
-      updateProgress(95, 11);
+      // Step 13 - Final formatting (97%)
+      updateProgress(97, 12);
       console.log("Compiling final analysis report...");
       await simulateProcessingDelay(600, 800);
       
@@ -256,13 +268,13 @@ export const analyzeFootballVideo = async (videoFile: File): Promise<FootballVid
       analysisCache.set(videoHash, enhancedAnalysis);
       
       // Complete the analysis (100%)
-      updateProgress(100, 12);
+      updateProgress(100, 13);
       
       return enhancedAnalysis;
     } catch (error) {
       console.error("Error in video analysis:", error);
       // Fallback to baseline analysis if real analysis fails
-      updateProgress(100, 12);
+      updateProgress(100, 13);
       return baselineAnalysis;
     }
   };
@@ -354,7 +366,8 @@ export const analyzeFootballVideo = async (videoFile: File): Promise<FootballVid
     baseAnalysis: PlayerAnalysis, 
     detectionResult: any, 
     movementAnalysis: any,
-    videoProperties: any
+    videoProperties: any,
+    eyeTrackingResult?: any
   ): PlayerAnalysis => {
     // Use video properties to adjust analysis parameters
     const videoQualityFactor = (videoProperties.width * videoProperties.height) / (1280 * 720);
@@ -385,7 +398,7 @@ export const analyzeFootballVideo = async (videoFile: File): Promise<FootballVid
     }));
     
     // Calculate overall performance score with weighted influence from video properties
-    const adjustedPerformanceScore = Math.floor(
+    let adjustedPerformanceScore = Math.floor(
       (realPerformance.pace * 0.25 + 
        realPerformance.stamina * 0.25 + 
        realPerformance.acceleration * 0.2 + 
@@ -394,16 +407,76 @@ export const analyzeFootballVideo = async (videoFile: File): Promise<FootballVid
       (0.9 + videoQualityFactor * 0.1) // Small boost for higher quality videos
     );
     
+    // Calculate talent score based on eye tracking if available
+    let talentScore = baseAnalysis.talentScore;
+    let enhancedInsights = [...baseAnalysis.advancedInsights];
+    
+    if (eyeTrackingResult) {
+      // Adjust vision and decision metrics based on eye tracking
+      const adjustedVision = Math.min(99, Math.max(60, Math.floor(
+        (baseAnalysis.stats.vision * 0.4) + (eyeTrackingResult.fieldAwarenessScore * 0.6)
+      )));
+      
+      const adjustedDecision = Math.min(99, Math.max(60, Math.floor(
+        (baseAnalysis.stats.decision * 0.3) + (eyeTrackingResult.decisionSpeed * 0.7)
+      )));
+      
+      const adjustedComposure = Math.min(99, Math.max(60, Math.floor(
+        (baseAnalysis.stats.composure * 0.5) + (eyeTrackingResult.anticipationScore * 0.5)
+      )));
+      
+      // Calculate talent score with eye tracking data (giving more weight to cognitive abilities)
+      talentScore = Math.min(99, Math.floor(
+        adjustedVision * 0.25 + 
+        adjustedDecision * 0.25 + 
+        adjustedComposure * 0.2 + 
+        realPerformance.pace * 0.15 + 
+        baseAnalysis.stats.ballControl * 0.15
+      ));
+      
+      // Adjust performance score to include eye tracking data
+      adjustedPerformanceScore = Math.floor(
+        (adjustedPerformanceScore * 0.7) + (talentScore * 0.3)
+      );
+      
+      // Add eye tracking insights
+      if (eyeTrackingResult.fieldAwarenessScore > 85) {
+        enhancedInsights.push("يتمتع اللاعب بوعي استثنائي بالملعب وقدرة ممتازة على مسح المساحات والتموضع الصحيح");
+      }
+      
+      if (eyeTrackingResult.decisionSpeed > 85) {
+        enhancedInsights.push("يُظهر اللاعب سرعة فائقة في اتخاذ القرارات التكتيكية والاستجابة للمواقف المتغيرة");
+      }
+      
+      if (eyeTrackingResult.anticipationScore > 80) {
+        enhancedInsights.push("يمتلك اللاعب قدرة استثنائية على توقع تطورات اللعب واستباق الخصم بشكل دقيق");
+      }
+    }
+    
     return {
       ...baseAnalysis,
       confidence: detectionResult.confidence,
       movements: enhancedMovements,
       performanceScore: adjustedPerformanceScore,
+      talentScore: talentScore,
+      advancedInsights: enhancedInsights,
       stats: {
         ...baseAnalysis.stats,
         pace: realPerformance.pace,
         stamina: realPerformance.stamina,
-        acceleration: realPerformance.acceleration
+        acceleration: realPerformance.acceleration,
+        // Update vision and decision making based on eye tracking if available
+        ...(eyeTrackingResult && {
+          vision: Math.min(99, Math.max(60, Math.floor(
+            (baseAnalysis.stats.vision * 0.4) + (eyeTrackingResult.fieldAwarenessScore * 0.6)
+          ))),
+          decision: Math.min(99, Math.max(60, Math.floor(
+            (baseAnalysis.stats.decision * 0.3) + (eyeTrackingResult.decisionSpeed * 0.7)
+          ))),
+          composure: Math.min(99, Math.max(60, Math.floor(
+            (baseAnalysis.stats.composure * 0.5) + (eyeTrackingResult.anticipationScore * 0.5)
+          )))
+        })
       }
     };
   };

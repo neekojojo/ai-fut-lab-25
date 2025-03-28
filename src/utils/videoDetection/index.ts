@@ -1,6 +1,7 @@
 
 import { detectPeopleInVideo as detectWithTensorflow } from './detectionService';
 import { detectPlayersWithYOLO } from './yoloDetectionService';
+import { analyzeEyeMovement, type EyeTrackingAnalysis } from './eyeballTracking';
 import type { DetectionResult } from './types';
 
 // Export a combined detection function
@@ -19,8 +20,17 @@ export const detectPeopleInVideo = async (
   }
 };
 
+// Function to analyze player eye movement
+export const analyzePlayerEyeMovement = async (
+  videoFile: File,
+  detectionResult?: DetectionResult
+): Promise<EyeTrackingAnalysis> => {
+  return analyzeEyeMovement(videoFile, detectionResult);
+};
+
 // Also export individual methods for direct access
-export { detectWithTensorflow, detectPlayersWithYOLO };
+export { detectWithTensorflow, detectPlayersWithYOLO, analyzeEyeMovement };
 
 // Re-export types
 export * from './types';
+export type { EyeTrackingAnalysis, EyeTrackingData } from './eyeballTracking';
