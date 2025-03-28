@@ -1,5 +1,5 @@
 
-import { analyzeFootballVideo } from '@/utils/analysisService';
+import { analyzeFootballVideo } from '@/utils/analysis';
 import { savePlayerAnalysis } from '@/services/playerAnalysisService';
 import { User } from '@supabase/supabase-js';
 import type { PlayerAnalysis } from '@/components/AnalysisReport.d';

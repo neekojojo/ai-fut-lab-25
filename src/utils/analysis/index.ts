@@ -65,6 +65,9 @@ export const analyzeFootballVideo = async (videoFile: File): Promise<{
       updateProgress(50, "حساب إحصاءات أداء اللاعب");
       const movementAnalysis = await analyzePlayerMovements(detectionResult.playerPositions);
       
+      // Use StatsCalculator to calculate some statistics (if needed)
+      const statsCalculator = new StatsCalculator();
+      
       // Combine real data with generated data
       const enhancedAnalysis: PlayerAnalysis = {
         ...baselineAnalysis,
