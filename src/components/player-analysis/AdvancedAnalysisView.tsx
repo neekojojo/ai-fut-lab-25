@@ -1,10 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Activity } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, Activity, Zap, TrendingUp, Timer, Dumbbell } from "lucide-react";
 import { ChartContainer } from '@/components/ui/chart';
-import { Line, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Line, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import MovementAnalysisChart from '../player-movement/MovementAnalysisChart';
 
 interface AdvancedAnalysisViewProps {
   analysis: any;
@@ -12,7 +14,9 @@ interface AdvancedAnalysisViewProps {
 }
 
 const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, onBack }) => {
-  // Example movement data for charts
+  const [activeTab, setActiveTab] = useState('patterns');
+  
+  // مثال لبيانات الحركة للرسوم البيانية
   const speedData = [
     { name: "0م", current: 0, previous: 0 },
     { name: "5م", current: 12, previous: 10 },
@@ -51,19 +55,20 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
     { name: "90د", current: 80, previous: 65 }
   ];
 
-  const renderLineChart = (data: any[], dataKeys: string[], colors: string[]) => (
-    <ResponsiveContainer width="100%" height={250}>
-      <Line 
-        data={data} 
-        type="monotone" 
-        dataKey={dataKeys[0]} 
-        stroke={colors[0]} 
-        strokeWidth={2} 
-        dot={{ r: 4 }}
-        activeDot={{ r: 6 }}
-      />
-    </ResponsiveContainer>
-  );
+  // بيانات حركة اللاعب الإضافية
+  const movementData = Array.from({ length: 30 }, (_, i) => ({
+    timestamp: i,
+    speed: 5 + Math.sin(i / 3) * 3 + Math.random() * 2,
+    acceleration: 1 + Math.cos(i / 4) * 0.8 + Math.random() * 0.5,
+  }));
+
+  // بيانات مناطق السرعة
+  const speedZones = {
+    walking: 0.45,
+    jogging: 0.32,
+    running: 0.18,
+    sprinting: 0.05
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -78,184 +83,288 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>السرعة والتسارع</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">منحنى السرعة</h3>
-              <div className="bg-muted/20 p-4 rounded-lg">
-                <ChartContainer className="h-[250px]">
-                  <Line 
-                    data={speedData} 
-                    type="monotone" 
-                    dataKey="current" 
-                    name="الحالي"
-                    stroke="#8B5CF6" 
-                    strokeWidth={2}
-                    activeDot={{ r: 6 }}
-                  />
-                  <Line 
-                    data={speedData} 
-                    type="monotone" 
-                    dataKey="previous" 
-                    name="السابق"
-                    stroke="#D1D5DB" 
-                    strokeWidth={2}
-                    strokeDasharray="5 5"
-                  />
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                </ChartContainer>
-              </div>
-              <p className="text-xs text-muted-foreground">تحليل سرعة اللاعب خلال مسافات مختلفة مقارنة بالأداء السابق</p>
-            </div>
+      <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid grid-cols-2 w-full">
+          <TabsTrigger value="patterns">أنماط الحركة</TabsTrigger>
+          <TabsTrigger value="metrics">مؤشرات الأداء</TabsTrigger>
+        </TabsList>
 
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">معدل التسارع</h3>
-              <div className="bg-muted/20 p-4 rounded-lg">
-                <ChartContainer className="h-[250px]">
-                  <Area 
-                    data={accelerationData} 
-                    type="monotone" 
-                    dataKey="current" 
-                    name="الحالي"
-                    stroke="#10B981" 
-                    fill="#10B98120"
-                    strokeWidth={2}
-                  />
-                  <Area 
-                    data={accelerationData} 
-                    type="monotone" 
-                    dataKey="previous" 
-                    name="السابق"
-                    stroke="#D1D5DB" 
-                    fill="#D1D5DB20"
-                    strokeWidth={2}
-                    strokeDasharray="5 5"
-                  />
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                </ChartContainer>
-              </div>
-              <p className="text-xs text-muted-foreground">تحليل معدل التسارع للاعب خلال فترات زمنية مختلفة</p>
-            </div>
-          </CardContent>
-        </Card>
+        <TabsContent value="patterns">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>السرعة والتسارع</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">منحنى السرعة</h3>
+                  <div className="bg-muted/20 p-4 rounded-lg">
+                    <ChartContainer className="h-[250px]">
+                      <Line 
+                        data={speedData} 
+                        type="monotone" 
+                        dataKey="current" 
+                        name="الحالي"
+                        stroke="#8B5CF6" 
+                        strokeWidth={2}
+                        activeDot={{ r: 6 }}
+                      />
+                      <Line 
+                        data={speedData} 
+                        type="monotone" 
+                        dataKey="previous" 
+                        name="السابق"
+                        stroke="#D1D5DB" 
+                        strokeWidth={2}
+                        strokeDasharray="5 5"
+                      />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                    </ChartContainer>
+                  </div>
+                  <p className="text-xs text-muted-foreground">تحليل سرعة اللاعب خلال مسافات مختلفة مقارنة بالأداء السابق</p>
+                </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>أنماط الحركة وكفاءة الطاقة</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">نمط الحركة</h3>
-              <div className="bg-muted/20 p-4 rounded-lg">
-                <ChartContainer className="h-[250px]">
-                  <Bar 
-                    data={movementPatternData} 
-                    dataKey="current" 
-                    name="الحالي"
-                    fill="#3B82F6" 
-                    radius={[4, 4, 0, 0]}
-                  />
-                  <Bar 
-                    data={movementPatternData} 
-                    dataKey="previous" 
-                    name="السابق"
-                    fill="#D1D5DB" 
-                    radius={[4, 4, 0, 0]}
-                  />
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                </ChartContainer>
-              </div>
-              <p className="text-xs text-muted-foreground">تحليل أنماط حركة اللاعب ومقارنتها بالأداء السابق</p>
-            </div>
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">معدل التسارع</h3>
+                  <div className="bg-muted/20 p-4 rounded-lg">
+                    <ChartContainer className="h-[250px]">
+                      <Area 
+                        data={accelerationData} 
+                        type="monotone" 
+                        dataKey="current" 
+                        name="الحالي"
+                        stroke="#10B981" 
+                        fill="#10B98120"
+                        strokeWidth={2}
+                      />
+                      <Area 
+                        data={accelerationData} 
+                        type="monotone" 
+                        dataKey="previous" 
+                        name="السابق"
+                        stroke="#D1D5DB" 
+                        fill="#D1D5DB20"
+                        strokeWidth={2}
+                        strokeDasharray="5 5"
+                      />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                    </ChartContainer>
+                  </div>
+                  <p className="text-xs text-muted-foreground">تحليل معدل التسارع للاعب خلال فترات زمنية مختلفة</p>
+                </div>
+              </CardContent>
+            </Card>
 
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">كفاءة الطاقة</h3>
-              <div className="bg-muted/20 p-4 rounded-lg">
-                <ChartContainer className="h-[250px]">
-                  <Line 
-                    data={energyEfficiencyData} 
-                    type="monotone" 
-                    dataKey="current" 
-                    name="الحالي"
-                    stroke="#F59E0B" 
-                    strokeWidth={2}
-                    dot={{ r: 4 }}
-                    activeDot={{ r: 6 }}
-                  />
-                  <Line 
-                    data={energyEfficiencyData} 
-                    type="monotone" 
-                    dataKey="previous" 
-                    name="السابق"
-                    stroke="#D1D5DB" 
-                    strokeWidth={2}
-                    strokeDasharray="5 5"
-                  />
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                </ChartContainer>
-              </div>
-              <p className="text-xs text-muted-foreground">تحليل كفاءة استهلاك الطاقة خلال المباراة</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>أنماط الحركة وكفاءة الطاقة</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">نمط الحركة</h3>
+                  <div className="bg-muted/20 p-4 rounded-lg">
+                    <ChartContainer className="h-[250px]">
+                      <Bar 
+                        data={movementPatternData} 
+                        dataKey="current" 
+                        name="الحالي"
+                        fill="#3B82F6" 
+                        radius={[4, 4, 0, 0]}
+                      />
+                      <Bar 
+                        data={movementPatternData} 
+                        dataKey="previous" 
+                        name="السابق"
+                        fill="#D1D5DB" 
+                        radius={[4, 4, 0, 0]}
+                      />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                    </ChartContainer>
+                  </div>
+                  <p className="text-xs text-muted-foreground">تحليل أنماط حركة اللاعب ومقارنتها بالأداء السابق</p>
+                </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>تحليل متقدم للأداء الفني</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-primary/5 p-4 rounded-lg">
-                <h3 className="text-sm font-medium text-primary mb-2">دقة الحركة</h3>
-                <p className="text-3xl font-bold">{analysis.performance?.technical || 82}%</p>
-                <p className="text-xs text-muted-foreground mt-1">تحسن بنسبة 4% عن التحليل السابق</p>
-              </div>
-              <div className="bg-primary/5 p-4 rounded-lg">
-                <h3 className="text-sm font-medium text-primary mb-2">التوازن الحركي</h3>
-                <p className="text-3xl font-bold">{analysis.stats?.balance || 76}%</p>
-                <p className="text-xs text-muted-foreground mt-1">متوسط خلال الفترة الأخيرة</p>
-              </div>
-              <div className="bg-primary/5 p-4 rounded-lg">
-                <h3 className="text-sm font-medium text-primary mb-2">الكفاءة الحركية</h3>
-                <p className="text-3xl font-bold">{(analysis.stats?.agility || 0) + 5}%</p>
-                <p className="text-xs text-muted-foreground mt-1">تحسن ملحوظ في الكفاءة الحركية</p>
-              </div>
-            </div>
-
-            <div className="p-4 bg-secondary/10 rounded-lg mt-6">
-              <h3 className="font-medium mb-2">التوصيات الفنية للحركة</h3>
-              <ul className="list-disc list-inside space-y-2 text-sm">
-                <li>تحسين التوازن أثناء تغيير الاتجاه بسرعة عالية</li>
-                <li>تطوير كفاءة الحركة لتقليل استهلاك الطاقة خلال المباراة</li>
-                <li>العمل على تحسين انفجارية التسارع في المسافات القصيرة</li>
-                <li>تطوير القدرة على الحفاظ على السرعة القصوى لفترات أطول</li>
-              </ul>
-            </div>
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">كفاءة الطاقة</h3>
+                  <div className="bg-muted/20 p-4 rounded-lg">
+                    <ChartContainer className="h-[250px]">
+                      <Line 
+                        data={energyEfficiencyData} 
+                        type="monotone" 
+                        dataKey="current" 
+                        name="الحالي"
+                        stroke="#F59E0B" 
+                        strokeWidth={2}
+                        dot={{ r: 4 }}
+                        activeDot={{ r: 6 }}
+                      />
+                      <Line 
+                        data={energyEfficiencyData} 
+                        type="monotone" 
+                        dataKey="previous" 
+                        name="السابق"
+                        stroke="#D1D5DB" 
+                        strokeWidth={2}
+                        strokeDasharray="5 5"
+                      />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                    </ChartContainer>
+                  </div>
+                  <p className="text-xs text-muted-foreground">تحليل كفاءة استهلاك الطاقة خلال المباراة</p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
+        </TabsContent>
+
+        <TabsContent value="metrics">
+          <div className="grid grid-cols-1 gap-6">
+            <MovementAnalysisChart 
+              movementData={movementData}
+              speedZones={speedZones}
+              sprintCount={12}
+              efficiencyScore={78}
+            />
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>تحليل متقدم للأداء الفني</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-primary/5 p-4 rounded-lg">
+                      <h3 className="text-sm font-medium text-primary mb-2 flex items-center">
+                        <Zap className="h-4 w-4 mr-2" />
+                        دقة الحركة
+                      </h3>
+                      <p className="text-3xl font-bold">{analysis.performance?.technical || 82}%</p>
+                      <p className="text-xs text-muted-foreground mt-1">تحسن بنسبة 4% عن التحليل السابق</p>
+                    </div>
+                    <div className="bg-primary/5 p-4 rounded-lg">
+                      <h3 className="text-sm font-medium text-primary mb-2 flex items-center">
+                        <TrendingUp className="h-4 w-4 mr-2" />
+                        التوازن الحركي
+                      </h3>
+                      <p className="text-3xl font-bold">{analysis.stats?.balance || 76}%</p>
+                      <p className="text-xs text-muted-foreground mt-1">متوسط خلال الفترة الأخيرة</p>
+                    </div>
+                    <div className="bg-primary/5 p-4 rounded-lg">
+                      <h3 className="text-sm font-medium text-primary mb-2 flex items-center">
+                        <Activity className="h-4 w-4 mr-2" />
+                        الكفاءة الحركية
+                      </h3>
+                      <p className="text-3xl font-bold">{(analysis.stats?.agility || 0) + 5}%</p>
+                      <p className="text-xs text-muted-foreground mt-1">تحسن ملحوظ في الكفاءة الحركية</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div className="bg-secondary/10 p-4 rounded-lg">
+                      <h3 className="font-medium mb-2 flex items-center">
+                        <Timer className="h-4 w-4 mr-2 text-amber-500" />
+                        مؤشرات التحمل
+                      </h3>
+                      <div className="space-y-3">
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>القدرة على التحمل</span>
+                            <span className="font-medium">{85}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div className="bg-amber-500 h-2 rounded-full" style={{ width: '85%' }}></div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>سرعة الاستشفاء</span>
+                            <span className="font-medium">{78}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div className="bg-amber-500 h-2 rounded-full" style={{ width: '78%' }}></div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>ثبات الأداء</span>
+                            <span className="font-medium">{70}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div className="bg-amber-500 h-2 rounded-full" style={{ width: '70%' }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-secondary/10 p-4 rounded-lg">
+                      <h3 className="font-medium mb-2 flex items-center">
+                        <Dumbbell className="h-4 w-4 mr-2 text-blue-500" />
+                        ملف التسارع
+                      </h3>
+                      <div className="space-y-3">
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>التسارع المفاجئ</span>
+                            <span className="font-medium">{65}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div className="bg-blue-500 h-2 rounded-full" style={{ width: '65%' }}></div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>التسارع المستمر</span>
+                            <span className="font-medium">{82}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div className="bg-blue-500 h-2 rounded-full" style={{ width: '82%' }}></div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>القدرة على الإبطاء</span>
+                            <span className="font-medium">{73}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div className="bg-blue-500 h-2 rounded-full" style={{ width: '73%' }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg mt-6 border border-blue-100 dark:border-blue-900/30">
+                    <h3 className="font-medium mb-2">التوصيات الفنية للحركة</h3>
+                    <ul className="list-disc list-inside space-y-2 text-sm">
+                      <li>تحسين التوازن أثناء تغيير الاتجاه بسرعة عالية</li>
+                      <li>تطوير كفاءة الحركة لتقليل استهلاك الطاقة خلال المباراة</li>
+                      <li>العمل على تحسين انفجارية التسارع في المسافات القصيرة</li>
+                      <li>تطوير القدرة على الحفاظ على السرعة القصوى لفترات أطول</li>
+                      <li>تمارين مخصصة لتحسين معدل الاستشفاء بعد الجهد العالي</li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
