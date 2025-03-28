@@ -1,13 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TeamCompatibilityResult } from '@/services/teamTacticsService';
+import { TeamCompatibilityResult } from '@/services/teamTactics';
 import { PlayerAnalysis } from '@/components/AnalysisReport.d';
 import { Loader2 } from "lucide-react";
-import teamTacticsService from '@/services/teamTacticsService';
+import teamTacticsService from '@/services/teamTactics';
 
 interface ClubCompatibilityPanelProps {
   playerAnalysis: PlayerAnalysis;
@@ -21,7 +20,6 @@ const ClubCompatibilityPanel: React.FC<ClubCompatibilityPanelProps> = ({ playerA
   useEffect(() => {
     const fetchCompatibility = async () => {
       try {
-        // Convert PlayerAnalysis stats to the format expected by teamTacticsService
         const adaptedStats = {
           avgSpeed: playerAnalysis.stats.pace || 70,
           maxSpeed: playerAnalysis.stats.acceleration || 75,
@@ -31,7 +29,6 @@ const ClubCompatibilityPanel: React.FC<ClubCompatibilityPanelProps> = ({ playerA
           technicalScore: playerAnalysis.stats.ballControl || 75,
           physicalScore: playerAnalysis.stats.physical || 75,
           movementEfficiency: playerAnalysis.stats.agility || 70,
-          // Additional properties needed by calculateTacticalFit
           passing: playerAnalysis.stats.passing || 70,
           ballControl: playerAnalysis.stats.ballControl || 70,
           vision: playerAnalysis.stats.vision || 70,
@@ -43,7 +40,6 @@ const ClubCompatibilityPanel: React.FC<ClubCompatibilityPanelProps> = ({ playerA
           decision: playerAnalysis.stats.decision || 70
         };
         
-        // Analyze compatibility with Saudi League teams
         const results = await teamTacticsService.analyzeTeamCompatibility(
           adaptedStats,
           playerAnalysis.position,
