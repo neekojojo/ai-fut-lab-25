@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { CalendarIcon, TrendingUp, Award, Zap } from 'lucide-react';
+import { CalendarIcon, Award, Zap } from 'lucide-react';
 import { PlayerAnalysis } from '@/components/AnalysisReport.d';
 
 interface PlayerDigitalIdentityProps {
@@ -11,13 +11,6 @@ interface PlayerDigitalIdentityProps {
 }
 
 const PlayerDigitalIdentity: React.FC<PlayerDigitalIdentityProps> = ({ analysis }) => {
-  // Calculate future value (20-30% increase based on talent score)
-  const currentValue = analysis.marketValue || "$500,000";
-  const currentValueNum = parseInt(currentValue.replace(/\$|,/g, ''));
-  const growthPercentage = 20 + (analysis.talentScore || 70) / 10;
-  const futureValueNum = Math.round(currentValueNum * (1 + growthPercentage / 100));
-  const futureValue = `$${futureValueNum.toLocaleString()}`;
-
   // Generate a unique player ID
   const playerId = `FUT-${Math.floor(Math.random() * 1000)}-${analysis.playerName.substring(0, 3).toUpperCase()}`;
 
@@ -61,28 +54,10 @@ const PlayerDigitalIdentity: React.FC<PlayerDigitalIdentityProps> = ({ analysis 
             <Progress value={analysis.performance?.physical || 70} className="h-2" />
           </div>
           
-          <div className="grid grid-cols-2 gap-4 mt-6">
-            <div className="rounded-lg border bg-card p-3 text-center">
-              <div className="flex items-center justify-center text-muted-foreground mb-1">
-                <Award className="h-4 w-4 mr-1" />
-                <span className="text-xs">القيمة الحالية</span>
-              </div>
-              <p className="font-bold text-primary">{currentValue}</p>
-            </div>
-            
-            <div className="rounded-lg border bg-card p-3 text-center">
-              <div className="flex items-center justify-center text-muted-foreground mb-1">
-                <TrendingUp className="h-4 w-4 mr-1" />
-                <span className="text-xs">القيمة المستقبلية</span>
-              </div>
-              <p className="font-bold text-primary">{futureValue}</p>
-            </div>
-          </div>
-          
           <div className="mt-4 flex items-center rounded-md bg-primary/10 p-2">
             <Zap className="h-5 w-5 text-primary mr-2" />
             <p className="text-xs">
-              معدل النمو المتوقع: <span className="font-bold">{growthPercentage.toFixed(1)}%</span>
+              <span className="font-bold">معدل التحسين المتوقع:</span> تتبع معدل تحسين المهارات مع التدريب
             </p>
           </div>
         </div>

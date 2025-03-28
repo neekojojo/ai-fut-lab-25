@@ -3,7 +3,6 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { 
   Brain, 
-  TrendingUp, 
   Target, 
   LineChart, 
   Zap
@@ -23,22 +22,15 @@ const PlatformSummary: React.FC<PlatformSummaryProps> = ({ isMobile }) => {
           </h2>
           <p className={`text-muted-foreground ${isMobile ? 'text-sm' : 'text-base'}`}>
             FootballAI Analyzer is a powerful platform that uses artificial intelligence to evaluate football players
-            with precision. Get detailed insights into technical skills, market value estimations, and personalized development plans.
+            with precision. Get detailed insights into technical skills, personalized development plans, and team compatibility analysis.
           </p>
         </div>
 
-        <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'md:grid-cols-2 lg:grid-cols-4 gap-6'}`}>
+        <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'md:grid-cols-3 gap-6'}`}>
           <FeatureCard
             icon={<Brain className="w-5 h-5 text-primary" />}
             title="Advanced Video Analysis"
             description="AI-powered video analysis that evaluates technical skills, positioning, and physical attributes"
-            isMobile={isMobile}
-          />
-          
-          <FeatureCard
-            icon={<TrendingUp className="w-5 h-5 text-primary" />}
-            title="Market Valuation"
-            description="Accurate prediction of player market value based on performance metrics and comparison data"
             isMobile={isMobile}
           />
           
