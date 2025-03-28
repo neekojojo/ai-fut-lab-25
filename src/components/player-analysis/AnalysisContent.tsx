@@ -9,10 +9,10 @@ import {
   TrainingRecommendation 
 } from '@/utils/ml/playerMLService';
 import { 
-  PlayerAnalysis, 
-  PlayerMovement, 
-  PassAttempt, 
-  PositionHeatmap 
+  PlayerAnalysis,
+  PlayerMovement,
+  PassAttempt,
+  PositionHeatmap
 } from '@/types/playerAnalysis';
 import ClubCompatibilityPanel from './ClubCompatibilityPanel';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
