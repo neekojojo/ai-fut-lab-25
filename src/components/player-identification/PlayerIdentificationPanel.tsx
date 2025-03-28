@@ -1,17 +1,15 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Search, InfoIcon } from 'lucide-react';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
+import { Check, Search, InfoIcon, RefreshCw, Loader2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { searchPlayersByName, searchTeamsByName } from '@/utils/videoDetection/playerIdentifier';
 import type { IdentifiedPlayer, IdentifiedTeam } from '@/utils/videoDetection/playerIdentification';
+import PlayerIdentificationCard from './PlayerIdentificationCard';
+import TeamIdentificationCard from './TeamIdentificationCard';
 
 interface PlayerIdentificationPanelProps {
   suggestedPlayers: IdentifiedPlayer[];
@@ -30,154 +28,196 @@ const PlayerIdentificationPanel: React.FC<PlayerIdentificationPanelProps> = ({
   selectedPlayer,
   selectedTeam
 }) => {
-  const [manualMode, setManualMode] = useState(false);
+  const [activeTab, setActiveTab] = useState<'suggested' | 'search'>('suggested');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<{
+    players: IdentifiedPlayer[];
+    teams: IdentifiedTeam[];
+  }>({
+    players: [],
+    teams: []
+  });
+  const [isSearching, setIsSearching] = useState(false);
 
-  const handlePlayerSelect = (playerId: string) => {
-    const player = suggestedPlayers.find(p => p.id === playerId) || null;
+  // تنفيذ البحث عند تغيير استعلام البحث
+  useEffect(() => {
+    const performSearch = async () => {
+      if (searchQuery.length < 2) {
+        setSearchResults({ players: [], teams: [] });
+        return;
+      }
+      
+      setIsSearching(true);
+      
+      try {
+        // البحث عن اللاعبين والفرق بشكل متوازٍ
+        const [playersResults, teamsResults] = await Promise.all([
+          searchPlayersByName(searchQuery),
+          searchTeamsByName(searchQuery)
+        ]);
+        
+        setSearchResults({
+          players: playersResults,
+          teams: teamsResults
+        });
+      } catch (error) {
+        console.error('خطأ أثناء البحث:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+    
+    // استخدام مؤقت لتأخير البحث حتى يتوقف المستخدم عن الكتابة
+    const timer = setTimeout(performSearch, 500);
+    
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+  
+  // دالة تحديد اللاعب
+  const handlePlayerSelect = (player: IdentifiedPlayer) => {
     onPlayerSelect(player);
   };
 
-  const handleTeamSelect = (teamId: string) => {
-    const team = suggestedTeams.find(t => t.id === teamId) || null;
+  // دالة تحديد الفريق
+  const handleTeamSelect = (team: IdentifiedTeam) => {
     onTeamSelect(team);
-  };
-  
-  // تحويل درجة الثقة إلى نص وصفي
-  const getConfidenceText = (score: number): string => {
-    if (score >= 0.8) return 'عالية';
-    if (score >= 0.6) return 'متوسطة';
-    return 'منخفضة';
-  };
-  
-  // تحويل درجة الثقة إلى لون
-  const getConfidenceColor = (score: number): string => {
-    if (score >= 0.8) return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-    if (score >= 0.6) return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
-    return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
   };
 
   return (
     <Card className="shadow-sm">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          تحديد هوية اللاعب والنادي
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setManualMode(!manualMode)}
-            className="text-xs"
-          >
-            {manualMode ? 'استخدام الاقتراحات' : 'إدخال يدوي'} 
-          </Button>
+          <div>تحديد هوية اللاعب والنادي</div>
+          
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'suggested' | 'search')} className="w-auto">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="suggested">المقترحة</TabsTrigger>
+              <TabsTrigger value="search">بحث</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </CardTitle>
         <CardDescription className="text-sm text-muted-foreground">
-          حدد هوية اللاعب والنادي من الاقتراحات التالية
+          {activeTab === 'suggested' ? 
+            'حدد هوية اللاعب والنادي من الاقتراحات التالية' : 
+            'ابحث عن اللاعب أو النادي بالاسم'}
         </CardDescription>
+        
+        {activeTab === 'search' && (
+          <div className="relative mt-2">
+            <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="ابحث عن اسم اللاعب أو الفريق..."
+              className="pl-3 pr-9 w-full"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        )}
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* قسم تحديد اللاعب */}
-        <div>
-          <h3 className="text-sm font-medium mb-2">تحديد اللاعب</h3>
-          
-          {manualMode ? (
-            <div className="mb-4">
-              <Select onValueChange={handlePlayerSelect}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="اختر لاعب..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {suggestedPlayers.map(player => (
-                    <SelectItem key={player.id} value={player.id}>
-                      {player.name} - {player.team}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          ) : (
-            <div className="space-y-2">
+        <TabsContent value="suggested" className="space-y-6 m-0 pt-2">
+          {/* قسم تحديد اللاعب */}
+          <div>
+            <h3 className="text-sm font-medium mb-3">تحديد اللاعب</h3>
+            
+            <div className="grid grid-cols-1 gap-3">
               {suggestedPlayers.map(player => (
-                <div 
-                  key={player.id} 
-                  className={`p-3 border rounded-md cursor-pointer transition-colors flex items-center justify-between ${
-                    selectedPlayer?.id === player.id 
-                      ? 'border-primary bg-primary/5' 
-                      : 'hover:bg-accent'
-                  }`}
-                  onClick={() => onPlayerSelect(player)}
-                >
-                  <div>
-                    <div className="font-medium">{player.name}</div>
-                    <div className="text-sm text-muted-foreground flex items-center gap-2">
-                      <span>{player.position}</span>
-                      <span>•</span>
-                      <span>{player.nationality}</span>
-                      <span>•</span>
-                      <span>{player.team}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge className={getConfidenceColor(player.confidenceScore)}>
-                      درجة الثقة: {getConfidenceText(player.confidenceScore)}
-                    </Badge>
-                    {selectedPlayer?.id === player.id && (
-                      <Check className="h-5 w-5 text-primary" />
-                    )}
-                  </div>
-                </div>
+                <PlayerIdentificationCard
+                  key={player.id}
+                  player={player}
+                  isSelected={selectedPlayer?.id === player.id}
+                  onSelect={() => handlePlayerSelect(player)}
+                />
               ))}
+              
+              {suggestedPlayers.length === 0 && (
+                <div className="text-center p-4 text-muted-foreground text-sm">
+                  لم يتم العثور على لاعبين مقترحين. يرجى تحميل فيديو للتحليل أو استخدام البحث.
+                </div>
+              )}
             </div>
-          )}
-        </div>
-        
-        {/* قسم تحديد النادي */}
-        <div>
-          <h3 className="text-sm font-medium mb-2">تحديد النادي</h3>
+          </div>
           
-          {manualMode ? (
-            <div className="mb-4">
-              <Select onValueChange={handleTeamSelect}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="اختر نادي..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {suggestedTeams.map(team => (
-                    <SelectItem key={team.id} value={team.id}>
-                      {team.name} - {team.league}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          ) : (
-            <div className="space-y-2">
+          {/* قسم تحديد النادي */}
+          <div>
+            <h3 className="text-sm font-medium mb-3">تحديد النادي</h3>
+            
+            <div className="grid grid-cols-1 gap-3">
               {suggestedTeams.map(team => (
-                <div 
-                  key={team.id} 
-                  className={`p-3 border rounded-md cursor-pointer transition-colors flex items-center justify-between ${
-                    selectedTeam?.id === team.id 
-                      ? 'border-primary bg-primary/5' 
-                      : 'hover:bg-accent'
-                  }`}
-                  onClick={() => onTeamSelect(team)}
-                >
-                  <div>
-                    <div className="font-medium">{team.name}</div>
-                    <div className="text-sm text-muted-foreground">{team.league}</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge className={getConfidenceColor(team.confidenceScore)}>
-                      درجة الثقة: {getConfidenceText(team.confidenceScore)}
-                    </Badge>
-                    {selectedTeam?.id === team.id && (
-                      <Check className="h-5 w-5 text-primary" />
-                    )}
-                  </div>
-                </div>
+                <TeamIdentificationCard 
+                  key={team.id}
+                  team={team}
+                  isSelected={selectedTeam?.id === team.id}
+                  onSelect={() => handleTeamSelect(team)}
+                />
               ))}
+              
+              {suggestedTeams.length === 0 && (
+                <div className="text-center p-4 text-muted-foreground text-sm">
+                  لم يتم العثور على فرق مقترحة. يرجى تحميل فيديو للتحليل أو استخدام البحث.
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="search" className="space-y-6 m-0 pt-2">
+          {/* نتائج بحث اللاعبين */}
+          <div>
+            <h3 className="text-sm font-medium mb-3">نتائج بحث اللاعبين</h3>
+            
+            {isSearching ? (
+              <div className="flex items-center justify-center p-6">
+                <Loader2 className="h-8 w-8 animate-spin text-primary/70" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3">
+                {searchResults.players.map(player => (
+                  <PlayerIdentificationCard
+                    key={player.id}
+                    player={player}
+                    isSelected={selectedPlayer?.id === player.id}
+                    onSelect={() => handlePlayerSelect(player)}
+                  />
+                ))}
+                
+                {!isSearching && searchQuery.length >= 2 && searchResults.players.length === 0 && (
+                  <div className="text-center p-4 text-muted-foreground text-sm">
+                    لم يتم العثور على لاعبين مطابقين للبحث.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          
+          {/* نتائج بحث الفرق */}
+          <div>
+            <h3 className="text-sm font-medium mb-3">نتائج بحث الفرق</h3>
+            
+            {isSearching ? (
+              <div className="flex items-center justify-center p-6">
+                <Loader2 className="h-8 w-8 animate-spin text-primary/70" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3">
+                {searchResults.teams.map(team => (
+                  <TeamIdentificationCard 
+                    key={team.id}
+                    team={team}
+                    isSelected={selectedTeam?.id === team.id}
+                    onSelect={() => handleTeamSelect(team)}
+                  />
+                ))}
+                
+                {!isSearching && searchQuery.length >= 2 && searchResults.teams.length === 0 && (
+                  <div className="text-center p-4 text-muted-foreground text-sm">
+                    لم يتم العثور على فرق مطابقة للبحث.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </TabsContent>
         
         {/* نصائح حول كيفية تحسين دقة التعرف */}
         <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-md border border-blue-200 dark:border-blue-800">

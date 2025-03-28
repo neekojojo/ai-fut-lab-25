@@ -3,6 +3,8 @@ import { detectPeopleInVideo as detectWithTensorflow } from './detectionService'
 import { detectPlayersWithYOLO } from './yoloDetectionService';
 import { analyzeEyeMovement, type EyeTrackingAnalysis } from './eyeballTracking';
 import type { DetectionResult } from './types';
+import { identifyPlayersInDetectionResult } from './playerIdentifier';
+import { IdentifiedPlayer, IdentifiedTeam } from './playerIdentification';
 
 // Export a combined detection function
 export const detectPeopleInVideo = async (
@@ -26,6 +28,27 @@ export const analyzePlayerEyeMovement = async (
   detectionResult?: DetectionResult
 ): Promise<EyeTrackingAnalysis> => {
   return analyzeEyeMovement(videoFile, detectionResult);
+};
+
+// New function to identify players from detection results
+export const identifyPlayersFromVideo = async (
+  videoFile: File, 
+  detectionResult?: DetectionResult,
+  progressCallback?: (progress: number) => void
+): Promise<{
+  players: IdentifiedPlayer[],
+  teams: IdentifiedTeam[]
+}> => {
+  // If detection result not provided, perform detection first
+  const result = detectionResult || await detectPeopleInVideo(
+    videoFile,
+    'yolo', // Use YOLO for better accuracy in player detection
+    'm',
+    progressCallback
+  );
+  
+  // Identify players from the detection result
+  return identifyPlayersInDetectionResult(result, videoFile);
 };
 
 // Also export individual methods for direct access
