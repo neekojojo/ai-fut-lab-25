@@ -29,7 +29,7 @@ export const analyzeVideo = async (
     
     // Setup timeout to prevent indefinite hanging
     let analysisTimeout: number | undefined;
-    const maxAnalysisTime = 180000; // 3 minutes max
+    const maxAnalysisTime = 120000; // Reduced to 2 minutes max
     
     // Set to processing state with initial progress
     setAnalysisState('processing');
@@ -48,7 +48,7 @@ export const analyzeVideo = async (
     
     // Setup timeout to prevent indefinite hanging
     analysisTimeout = window.setTimeout(() => {
-      console.error("Analysis timed out after 3 minutes");
+      console.error("Analysis timed out after 2 minutes");
       toast({
         title: "انتهت مهلة التحليل",
         description: "استغرقت عملية التحليل وقتاً طويلاً جداً، يرجى المحاولة مرة أخرى.",
@@ -70,18 +70,27 @@ export const analyzeVideo = async (
     let currentStage = "بدء تحليل الفيديو";
     
     // Setup heartbeat to ensure UI progress updates
-    let lastProgressUpdate = 0;
+    let lastProgressUpdate = Date.now();
     const heartbeatInterval = window.setInterval(() => {
-      // If progress hasn't changed for 30 seconds, nudge it forward slightly
+      // If progress hasn't changed for 20 seconds, nudge it forward slightly
       const now = Date.now();
-      if (now - lastProgressUpdate > 30000 && lastProgressUpdate > 0) {
+      if (now - lastProgressUpdate > 20000 && lastProgressUpdate > 0) {
         if (currentProgress < 95) {
           console.log("Heartbeat nudging progress forward");
-          setProgress(currentProgress + 1);
+          currentProgress += 1;
+          setProgress(currentProgress);
           setStage(currentStage + ' (مستمر...)');
         }
       }
-    }, 15000);
+      
+      // If total time exceeds 90% of max time, speed up progress to ensure completion
+      const totalElapsed = now - analysisStartTime;
+      if (totalElapsed > (maxAnalysisTime * 0.9) && currentProgress < 90) {
+        console.log("Analysis approaching timeout, accelerating progress");
+        currentProgress = Math.min(95, currentProgress + 5);
+        setProgress(currentProgress);
+      }
+    }, 10000); // Check more frequently
     
     // Register for progress updates with detailed stages
     result.progressUpdates((progress, stage) => {

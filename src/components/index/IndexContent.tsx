@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { NavigateFunction } from 'react-router-dom';
 import LoadingAnimation from '@/components/LoadingAnimation';
@@ -26,6 +25,7 @@ const IndexContent: React.FC<IndexContentProps> = ({ navigate, isMobile }) => {
   const [showPeopleDetection, setShowPeopleDetection] = useState(false);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [selectedAnalysisModel, setSelectedAnalysisModel] = useState<'google-automl' | 'kaggle-datasets' | null>(null);
+  const [analysisStartTime, setAnalysisStartTime] = useState(Date.now());
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -47,6 +47,9 @@ const IndexContent: React.FC<IndexContentProps> = ({ navigate, isMobile }) => {
   const handleAnalyzeWithAI = async (fileToAnalyze = videoFile) => {
     if (!fileToAnalyze) return;
     
+    // Set the analysis start time
+    setAnalysisStartTime(Date.now());
+    
     AnalysisService.analyzeVideo(
       fileToAnalyze, 
       setAnalysisState,
@@ -54,7 +57,8 @@ const IndexContent: React.FC<IndexContentProps> = ({ navigate, isMobile }) => {
       setStage,
       setAnalysis,
       user,
-      { toast }
+      { toast },
+      resetAnalysis // Pass reset function as error callback
     );
   };
 
@@ -87,6 +91,16 @@ const IndexContent: React.FC<IndexContentProps> = ({ navigate, isMobile }) => {
         duration: 3000,
       });
       navigate('/sign-in');
+    }
+  };
+
+  const handleResetAnalysis = () => {
+    // If we have a video file, restart the analysis
+    if (videoFile) {
+      handleAnalyzeWithAI(videoFile);
+    } else {
+      // Otherwise just reset to idle state
+      resetAnalysis();
     }
   };
 
@@ -128,7 +142,13 @@ const IndexContent: React.FC<IndexContentProps> = ({ navigate, isMobile }) => {
       )}
       
       {analysisState === 'processing' && (
-        <AnalysisProcessing progress={progress} stage={stage} isMobile={isMobile} />
+        <AnalysisProcessing 
+          progress={progress} 
+          stage={stage} 
+          isMobile={isMobile}
+          onReset={handleResetAnalysis}
+          analysisStartTime={analysisStartTime}
+        />
       )}
       
       {analysisState === 'complete' && analysis && (
