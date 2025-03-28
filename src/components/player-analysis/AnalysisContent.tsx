@@ -1,14 +1,14 @@
 
 import React from 'react';
-import StatsPanel from './StatsPanel';
-import MovementPanel from './MovementPanel';
-import InsightsPanel from './InsightsPanel';
-import SimilarPlayersPanel from './SimilarPlayersPanel';
-import TrainingRecommendationsPanel from './TrainingRecommendationsPanel';
-import TeamCompatibilityPanel from './TeamCompatibilityPanel';
-import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
 import { ProfessionalPlayer } from '@/utils/ml/playerMLService';
+import {
+  StatsTabContent,
+  MovementTabContent,
+  InsightsTabContent,
+  SimilarPlayersTabContent,
+  TrainingTabContent,
+  ClubsTabContent
+} from './tab-contents';
 
 interface AnalysisContentProps {
   activeTab: string;
@@ -27,41 +27,34 @@ const AnalysisContent: React.FC<AnalysisContentProps> = ({
   playerComparison,
   onViewAdvanced 
 }) => {
-  // Handle button click for advanced movement analysis
-  const handleAdvancedView = () => {
-    console.log("Advanced movement analysis button clicked");
-    if (onViewAdvanced) {
-      onViewAdvanced();
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'stats':
+        return <StatsTabContent playerStats={playerStats} analysis={mockAnalysis.analysis} />;
+      
+      case 'movement':
+        return <MovementTabContent analysis={mockAnalysis.analysis} onViewAdvanced={onViewAdvanced} />;
+      
+      case 'insights':
+        return <InsightsTabContent analysis={mockAnalysis.analysis} />;
+      
+      case 'similar-players':
+        return <SimilarPlayersTabContent playerComparison={playerComparison} />;
+      
+      case 'training':
+        return <TrainingTabContent recommendations={trainingRecommendations} />;
+      
+      case 'clubs':
+        return <ClubsTabContent playerAnalysis={mockAnalysis.analysis} />;
+      
+      default:
+        return null;
     }
   };
 
   return (
     <div className="space-y-6">
-      {activeTab === 'stats' && <StatsPanel stats={playerStats} analysis={mockAnalysis.analysis} />}
-      
-      {activeTab === 'movement' && (
-        <div className="space-y-6">
-          <MovementPanel analysis={mockAnalysis.analysis} />
-          <div className="text-center">
-            <Button 
-              onClick={handleAdvancedView} 
-              variant="outline" 
-              className="gap-2"
-            >
-              <ExternalLink className="h-4 w-4 mr-1 rtl:ml-1 rtl:mr-0" />
-              عرض تحليل الحركة المتقدم
-            </Button>
-          </div>
-        </div>
-      )}
-      
-      {activeTab === 'insights' && <InsightsPanel analysis={mockAnalysis.analysis} />}
-      
-      {activeTab === 'similar-players' && <SimilarPlayersPanel playerComparison={playerComparison} />}
-      
-      {activeTab === 'training' && <TrainingRecommendationsPanel recommendations={trainingRecommendations} />}
-      
-      {activeTab === 'clubs' && <TeamCompatibilityPanel playerAnalysis={mockAnalysis.analysis} />}
+      {renderTabContent()}
     </div>
   );
 };
