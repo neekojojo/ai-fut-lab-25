@@ -1,6 +1,7 @@
 
 import React from "react";
 import { ChartConfigType } from "./types";
+import { ChartConfig } from "@/components/ui/chart/types";
 
 interface ChartConfigAdapterProps {
   config: ChartConfigType;
@@ -13,7 +14,7 @@ const ChartConfigAdapter: React.FC<ChartConfigAdapterProps> = ({
   children,
 }) => {
   // Convert our config to the expected format
-  const adaptedConfig = Object.entries(config).reduce((acc, [key, value]) => {
+  const adaptedConfig: ChartConfig = Object.entries(config).reduce((acc, [key, value]) => {
     acc[key] = {
       color: value.color,
       label: value.label,
@@ -25,13 +26,17 @@ const ChartConfigAdapter: React.FC<ChartConfigAdapterProps> = ({
     return acc;
   }, {} as Record<string, any>);
 
-  // Clone the children and pass the adapted config
-  return React.Children.map(children, (child) => {
-    if (React.isValidElement(child)) {
-      return React.cloneElement(child, { config: adaptedConfig });
-    }
-    return child;
-  });
+  // Return the children with the adapted config
+  return (
+    <>
+      {React.Children.map(children, (child) => {
+        if (React.isValidElement(child)) {
+          return React.cloneElement(child, { config: adaptedConfig });
+        }
+        return child;
+      })}
+    </>
+  );
 };
 
 export default ChartConfigAdapter;

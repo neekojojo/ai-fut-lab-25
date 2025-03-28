@@ -16,16 +16,6 @@ export const ChartContainer = React.forwardRef<
   const uniqueId = React.useId();
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`;
 
-  // Fix for the TypeScript error: properly checking if children is a valid React element
-  // If not, we need to ensure we're returning a proper ReactElement instead of just any ReactNode
-  const renderChildren = () => {
-    if (React.isValidElement(children)) {
-      return children;
-    }
-    // For non-element children (like strings), wrap them in a fragment
-    return <React.Fragment>{children}</React.Fragment>;
-  };
-
   return (
     <ChartContext.Provider value={{ config }}>
       <div
@@ -39,7 +29,7 @@ export const ChartContainer = React.forwardRef<
       >
         <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer>
-          {renderChildren()}
+          {children}
         </RechartsPrimitive.ResponsiveContainer>
       </div>
     </ChartContext.Provider>
