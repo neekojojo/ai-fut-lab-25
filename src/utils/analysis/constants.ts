@@ -60,3 +60,124 @@ export const DETAILED_STAGES = [
   "تكامل مع منصات التحليل الخارجية",
   "إنشاء التقرير النهائي"
 ];
+
+// Adding the missing PROFESSIONAL_PLAYERS constant
+export const PROFESSIONAL_PLAYERS = [
+  {
+    name: "Cristiano Ronaldo",
+    position: "Forward",
+    skills: ["Finishing", "Aerial ability", "Long shots", "Speed", "Power"],
+    style: "Direct, athletic forward with exceptional finishing ability"
+  },
+  {
+    name: "Lionel Messi",
+    position: "Forward",
+    skills: ["Dribbling", "Vision", "Finishing", "Free kicks", "Ball control"],
+    style: "Technical, creative playmaker with incredible close control"
+  },
+  {
+    name: "Kevin De Bruyne",
+    position: "Midfielder",
+    skills: ["Passing", "Vision", "Long shots", "Set pieces", "Work rate"],
+    style: "Complete midfielder with exceptional passing range and creativity"
+  },
+  {
+    name: "Virgil van Dijk",
+    position: "Defender",
+    skills: ["Aerial ability", "Tackling", "Positioning", "Leadership", "Composure"],
+    style: "Dominant, composed defender with excellent leadership qualities"
+  },
+  {
+    name: "Manuel Neuer",
+    position: "Goalkeeper",
+    skills: ["Shot stopping", "Sweeping", "Distribution", "Command of area", "One-on-ones"],
+    style: "Modern sweeper-keeper with excellent ball-playing ability"
+  },
+  {
+    name: "N'Golo Kanté",
+    position: "Midfielder",
+    skills: ["Tackling", "Interceptions", "Stamina", "Positioning", "Work rate"],
+    style: "Tireless ball-winner with exceptional defensive awareness"
+  },
+  {
+    name: "Karim Benzema",
+    position: "Forward",
+    skills: ["Finishing", "Link-up play", "Movement", "Technical ability", "Intelligence"],
+    style: "Complete forward with exceptional technical ability and game intelligence"
+  },
+  {
+    name: "Sergio Ramos",
+    position: "Defender",
+    skills: ["Tackling", "Leadership", "Aerial ability", "Set pieces", "Aggression"],
+    style: "Aggressive leader with exceptional set-piece ability"
+  },
+  {
+    name: "Trent Alexander-Arnold",
+    position: "Defender",
+    skills: ["Crossing", "Passing", "Set pieces", "Vision", "Technique"],
+    style: "Creative right-back with exceptional passing range"
+  }
+];
+
+// Adding the missing AVAILABLE_BADGES constant
+export const AVAILABLE_BADGES = [
+  {
+    name: "صانع اللعب",
+    description: "لاعب متميز في تمرير الكرة وصناعة الفرص",
+    level: "gold",
+    unlockCondition: (analysis) => analysis.stats.passing >= 85 && analysis.stats.vision >= 80
+  },
+  {
+    name: "القناص",
+    description: "مهارة استثنائية في إنهاء الهجمات وتسجيل الأهداف",
+    level: "gold",
+    unlockCondition: (analysis) => analysis.stats.shooting >= 85 && analysis.position === "Forward"
+  },
+  {
+    name: "المدافع الصلب",
+    description: "قدرات دفاعية متميزة وصلابة في المواجهات",
+    level: "gold",
+    unlockCondition: (analysis) => analysis.position === "Defender" && analysis.stats.defending >= 85
+  },
+  {
+    name: "الجناح السريع",
+    description: "سرعة فائقة وقدرة على اختراق الدفاعات",
+    level: "silver",
+    unlockCondition: (analysis) => analysis.stats.pace >= 85 && analysis.stats.dribbling >= 80
+  },
+  {
+    name: "لاعب الوسط الشامل",
+    description: "متوازن في المهارات الهجومية والدفاعية",
+    level: "silver",
+    unlockCondition: (analysis) => (
+      analysis.position === "Midfielder" && 
+      analysis.stats.passing >= 75 && 
+      analysis.stats.defending >= 70
+    )
+  },
+  {
+    name: "القائد",
+    description: "مهارات قيادية وتأثير إيجابي على الفريق",
+    level: "silver",
+    unlockCondition: (analysis) => analysis.stats.vision >= 80 && analysis.stats.decision >= 80
+  },
+  {
+    name: "المراوغ الماهر",
+    description: "قدرة استثنائية على المراوغة والتحكم بالكرة",
+    level: "bronze",
+    unlockCondition: (analysis) => analysis.stats.dribbling >= 80 && analysis.stats.ballControl >= 80
+  },
+  {
+    name: "لاعب تكتيكي",
+    description: "فهم ممتاز للجوانب التكتيكية وتنفيذ التعليمات",
+    level: "bronze",
+    unlockCondition: (analysis) => analysis.performance.tactical >= 80
+  },
+  {
+    name: "اللاعب الواعد",
+    description: "إمكانات واعدة ومستقبل مشرق في كرة القدم",
+    level: "bronze",
+    unlockCondition: (analysis) => analysis.talentScore >= 75 && analysis.talentScore < 85
+  }
+];
+
