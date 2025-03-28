@@ -1,46 +1,90 @@
-
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import MovementAnalysis from '@/components/MovementAnalysis';
-import AdvancedPlayerCharts from '@/components/AdvancedPlayerCharts';
-import PlayerStatsAR from '@/components/ar/PlayerStatsAR';
-import { PlayerStats } from '@/utils/dataProcessing/playerAnalysisTypes';
-import { PlayerComparison, TrainingRecommendation } from '@/utils/ml/playerMLService';
-import { PlayerAnalysis } from '@/components/AnalysisReport.d';
+import { 
+  PlayerStats, 
+  ProfessionalPlayer, 
+  SimilarityMetric, 
+  TrainingRecommendation 
+} from '@/utils/ml/playerMLService';
+import { 
+  PlayerAnalysis, 
+  PlayerMovement, 
+  PassAttempt, 
+  PositionHeatmap 
+} from '@/components/AnalysisReport.d';
+import ClubCompatibilityPanel from './ClubCompatibilityPanel';
+
+// Define interfaces for props
+interface MockAnalysis {
+  playerMovements: PlayerMovement[];
+  passes: PassAttempt[];
+  heatmap: PositionHeatmap[];
+  analysis: PlayerAnalysis;
+}
 
 interface AnalysisContentProps {
   activeTab: string;
   playerStats: PlayerStats;
-  mockAnalysis: PlayerAnalysis;
+  mockAnalysis: MockAnalysis;
   trainingRecommendations: TrainingRecommendation[];
-  playerComparison: PlayerComparison;
+  playerComparison: {
+    similarPlayers: ProfessionalPlayer[];
+    similarityMetrics: SimilarityMetric[];
+  };
 }
 
-const AnalysisContent: React.FC<AnalysisContentProps> = ({
-  activeTab,
-  playerStats,
-  mockAnalysis,
-  trainingRecommendations,
-  playerComparison
+const AnalysisContent: React.FC<AnalysisContentProps> = ({ 
+  activeTab, 
+  playerStats, 
+  mockAnalysis, 
+  trainingRecommendations, 
+  playerComparison 
 }) => {
+  // We'll use the analysis from mockAnalysis for consistency
+  const analysis = mockAnalysis.analysis;
+  
   return (
-    <Card>
-      <CardContent className="p-6">
-        {activeTab === 'movement' ? (
-          <MovementAnalysis analysis={mockAnalysis} />
-        ) : activeTab === 'charts' ? (
-          <AdvancedPlayerCharts 
-            playerStats={playerStats} 
-            playerName={mockAnalysis.playerName}
-            playerPosition={mockAnalysis.position}
-            trainingRecommendations={trainingRecommendations}
-            playerComparison={playerComparison}
-          />
-        ) : (
-          <PlayerStatsAR playerStats={playerStats} playerName={mockAnalysis.playerName} />
-        )}
-      </CardContent>
-    </Card>
+    <div className="space-y-4">
+      {activeTab === 'movement' && (
+        <div className="grid grid-cols-1 gap-4">
+          {/* Add your movement analysis components here */}
+          <p>Movement Analysis Content</p>
+        </div>
+      )}
+      
+      {activeTab === 'technical' && (
+        <div className="grid grid-cols-1 gap-4">
+          {/* Add your technical analysis components here */}
+          <p>Technical Analysis Content</p>
+        </div>
+      )}
+      
+      {activeTab === 'tactical' && (
+        <div className="grid grid-cols-1 gap-4">
+          {/* Add your tactical analysis components here */}
+          <p>Tactical Analysis Content</p>
+        </div>
+      )}
+      
+      {activeTab === 'physical' && (
+        <div className="grid grid-cols-1 gap-4">
+          {/* Add your physical analysis components here */}
+          <p>Physical Analysis Content</p>
+        </div>
+      )}
+      
+      {activeTab === 'comparison' && (
+        <div className="grid grid-cols-1 gap-4">
+          {/* Add your comparison analysis components here */}
+          <p>Comparison Analysis Content</p>
+        </div>
+      )}
+      
+      {activeTab === 'club-compatibility' && (
+        <div className="grid grid-cols-1 gap-4">
+          <ClubCompatibilityPanel playerAnalysis={analysis} />
+        </div>
+      )}
+    </div>
   );
 };
 

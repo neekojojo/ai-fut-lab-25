@@ -27,8 +27,8 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
   
   useEffect(() => {
     toast({
-      title: "Advanced Analysis Ready",
-      description: "Explore detailed movement patterns and performance metrics across different tabs.",
+      title: "تحليل متقدم جاهز",
+      description: "استكشف أنماط الحركة التفصيلية ومقاييس الأداء عبر علامات التبويب المختلفة، بما في ذلك توافق اللاعب مع الأندية.",
     });
   }, []);
   
