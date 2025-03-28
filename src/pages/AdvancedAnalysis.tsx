@@ -5,10 +5,9 @@ import Header from '@/components/Header';
 import AdvancedPlayerDashboard from '@/components/advanced-analysis/AdvancedPlayerDashboard';
 import { PlayerAnalysis } from '@/types/playerAnalysis';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/toaster';
 import { ArrowLeft, Loader2 } from 'lucide-react';
-import { analyzeFootballVideo } from '@/utils/analysis';
-import { fetchPlayerAnalyses } from '@/services/playerAnalysisService';
+import { fetchPlayerAnalysisById, fetchPlayerAnalyses } from '@/services/playerAnalysisService';
 
 const AdvancedAnalysis: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,22 +22,22 @@ const AdvancedAnalysis: React.FC = () => {
       try {
         setIsLoading(true);
         
-        // 1. Fetch current analysis
+        // 1. التحقق من وجود المعرف
         if (!id) {
           throw new Error('معرف التحليل غير متوفر');
         }
         
-        // حصول على التحليلات السابقة
-        const allAnalyses = await fetchPlayerAnalyses();
-        
-        // البحث عن التحليل الحالي من قائمة التحليلات
-        const currentAnalysis = allAnalyses.find(a => a.id === id);
+        // 2. الحصول على التحليل الحالي باستخدام المعرف
+        const currentAnalysis = await fetchPlayerAnalysisById(id);
         
         if (!currentAnalysis) {
           throw new Error('لم يتم العثور على التحليل');
         }
         
-        // تحديد التحليلات السابقة (باستثناء التحليل الحالي)
+        // 3. الحصول على التحليلات السابقة
+        const allAnalyses = await fetchPlayerAnalyses();
+        
+        // 4. تصفية التحليلات السابقة (باستثناء التحليل الحالي)
         const previousPlayerAnalyses = allAnalyses
           .filter(a => a.id !== id && a.playerId === currentAnalysis.playerId)
           .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
