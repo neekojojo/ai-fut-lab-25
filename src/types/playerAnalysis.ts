@@ -7,7 +7,7 @@ import { ProgressData } from './progress';
 import { InjuryRiskData } from './injuries';
 import { SimilarProfessional } from './training';
 
-// Re-export the types from playerMovement.ts
+// Re-export the types from playerMovement.ts with proper syntax
 export type { PlayerMovement, PassAttempt, PositionHeatmap } from './playerMovement';
 
 // Core player analysis type
