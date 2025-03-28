@@ -18,7 +18,7 @@ interface PlayerAnalysisViewProps {
 }
 
 const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onResetAnalysis }) => {
-  const [activeTab, setActiveTab] = useState('movement');
+  const [activeTab, setActiveTab] = useState('clubs'); // Set default tab to clubs
   const [viewMode, setViewMode] = useState<'tabs' | 'advanced'>('tabs');
   const { toast } = useToast();
   

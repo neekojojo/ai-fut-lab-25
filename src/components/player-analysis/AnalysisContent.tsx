@@ -5,7 +5,7 @@ import MovementPanel from './MovementPanel';
 import InsightsPanel from './InsightsPanel';
 import SimilarPlayersPanel from './SimilarPlayersPanel';
 import TrainingRecommendationsPanel from './TrainingRecommendationsPanel';
-import ClubCompatibilityPanel from './ClubCompatibilityPanel';
+import TeamCompatibilityPanel from './TeamCompatibilityPanel';
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import { ProfessionalPlayer } from '@/utils/ml/playerMLService';
@@ -49,7 +49,7 @@ const AnalysisContent: React.FC<AnalysisContentProps> = ({
       
       {activeTab === 'training' && <TrainingRecommendationsPanel recommendations={trainingRecommendations} />}
       
-      {activeTab === 'clubs' && <ClubCompatibilityPanel playerAnalysis={mockAnalysis.analysis} />}
+      {activeTab === 'clubs' && <TeamCompatibilityPanel playerAnalysis={mockAnalysis.analysis} />}
     </div>
   );
 };
