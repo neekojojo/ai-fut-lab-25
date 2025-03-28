@@ -31,6 +31,7 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
     toast({
       title: "تحليل متقدم جاهز",
       description: "استكشف أنماط الحركة التفصيلية ومقاييس الأداء عبر علامات التبويب المختلفة، بما في ذلك توافق اللاعب مع الأندية.",
+      className: "bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border-primary/20",
     });
   }, []);
 
@@ -45,16 +46,23 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
   
   return (
     <div className="space-y-6 animate-fade-in">
-      <AnalysisHeader onResetAnalysis={onResetAnalysis} />
-      <AnalysisTabNav activeTab={activeTab} setActiveTab={setActiveTab} />
-      <AnalysisContent
-        activeTab={activeTab}
-        playerStats={playerStats}
-        mockAnalysis={mockAnalysis}
-        trainingRecommendations={trainingRecommendations}
-        playerComparison={playerComparison}
-        onViewAdvanced={() => setViewMode('advanced')}
-      />
+      <div className="bg-gradient-to-r from-primary/5 to-transparent p-4 rounded-lg shadow-sm border border-primary/10">
+        <AnalysisHeader onResetAnalysis={onResetAnalysis} />
+      </div>
+      
+      <div className="bg-white dark:bg-gray-900/50 shadow-sm rounded-lg overflow-hidden border border-primary/10">
+        <AnalysisTabNav activeTab={activeTab} setActiveTab={setActiveTab} />
+        <div className="p-4">
+          <AnalysisContent
+            activeTab={activeTab}
+            playerStats={playerStats}
+            mockAnalysis={mockAnalysis}
+            trainingRecommendations={trainingRecommendations}
+            playerComparison={playerComparison}
+            onViewAdvanced={() => setViewMode('advanced')}
+          />
+        </div>
+      </div>
     </div>
   );
 };
