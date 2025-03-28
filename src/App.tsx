@@ -6,6 +6,7 @@ import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
 import NotFound from './pages/NotFound';
 import ProfessionalTips from './pages/ProfessionalTips';
+import StressManagement from './pages/StressManagement';
 import { Toaster } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/components/auth/AuthContext';
@@ -30,6 +31,7 @@ function App() {
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/professional-tips" element={<ProfessionalTips />} />
+            <Route path="/stress-management" element={<StressManagement />} />
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="*" element={<NotFound />} />

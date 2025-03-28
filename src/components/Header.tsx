@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/auth/AuthContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { UserIcon, GraduationCap } from 'lucide-react';
+import { UserIcon, GraduationCap, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 const Header = () => {
@@ -68,6 +68,17 @@ const Header = () => {
                   <span className="flex items-center gap-1">
                     <GraduationCap className="h-4 w-4" />
                     <span>نصائح احترافية</span>
+                  </span>
+                </Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                <Link to="/stress-management">
+                  <span className="flex items-center gap-1">
+                    <Shield className="h-4 w-4" />
+                    <span>التحكم في التوتر</span>
                   </span>
                 </Link>
               </NavigationMenuLink>
