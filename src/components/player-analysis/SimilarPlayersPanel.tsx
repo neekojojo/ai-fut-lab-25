@@ -22,7 +22,7 @@ const SimilarPlayersPanel: React.FC<SimilarPlayersPanelProps> = ({ playerCompari
               <div className="flex items-center space-x-3 rtl:space-x-reverse">
                 <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full bg-gray-100">
                   <img 
-                    src={player.photo || "/placeholder.svg"} 
+                    src={"/placeholder.svg"} 
                     alt={player.name} 
                     className="h-full w-full object-cover"
                   />
@@ -49,7 +49,7 @@ const SimilarPlayersPanel: React.FC<SimilarPlayersPanelProps> = ({ playerCompari
               
               <div>
                 <h4 className="text-sm font-medium mb-2">ما يمكن تعلمه:</h4>
-                <p className="text-sm">{player.learningPoints || 'التركيز على تحسين نقاط القوة المماثلة'}</p>
+                <p className="text-sm">التركيز على تحسين نقاط القوة المماثلة</p>
               </div>
             </div>
           ))}

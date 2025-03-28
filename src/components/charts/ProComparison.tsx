@@ -1,23 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Bar, 
-  BarChart, 
-  CartesianGrid, 
-  Cell, 
-  ResponsiveContainer, 
-  Tooltip, 
-  XAxis, 
-  YAxis 
-} from 'recharts';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CHART_COLORS } from './constants';
 import { PlayerComparison } from '@/utils/ml/playerMLService';
-import { professionalPlayerService } from '@/services/professionalPlayerService';
 import { PlayerStats } from '@/utils/dataProcessing/playerAnalysisTypes';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
-import { Search, RefreshCw } from 'lucide-react';
+import { professionalPlayerService } from '@/services/professionalPlayerService';
+import { PlayerSimilarityCard } from './pro-comparison/PlayerSimilarityCard';
+import { AttributeComparisonCard } from './pro-comparison/AttributeComparisonCard';
 
 interface ProComparisonProps {
   playerComparison?: PlayerComparison;
@@ -113,120 +100,19 @@ export const ProComparison: React.FC<ProComparisonProps> = ({
 
   return (
     <>
-      <Card>
-        <CardHeader className="pb-2">
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle>Pro Player Similarity</CardTitle>
-              <CardDescription>
-                How your skills compare to professional players
-              </CardDescription>
-            </div>
-            {playerStats && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={fetchRealComparison} 
-                disabled={isLoading}
-              >
-                {isLoading ? <Skeleton className="h-4 w-4 rounded-full" /> : <RefreshCw className="h-4 w-4 mr-2" />}
-                {isLoading ? 'Loading...' : 'Refresh Data'}
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {error && (
-            <div className="p-4 mb-4 bg-red-50 text-red-700 rounded-md">
-              {error}
-            </div>
-          )}
-          
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {Array(3).fill(0).map((_, i) => (
-                <div key={i} className="flex flex-col items-center p-4 border rounded-lg animate-pulse">
-                  <div className="w-20 h-20 rounded-full bg-gray-200 mb-2"></div>
-                  <div className="h-5 bg-gray-200 rounded w-24 mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-16 mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-12 mb-2"></div>
-                  <div className="w-full h-20 mt-2 bg-gray-200 rounded"></div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {professionals.map((player, index) => (
-                <div key={index} className="flex flex-col items-center p-4 border rounded-lg bg-card">
-                  <div className="w-20 h-20 rounded-full flex items-center justify-center bg-primary/10 mb-2">
-                    <span className="text-xl font-bold text-primary">{player.name.charAt(0)}</span>
-                  </div>
-                  <h4 className="text-lg font-medium">{player.name}</h4>
-                  <p className="text-sm text-muted-foreground">{player.team}</p>
-                  <p className="text-sm text-muted-foreground capitalize">{player.position}</p>
-                  <div className="mt-2 flex items-center">
-                    <span className="text-lg font-bold text-primary">{player.similarity}%</span>
-                    <span className="ml-2 text-sm">match</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-sm font-medium">Strengths:</p>
-                    <ul className="text-xs list-disc list-inside">
-                      {player.strengths.map((strength, i) => (
-                        <li key={i}>{strength}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <PlayerSimilarityCard
+        professionals={professionals}
+        isLoading={isLoading}
+        error={error}
+        playerStats={playerStats}
+        fetchRealComparison={fetchRealComparison}
+      />
     
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle>Attribute Comparison</CardTitle>
-          <CardDescription>
-            How specific attributes compare to {professionals[0]?.name || "professionals"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="h-80 w-full bg-gray-100 animate-pulse rounded"></div>
-          ) : (
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={comparisonData}
-                  layout="vertical"
-                  margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" domain={[0, 100]} />
-                  <YAxis type="category" dataKey="category" width={90} />
-                  <Tooltip formatter={(value) => [`${value}% similar`, ""]} />
-                  <Bar dataKey="score" fill={CHART_COLORS.primary} radius={[0, 4, 4, 0]}>
-                    {comparisonData.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`}
-                        fill={entry.score > 75 ? CHART_COLORS.positive : entry.score > 50 ? CHART_COLORS.primary : CHART_COLORS.negative}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-          
-          <div className="mt-4 space-y-2">
-            {comparisonData.map((metric, index) => (
-              <div key={index} className="text-sm">
-                <span className="font-medium">{metric.category}</span>: {metric.description}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <AttributeComparisonCard
+        comparisonData={comparisonData}
+        isLoading={isLoading}
+        professionalName={professionals[0]?.name || "professionals"}
+      />
     </>
   );
 };
