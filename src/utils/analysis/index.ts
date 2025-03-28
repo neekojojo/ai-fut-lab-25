@@ -1,60 +1,29 @@
+
 import type { PlayerAnalysis } from "@/components/AnalysisReport.d";
 import { ANALYSIS_STAGES } from "./constants";
 import { generateEnhancedAnalysis } from "./analysisMockGenerator";
 import { compareWithPreviousAnalyses } from "./comparisonService";
 import { playerMLService } from "@/utils/ml/playerMLService";
 import { apiProxyService } from "@/services/apiProxyService";
-import { detectPeopleInVideo, analyzePlayerEyeMovement } from "@/utils/videoDetection";
-import { analyzePlayerMovements } from "@/utils/videoDetection/movementAnalysis";
-import { StatsCalculator } from "@/utils/dataProcessing/statsCalculator";
-import { extractVideoFrames } from "@/utils/videoDetection/frameExtraction";
-import type { DetectionResult } from "@/utils/videoDetection/types";
-
-// Enhanced stages for more realistic analysis flow with eye tracking
-const DETAILED_STAGES = [
-  'بدء تحليل الفيديو',                    // Start video analysis
-  'استخراج إطارات الفيديو',               // Extract video frames
-  'تحليل حركة اللاعب',                    // Player movement analysis
-  'اكتشاف مواقع اللاعبين',                 // Player position detection
-  'تحليل حركة العين وتوقع الموهبة',         // Eye tracking and talent prediction (NEW)
-  'تحليل الحركة والسرعة',                  // Speed and movement analysis
-  'تحليل المهارات الفنية',                 // Technical skills analysis
-  'قياس المؤشرات البدنية',                  // Physical metrics measurement
-  'تحديد نقاط القوة والضعف',               // Identifying strengths and weaknesses
-  'مقارنة مع البيانات المرجعية',            // Comparison with benchmark data
-  'حساب المؤشرات التكتيكية',               // Calculate tactical indicators
-  'تقييم الأداء الشامل',                   // Overall performance evaluation
-  'إنشاء تقرير التحليل النهائي',            // Compile final analysis report
-  'اكتمال التحليل'                        // Analysis complete
-];
-
-// Cache to store analysis results by video hash
-const analysisCache = new Map<string, PlayerAnalysis>();
+import { createDeterministicSeed, generateVideoHash } from "./videoUtils";
+import { ProgressTracker, ProgressCallback, DETAILED_STAGES } from "./progressTracker";
+import { performAnalysis } from "./analysisProcessor";
 
 // Type definition for the return value of analyzeFootballVideo
 export interface FootballVideoAnalysisResult {
   analysis: PlayerAnalysis;
-  progressUpdates: (callback: (progress: number, stage: string) => void) => void;
+  progressUpdates: (callback: ProgressCallback) => void;
 }
+
+// Cache to store analysis results by video hash
+const analysisCache = new Map<string, PlayerAnalysis>();
 
 // Analyze the football video with a combination of real detection and synthetic data
 export const analyzeFootballVideo = async (videoFile: File): Promise<FootballVideoAnalysisResult> => {
-  // Setup progress tracking variables
-  let currentProgress = 0;
-  let currentStage = DETAILED_STAGES[0];
+  // Setup progress tracking 
+  const progressTracker = new ProgressTracker(DETAILED_STAGES[0]);
   let isAnalysisRunning = false;
-  const updateCallbacks: Array<(progress: number, stage: string) => void> = [];
   
-  // Function to update progress
-  const updateProgress = (progress: number, stageIndex: number) => {
-    const stage = DETAILED_STAGES[stageIndex] || DETAILED_STAGES[DETAILED_STAGES.length - 1];
-    console.log(`Analysis progress: ${progress}%, stage: ${stage}`);
-    currentProgress = progress;
-    currentStage = stage;
-    // Call all registered callbacks with new progress
-    updateCallbacks.forEach(callback => callback(progress, stage));
-  };
-
   // Generate a deterministic hash for the video file with enhanced properties
   const videoHash = await generateVideoHash(videoFile);
   
@@ -68,19 +37,10 @@ export const analyzeFootballVideo = async (videoFile: File): Promise<FootballVid
       analysis: cachedAnalysis,
       progressUpdates: (callback) => {
         // Register callback
-        updateCallbacks.push(callback);
+        progressTracker.registerCallback(callback);
         
-        // Simulate progress for cached results with more detailed stages
-        const totalStages = DETAILED_STAGES.length;
-        for (let i = 0; i < totalStages; i++) {
-          const progress = Math.min(100, Math.round((i / (totalStages - 1)) * 100));
-          // Create closures with different delays for each stage
-          ((index, prog) => {
-            setTimeout(() => { 
-              callback(prog, DETAILED_STAGES[index]);
-            }, 300 * index + Math.random() * 200);
-          })(i, progress);
-        }
+        // Simulate progress for cached results
+        progressTracker.simulateCachedProgress();
       }
     };
   }
@@ -92,412 +52,30 @@ export const analyzeFootballVideo = async (videoFile: File): Promise<FootballVid
   // Return result object immediately with function to register progress callbacks
   const resultObj = {
     analysis: baselineAnalysis,
-    progressUpdates: (callback: (progress: number, stage: string) => void) => {
+    progressUpdates: (callback: ProgressCallback) => {
       // Register the callback
-      updateCallbacks.push(callback);
+      progressTracker.registerCallback(callback);
       
       // If analysis hasn't started yet, start it now
       if (!isAnalysisRunning) {
         isAnalysisRunning = true;
-        performAnalysis();
-      }
-      
-      // Immediately call with current progress
-      callback(currentProgress, currentStage);
-    }
-  };
-  
-  // Generate a more realistic video hash that considers file contents
-  async function generateVideoHash(file: File): Promise<string> {
-    // Create a hash based on file name, size, and the first few bytes of content
-    const firstChunk = await readFirstChunkOfFile(file, 1024);
-    const contentHash = await simpleHash(firstChunk);
-    return `${file.name}-${file.size}-${contentHash}`;
-  }
-  
-  // Read the first chunk of a file
-  async function readFirstChunkOfFile(file: File, size: number): Promise<ArrayBuffer> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          resolve(e.target.result as ArrayBuffer);
-        } else {
-          reject(new Error("Failed to read file chunk"));
-        }
-      };
-      reader.onerror = reject;
-      const blob = file.slice(0, Math.min(size, file.size));
-      reader.readAsArrayBuffer(blob);
-    });
-  }
-  
-  // Simple hash function for array buffer
-  async function simpleHash(buffer: ArrayBuffer): Promise<string> {
-    const arr = new Uint8Array(buffer);
-    let hash = 0;
-    for (let i = 0; i < arr.length; i++) {
-      hash = ((hash << 5) - hash) + arr[i];
-      hash |= 0; // Convert to 32bit integer
-    }
-    return hash.toString(36);
-  }
-  
-  // Create a deterministic seed based on video file properties
-  async function createDeterministicSeed(file: File): Promise<number> {
-    const firstChunk = await readFirstChunkOfFile(file, 512);
-    const arr = new Uint8Array(firstChunk);
-    // Create a more varied seed by sampling bytes from the file
-    let seed = file.size;
-    for (let i = 0; i < arr.length; i += 32) {
-      if (i < arr.length) {
-        seed = (seed * 33) + arr[i];
-      }
-    }
-    return Math.abs(seed);
-  }
-  
-  // Analysis process function with more detailed and realistic steps
-  const performAnalysis = async () => {
-    try {
-      // Step 1 - Initial setup (5%)
-      updateProgress(5, 0);
-      
-      // Small delay to ensure UI updates and simulate initial processing
-      await simulateProcessingDelay(400, 600);
-      
-      // Step 2 - Extract frames from video (12%)
-      updateProgress(12, 1);
-      console.log("Extracting video frames for analysis...");
-      // Simulate actual frame extraction by reading small portions of the video
-      try {
-        const frameExtractionStart = performance.now();
-        // Actually try to extract a few frames - helps with realism
-        const frames = await extractVideoFrames(videoFile, 2).catch(() => []);
-        const frameExtractionTime = performance.now() - frameExtractionStart;
-        console.log(`Extracted sample frames in ${frameExtractionTime.toFixed(2)}ms`);
-        // Delay based on video size for more realistic timing
-        await simulateProcessingDelay(700, videoFile.size / 1000000 * 30);
-      } catch (e) {
-        console.warn("Frame extraction simulation error:", e);
-        // Continue with analysis even if frame extraction fails
-        await simulateProcessingDelay(300, 800);
-      }
-      
-      // Step 3 - Detect players in video (25%)
-      updateProgress(25, 2);
-      console.log("Analyzing player movements...");
-      await simulateProcessingDelay(800, 1200);
-      
-      // Step 4 - Player position detection (35%)
-      updateProgress(35, 3);
-      console.log("Detecting player positions...");
-      
-      // Fix: Create a properly structured DetectionResult object
-      const detectionResult: DetectionResult = {
-        count: Math.round(5 + Math.random() * 5), // Random count between 5-10 players
-        confidence: 0.85 + (Math.random() * 0.1 - 0.05), // 0.8-0.9 range
-        frameResults: Array(10).fill(0).map((_, i) => ({
-          frameNumber: i,
-          detections: Math.round(5 + Math.random() * 5),
-          timestamp: i * 100, // milliseconds
-        })),
-        playerPositions: generateRealisticPlayerPositions(videoFile),
-      };
-      
-      await simulateProcessingDelay(600, 900);
-      
-      // Step 5 - Eye movement analysis (NEW) (45%)
-      updateProgress(45, 4);
-      console.log("Analyzing eye movement and predicting talent...");
-      // Perform eye tracking analysis
-      const eyeTrackingResult = await analyzePlayerEyeMovement(videoFile, detectionResult);
-      console.log("Eye tracking analysis complete:", eyeTrackingResult);
-      await simulateProcessingDelay(1000, 1500); // Longer delay for complex analysis
-      
-      // Step 6 - Speed and movement analysis (55%)
-      updateProgress(55, 5);
-      console.log("Analyzing player speed and movement patterns...");
-      await simulateProcessingDelay(700, 1000);
-      
-      // Step 7 - Technical skills analysis (65%)
-      updateProgress(65, 6);
-      console.log("Analyzing technical skills...");
-      await simulateProcessingDelay(800, 1200);
-      
-      // Step 8 - Physical metrics measurement (75%)
-      updateProgress(75, 7);
-      const movementAnalysis = {
-        averageSpeed: 12 + (Math.random() * 8 - 4), // 8-16 range
-        totalDistance: 500 + Math.random() * 300, // 500-800 range
-        maxAcceleration: 4 + Math.random() * 3 // 4-7 range
-      };
-      await simulateProcessingDelay(500, 800);
-      
-      // Step 9 - Identifying strengths and weaknesses (80%)
-      updateProgress(80, 8);
-      console.log("Identifying player strengths and weaknesses...");
-      await simulateProcessingDelay(600, 900);
-      
-      // Step 10 - Comparison with benchmark data (85%)
-      updateProgress(85, 9);
-      console.log("Comparing with benchmark data...");
-      await simulateProcessingDelay(500, 700);
-      
-      // Step 11 - Calculate tactical indicators (90%)
-      updateProgress(90, 10);
-      console.log("Calculating tactical indicators...");
-      await simulateProcessingDelay(600, 800);
-      
-      // Step 12 - Overall performance evaluation (93%)
-      updateProgress(93, 11);
-      console.log("Evaluating overall performance...");
-      
-      // Create enhanced analysis by combining baseline with more "realistic" data
-      // Now including eye tracking data
-      const videoProperties = await getVideoProperties(videoFile);
-      const enhancedAnalysis: PlayerAnalysis = createEnhancedAnalysis(
-        baselineAnalysis,
-        detectionResult, 
-        movementAnalysis,
-        videoProperties,
-        eyeTrackingResult
-      );
-      
-      // Update the analysis in the result
-      resultObj.analysis = enhancedAnalysis;
-      await simulateProcessingDelay(700, 1000);
-      
-      // Step 13 - Final formatting (97%)
-      updateProgress(97, 12);
-      console.log("Compiling final analysis report...");
-      await simulateProcessingDelay(600, 800);
-      
-      // Cache the analysis result for future use
-      analysisCache.set(videoHash, enhancedAnalysis);
-      
-      // Complete the analysis (100%)
-      updateProgress(100, 13);
-      
-      return enhancedAnalysis;
-    } catch (error) {
-      console.error("Error in video analysis:", error);
-      // Fallback to baseline analysis if real analysis fails
-      updateProgress(100, 13);
-      return baselineAnalysis;
-    }
-  };
-  
-  // Helper function to extract basic video properties
-  const getVideoProperties = async (file: File): Promise<{
-    duration: number;
-    width: number;
-    height: number;
-    aspectRatio: number;
-  }> => {
-    return new Promise((resolve) => {
-      try {
-        const video = document.createElement('video');
-        video.preload = 'metadata';
-        
-        video.onloadedmetadata = () => {
-          resolve({
-            duration: video.duration || 60,
-            width: video.videoWidth || 1280,
-            height: video.videoHeight || 720,
-            aspectRatio: (video.videoWidth && video.videoHeight) 
-              ? video.videoWidth / video.videoHeight 
-              : 16/9
-          });
-          URL.revokeObjectURL(video.src);
-        };
-        
-        video.onerror = () => {
-          // Fall back to default values if video properties can't be read
-          resolve({
-            duration: 60,
-            width: 1280,
-            height: 720,
-            aspectRatio: 16/9
-          });
-          URL.revokeObjectURL(video.src);
-        };
-        
-        video.src = URL.createObjectURL(file);
-        
-        // Add timeout to avoid hanging
-        setTimeout(() => {
-          if (!video.videoWidth) {
-            video.onerror(new Event('timeout'));
-          }
-        }, 2000);
-      } catch (e) {
-        // If any error happens, return default values
-        resolve({
-          duration: 60,
-          width: 1280,
-          height: 720,
-          aspectRatio: 16/9
+        performAnalysis(
+          videoFile, 
+          baselineAnalysis, 
+          progressTracker, 
+          (hash, analysis) => analysisCache.set(hash, analysis),
+          videoHash
+        ).then(analysis => {
+          // Update the analysis in the result object when complete
+          resultObj.analysis = analysis;
         });
       }
-    });
-  };
-  
-  // Generate realistic player positions based on video properties
-  const generateRealisticPlayerPositions = (file: File) => {
-    const positionCount = 10 + Math.floor(Math.random() * 10); // 10-20 positions
-    const positions = [];
-    
-    for (let i = 0; i < positionCount; i++) {
-      // Create more realistic position data with smoother progression
-      const timestamp = i * (1 + Math.random() * 0.5);
-      const x = 150 + Math.sin(i / 3) * 100 + Math.cos(i / 5) * 50;
-      const y = 200 + Math.cos(i / 4) * 80 + Math.sin(i / 7) * 30;
-      const speed = 5 + Math.sin(i / 2) * 3; // Speed varies between 2-8
-      
-      positions.push({
-        timestamp,
-        bbox: { 
-          x, 
-          y, 
-          width: 40 + Math.random() * 20, 
-          height: 80 + Math.random() * 40 
-        },
-        speed
-      });
     }
-    
-    return positions;
-  };
-  
-  // Create enhanced analysis based on "detected" data and video properties
-  const createEnhancedAnalysis = (
-    baseAnalysis: PlayerAnalysis, 
-    detectionResult: any, 
-    movementAnalysis: any,
-    videoProperties: any,
-    eyeTrackingResult?: any
-  ): PlayerAnalysis => {
-    // Use video properties to adjust analysis parameters
-    const videoQualityFactor = (videoProperties.width * videoProperties.height) / (1280 * 720);
-    const videoDurationFactor = Math.min(2, videoProperties.duration / 60); // Cap at 2x for very long videos
-    
-    // Calculate "real" performance metrics based on movement data and video properties
-    const realPerformance = {
-      pace: Math.min(99, Math.max(60, Math.floor(
-        movementAnalysis.averageSpeed * 5 * videoQualityFactor + (baseAnalysis.stats.pace * 0.3)
-      ))),
-      stamina: Math.min(99, Math.max(60, Math.floor(
-        movementAnalysis.totalDistance / 10 * videoDurationFactor + (baseAnalysis.stats.stamina * 0.3)
-      ))),
-      acceleration: Math.min(99, Math.max(60, Math.floor(
-        movementAnalysis.maxAcceleration * 8 * videoQualityFactor + (baseAnalysis.stats.acceleration * 0.3)
-      )))
-    };
-    
-    // Create enhanced movement data
-    const enhancedMovements = detectionResult.playerPositions.map(pos => ({
-      timestamp: pos.timestamp,
-      x: pos.bbox.x,
-      y: pos.bbox.y,
-      speed: pos.speed || 0,
-      acceleration: pos.speed ? Math.random() * 3 : 0,
-      direction: Math.random() * 360,
-      isActive: true
-    }));
-    
-    // Calculate overall performance score with weighted influence from video properties
-    let adjustedPerformanceScore = Math.floor(
-      (realPerformance.pace * 0.25 + 
-       realPerformance.stamina * 0.25 + 
-       realPerformance.acceleration * 0.2 + 
-       baseAnalysis.stats.ballControl * 0.15 +
-       baseAnalysis.stats.vision * 0.15) * 
-      (0.9 + videoQualityFactor * 0.1) // Small boost for higher quality videos
-    );
-    
-    // Calculate talent score based on eye tracking if available
-    let talentScore = baseAnalysis.talentScore;
-    let enhancedInsights = [...baseAnalysis.advancedInsights];
-    
-    if (eyeTrackingResult) {
-      // Adjust vision and decision metrics based on eye tracking
-      const adjustedVision = Math.min(99, Math.max(60, Math.floor(
-        (baseAnalysis.stats.vision * 0.4) + (eyeTrackingResult.fieldAwarenessScore * 0.6)
-      )));
-      
-      const adjustedDecision = Math.min(99, Math.max(60, Math.floor(
-        (baseAnalysis.stats.decision * 0.3) + (eyeTrackingResult.decisionSpeed * 0.7)
-      )));
-      
-      const adjustedComposure = Math.min(99, Math.max(60, Math.floor(
-        (baseAnalysis.stats.composure * 0.5) + (eyeTrackingResult.anticipationScore * 0.5)
-      )));
-      
-      // Calculate talent score with eye tracking data (giving more weight to cognitive abilities)
-      talentScore = Math.min(99, Math.floor(
-        adjustedVision * 0.25 + 
-        adjustedDecision * 0.25 + 
-        adjustedComposure * 0.2 + 
-        realPerformance.pace * 0.15 + 
-        baseAnalysis.stats.ballControl * 0.15
-      ));
-      
-      // Adjust performance score to include eye tracking data
-      adjustedPerformanceScore = Math.floor(
-        (adjustedPerformanceScore * 0.7) + (talentScore * 0.3)
-      );
-      
-      // Add eye tracking insights
-      if (eyeTrackingResult.fieldAwarenessScore > 85) {
-        enhancedInsights.push("يتمتع اللاعب بوعي استثنائي بالملعب وقدرة ممتازة على مسح المساحات والتموضع الصحيح");
-      }
-      
-      if (eyeTrackingResult.decisionSpeed > 85) {
-        enhancedInsights.push("يُظهر اللاعب سرعة فائقة في اتخاذ القرارات التكتيكية والاستجابة للمواقف المتغيرة");
-      }
-      
-      if (eyeTrackingResult.anticipationScore > 80) {
-        enhancedInsights.push("يمتلك اللاعب قدرة استثنائية على توقع تطورات اللعب واستباق الخصم بشكل دقيق");
-      }
-    }
-    
-    return {
-      ...baseAnalysis,
-      confidence: detectionResult.confidence,
-      movements: enhancedMovements,
-      performanceScore: adjustedPerformanceScore,
-      talentScore: talentScore,
-      advancedInsights: enhancedInsights,
-      stats: {
-        ...baseAnalysis.stats,
-        pace: realPerformance.pace,
-        stamina: realPerformance.stamina,
-        acceleration: realPerformance.acceleration,
-        // Update vision and decision making based on eye tracking if available
-        ...(eyeTrackingResult && {
-          vision: Math.min(99, Math.max(60, Math.floor(
-            (baseAnalysis.stats.vision * 0.4) + (eyeTrackingResult.fieldAwarenessScore * 0.6)
-          ))),
-          decision: Math.min(99, Math.max(60, Math.floor(
-            (baseAnalysis.stats.decision * 0.3) + (eyeTrackingResult.decisionSpeed * 0.7)
-          ))),
-          composure: Math.min(99, Math.max(60, Math.floor(
-            (baseAnalysis.stats.composure * 0.5) + (eyeTrackingResult.anticipationScore * 0.5)
-          )))
-        })
-      }
-    };
-  };
-  
-  // Helper function to simulate processing delay with variable timing
-  const simulateProcessingDelay = (minMs: number, maxMs: number): Promise<void> => {
-    const delay = minMs + Math.random() * (maxMs - minMs);
-    return new Promise(resolve => setTimeout(resolve, delay));
   };
   
   return resultObj;
 };
 
-// Re-export the comparison service
+// Re-export comparison service and constants for backward compatibility
 export { compareWithPreviousAnalyses } from "./comparisonService";
+export { ANALYSIS_STAGES } from "./constants";
