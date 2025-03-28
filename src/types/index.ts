@@ -8,3 +8,4 @@ export * from './training';
 export * from './badges';
 export * from './progress';
 export * from './injuries';
+export * from './files';
