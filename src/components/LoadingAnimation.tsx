@@ -24,6 +24,10 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ progress, stage }) 
       return "Comparing with professional player database";
     } else if (stage.includes("report") || stage.includes("تقرير")) {
       return "Creating personalized improvement recommendations";
+    } else if (stage.includes("integration") || stage.includes("تكامل") || stage.includes("خارجية")) {
+      return "Connecting with external systems and APIs for enhanced data";
+    } else if (stage.includes("performance") || stage.includes("أداء") || stage.includes("تحسين")) {
+      return "Optimizing processing speed and applying caching";
     } else {
       return "Processing video frames using neural network analysis";
     }

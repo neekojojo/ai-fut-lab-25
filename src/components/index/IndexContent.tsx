@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import VideoUpload from '../VideoUpload';
 import { ANALYSIS_STAGES } from '@/utils/analysis/constants';
 import { Separator } from '@/components/ui/separator';
-import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck } from 'lucide-react';
+import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, Globe } from 'lucide-react';
 
 export interface FileWithPreview extends File {
   preview: string;
@@ -88,11 +88,27 @@ const IndexContent: React.FC = () => {
           });
         }, 5000);
         
-        // Ensure we complete the analysis
+        // Final phase - Integration with external systems
         setTimeout(() => {
-          setAnalysisProgress(100);
-          setAnalysisStage('اكتمل التحليل');
-        }, 45000); // Ensure completion after ~45 seconds regardless
+          const finalInterval = setInterval(() => {
+            setAnalysisProgress(prev => {
+              const newValue = prev + (Math.random() * 0.8 + 0.2); // 0.2-1% increment
+              if (newValue >= 98) {
+                clearInterval(finalInterval);
+                setAnalysisStage('تكامل مع الأنظمة الخارجية');
+                
+                // Ensure we complete the analysis
+                setTimeout(() => {
+                  setAnalysisProgress(100);
+                  setAnalysisStage('اكتمل التحليل');
+                }, 3000);
+                
+                return 98;
+              }
+              return newValue;
+            });
+          }, 4000);
+        }, 20000); // Start final phase after ~20 seconds
         
       }, 40000); // Start third phase after ~40 seconds
       
@@ -183,6 +199,13 @@ const IndexContent: React.FC = () => {
                 title="تتبع التقدم مع مرور الوقت"
                 description="تحليل التطور وتحديد مجالات التحسين"
                 icon={<CalendarCheck className="h-8 w-8 text-primary" />}
+              />
+              
+              <StageCard
+                number={6}
+                title="التكامل مع الأنظمة الخارجية"
+                description="ربط مع أنظمة FIFA وتحسين الأداء"
+                icon={<Globe className="h-8 w-8 text-primary" />}
               />
             </div>
           </div>

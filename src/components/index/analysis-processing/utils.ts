@@ -1,3 +1,4 @@
+
 // Format time in minutes and seconds
 export const formatTime = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
@@ -7,14 +8,16 @@ export const formatTime = (seconds: number) => {
 
 // Get description text based on progress percentage
 export const getAnalysisStageDescription = (progress: number) => {
-  if (progress < 25) {
+  if (progress < 20) {
     return "جاري تحليل معلومات الفيديو...";
-  } else if (progress < 50) {
+  } else if (progress < 40) {
     return "تحليل حركة اللاعب والسرعة...";
-  } else if (progress < 75) {
+  } else if (progress < 60) {
     return "تحليل المهارات الفنية والتكتيكية...";
+  } else if (progress < 80) {
+    return "مقارنة المعلومات مع قاعدة البيانات...";
   } else if (progress < 95) {
-    return "إنشاء تقرير التحليل النهائي...";
+    return "التكامل مع الأنظمة الخارجية...";
   } else {
     return "اكتمل التحليل، جاري تحضير النتائج...";
   }
@@ -94,4 +97,36 @@ export const getAutoAdjustedProgress = (
   }
   
   return progress;
+};
+
+// Check if WebGL is available for acceleration
+export const isWebGLAccelerationAvailable = (): boolean => {
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(window.WebGLRenderingContext && 
+      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+  } catch (e) {
+    return false;
+  }
+};
+
+// Get a more detailed analysis stage based on progress
+export const getDetailedAnalysisStage = (progress: number): string => {
+  if (progress < 15) {
+    return "استخراج إطارات الفيديو";
+  } else if (progress < 30) {
+    return "تحليل حركة اللاعب";
+  } else if (progress < 45) {
+    return "تقييم المهارات الفنية";
+  } else if (progress < 60) {
+    return "حساب المؤشرات التكتيكية";
+  } else if (progress < 75) {
+    return "مقارنة مع بيانات اللاعبين المحترفين";
+  } else if (progress < 85) {
+    return "تحليل القيمة السوقية";
+  } else if (progress < 95) {
+    return "تكامل مع أنظمة FIFA وTransfermarkt";
+  } else {
+    return "إنهاء التحليل وتحضير التقرير";
+  }
 };

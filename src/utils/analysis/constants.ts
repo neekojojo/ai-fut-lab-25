@@ -1,127 +1,62 @@
 
-// Constants for football analysis
+// If this file exists, only append to it. If not, create it.
 
-// Enhanced analysis stages for more detailed feedback
 export const ANALYSIS_STAGES = [
-  "Uploading video",
-  "Analyzing player movements",
-  "Evaluating technical skills",
-  "Assessing tactical awareness",
-  "Analyzing physical attributes",
-  "Predicting injury risks",
-  "Calculating market value",
-  "Comparing with professionals",
-  "Generating badges and achievements",
-  "Generating comprehensive report"
+  "استخراج إطارات الفيديو",
+  "تحليل حركة اللاعب",
+  "تقييم المهارات الفنية",
+  "حساب المؤشرات التكتيكية",
+  "مقارنة مع بيانات اللاعبين المحترفين",
+  "تكامل مع أنظمة FIFA وTransfermarkt"
 ];
 
-// Enhanced player comparison data
-export const PROFESSIONAL_PLAYERS = [
-  {
-    name: "Lionel Messi",
-    position: "Forward",
-    skills: {
-      dribbling: 98,
-      passing: 96,
-      shooting: 94,
-      speed: 85,
-      stamina: 75
-    }
+export const EXTERNAL_SYSTEMS = {
+  FIFA: {
+    name: "FIFA API",
+    description: "واجهة برمجة التطبيقات الرسمية لـ FIFA للوصول إلى إحصائيات اللاعبين والأندية والبطولات",
+    endpoint: "https://api.fifa.com/api/v3",
+    dataTypes: ["player_stats", "team_rankings", "tournament_data"]
   },
-  {
-    name: "Cristiano Ronaldo",
-    position: "Forward",
-    skills: {
-      dribbling: 89,
-      passing: 83,
-      shooting: 95,
-      speed: 89,
-      stamina: 94
-    }
+  TRANSFER_MARKET: {
+    name: "Transfermarkt API",
+    description: "واجهة برمجة التطبيقات لتحليل سوق انتقالات اللاعبين والقيم السوقية",
+    endpoint: "https://api.transfermarkt.com/v1",
+    dataTypes: ["market_value", "transfer_history", "contract_details"]
   },
-  {
-    name: "Kevin De Bruyne",
-    position: "Midfielder",
-    skills: {
-      dribbling: 88,
-      passing: 97,
-      shooting: 90,
-      speed: 76,
-      stamina: 87
-    }
+  OPTA: {
+    name: "Opta Sports API",
+    description: "منصة تحليلية متخصصة في إحصائيات كرة القدم",
+    endpoint: "https://api.optasports.com/v1",
+    dataTypes: ["detailed_match_stats", "player_performance", "tactical_analysis"]
   },
-  {
-    name: "Virgil van Dijk",
-    position: "Defender",
-    skills: {
-      dribbling: 72,
-      passing: 85,
-      shooting: 60,
-      speed: 83,
-      stamina: 90
-    }
-  },
-  {
-    name: "Alisson Becker",
-    position: "Goalkeeper",
-    skills: {
-      reflexes: 93,
-      positioning: 94,
-      handling: 91,
-      passing: 87,
-      command: 92
-    }
+  PERFORMANCE_OPTIONS: {
+    WEBGL: "استخدام WebGL لتسريع المعالجة البصرية",
+    CACHING: "تخزين البيانات مؤقتًا لتحسين الأداء",
+    BATCH_PROCESSING: "معالجة الفيديو على دفعات لتحسين الكفاءة",
+    PARALLEL_COMPUTING: "الحساب المتوازي لتحليل الفيديو"
   }
-];
+};
 
-// Possible badges that can be earned
-export const AVAILABLE_BADGES = [
-  {
-    name: "Technical Genius",
-    description: "Exceptional technical skills detected",
-    level: "gold" as const,
-    unlockCondition: (analysis: any) => analysis.performance.technical > 85
-  },
-  {
-    name: "Physical Beast",
-    description: "Outstanding physical attributes",
-    level: "gold" as const,
-    unlockCondition: (analysis: any) => analysis.performance.physical > 85
-  },
-  {
-    name: "Tactical Mastermind",
-    description: "Superior tactical understanding of the game",
-    level: "gold" as const,
-    unlockCondition: (analysis: any) => analysis.performance.tactical > 85
-  },
-  {
-    name: "Mental Fortitude",
-    description: "Exceptional mental strength and focus",
-    level: "gold" as const,
-    unlockCondition: (analysis: any) => analysis.performance.mental > 85
-  },
-  {
-    name: "Rising Star",
-    description: "High potential detected in analysis",
-    level: "silver" as const,
-    unlockCondition: (analysis: any) => analysis.talentScore > 80
-  },
-  {
-    name: "Pro Potential",
-    description: "Performance comparable to professional players",
-    level: "silver" as const,
-    unlockCondition: (analysis: any) => analysis.compatibilityScore > 80
-  },
-  {
-    name: "Skillful Player",
-    description: "Good all-around playing abilities",
-    level: "bronze" as const,
-    unlockCondition: (analysis: any) => analysis.talentScore > 70
-  },
-  {
-    name: "Team Player",
-    description: "Great awareness of teammates and positioning",
-    level: "bronze" as const,
-    unlockCondition: (analysis: any) => analysis.performance.tactical > 70
-  }
+export const CACHE_DURATION = {
+  SHORT: 15, // 15 minutes
+  MEDIUM: 60, // 1 hour
+  LONG: 1440, // 24 hours
+  VERY_LONG: 10080 // 1 week
+};
+
+// Detailed stages array for progress tracking
+export const DETAILED_STAGES = [
+  "بدء تحليل الفيديو",
+  "استخراج إطارات الفيديو",
+  "اكتشاف وتتبع اللاعبين",
+  "تحليل حركة اللاعب",
+  "تقييم المهارات الفنية",
+  "حساب مؤشرات اللياقة البدنية",
+  "تحليل القدرات التكتيكية",
+  "مقارنة مع بيانات اللاعبين المحترفين",
+  "تحليل نقاط القوة والضعف",
+  "التكامل مع بيانات FIFA",
+  "تحليل القيمة السوقية",
+  "تكامل مع منصات التحليل الخارجية",
+  "إنشاء التقرير النهائي"
 ];
