@@ -30,13 +30,21 @@ export const analyzeVideo = async (
     
     console.log("Starting video analysis...");
     
+    // Extract initial video metadata for analysis
+    const videoMetadata = await extractVideoMetadata(videoFile);
+    console.log("Video metadata extracted:", videoMetadata);
+    
+    // Update stage to metadata extraction
+    setProgress(5);
+    setStage('استخراج بيانات الفيديو');
+    
     // Start analysis with proper progress tracking
     const result = await analyzeFootballVideo(videoFile);
     
     // Set initial analysis result
     setAnalysis(result.analysis);
     
-    // Register for progress updates
+    // Register for progress updates with detailed stages
     result.progressUpdates((progress, stage) => {
       console.log(`Progress update received: ${progress}%, stage: ${stage}`);
       
@@ -60,6 +68,58 @@ export const analyzeVideo = async (
       duration: 5000,
     });
     setAnalysisState('idle');
+  }
+};
+
+// Extract basic metadata from video file to enhance analysis realism
+const extractVideoMetadata = (videoFile: File): Promise<{
+  duration: number;
+  width: number;
+  height: number;
+  frameRate: number;
+}> => {
+  return new Promise((resolve, reject) => {
+    // Create a video element to extract metadata
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    
+    // Set up event handlers
+    video.onloadedmetadata = () => {
+      const frameRate = estimateFrameRate(video);
+      resolve({
+        duration: video.duration,
+        width: video.videoWidth,
+        height: video.videoHeight,
+        frameRate
+      });
+      // Clean up
+      URL.revokeObjectURL(video.src);
+    };
+    
+    video.onerror = () => {
+      reject(new Error('Failed to load video metadata'));
+      URL.revokeObjectURL(video.src);
+    };
+    
+    // Start loading video
+    video.src = URL.createObjectURL(videoFile);
+  });
+};
+
+// Estimate frame rate based on video properties
+const estimateFrameRate = (videoElement: HTMLVideoElement): number => {
+  // Most consumer videos are 30fps, professional sports typically 50-60fps
+  // We'll estimate based on video quality and size
+  const isHighResolution = videoElement.videoHeight >= 720;
+  const isLargeFile = videoElement.duration > 0 ? 
+    (videoElement.videoWidth * videoElement.videoHeight * videoElement.duration) / 10000000 > 10 : false;
+    
+  if (isHighResolution && isLargeFile) {
+    return 60; // Likely high-quality footage
+  } else if (isHighResolution) {
+    return 30; // HD but compressed
+  } else {
+    return 24; // Standard footage
   }
 };
 
