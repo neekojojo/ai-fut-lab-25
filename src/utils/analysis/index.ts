@@ -1,4 +1,3 @@
-
 import type { PlayerAnalysis } from "@/components/AnalysisReport.d";
 import { ANALYSIS_STAGES } from "./constants";
 import { generateEnhancedAnalysis } from "./analysisMockGenerator";
@@ -9,6 +8,7 @@ import { detectPeopleInVideo, analyzePlayerEyeMovement } from "@/utils/videoDete
 import { analyzePlayerMovements } from "@/utils/videoDetection/movementAnalysis";
 import { StatsCalculator } from "@/utils/dataProcessing/statsCalculator";
 import { extractVideoFrames } from "@/utils/videoDetection/frameExtraction";
+import type { DetectionResult } from "@/utils/videoDetection/types";
 
 // Enhanced stages for more realistic analysis flow with eye tracking
 const DETAILED_STAGES = [
@@ -192,10 +192,19 @@ export const analyzeFootballVideo = async (videoFile: File): Promise<FootballVid
       // Step 4 - Player position detection (35%)
       updateProgress(35, 3);
       console.log("Detecting player positions...");
-      const detectionResult = {
+      
+      // Fix: Create a properly structured DetectionResult object
+      const detectionResult: DetectionResult = {
+        count: Math.round(5 + Math.random() * 5), // Random count between 5-10 players
+        confidence: 0.85 + (Math.random() * 0.1 - 0.05), // 0.8-0.9 range
+        frameResults: Array(10).fill(0).map((_, i) => ({
+          frameNumber: i,
+          detections: Math.round(5 + Math.random() * 5),
+          timestamp: i * 100, // milliseconds
+        })),
         playerPositions: generateRealisticPlayerPositions(videoFile),
-        confidence: 0.85 + (Math.random() * 0.1 - 0.05) // 0.8-0.9 range
       };
+      
       await simulateProcessingDelay(600, 900);
       
       // Step 5 - Eye movement analysis (NEW) (45%)
