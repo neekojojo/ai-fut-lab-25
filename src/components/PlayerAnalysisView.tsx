@@ -41,6 +41,7 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
     setViewMode('advanced');
   };
 
+  // Render advanced analysis view when viewMode is 'advanced'
   if (viewMode === 'advanced') {
     return (
       <AdvancedAnalysisView 
