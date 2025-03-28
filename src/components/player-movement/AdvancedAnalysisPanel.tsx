@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { EnhancedMovementChart } from './EnhancedMovementChart';
-import { MovementAnalysisChart } from './MovementAnalysisChart';
+import EnhancedMovementChart from './EnhancedMovementChart';
+import MovementAnalysisChart from './MovementAnalysisChart';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EnhancedMovementAnalysis } from '@/utils/videoDetection/movementAnalysisEnhanced';
@@ -14,6 +14,43 @@ interface AdvancedAnalysisPanelProps {
   trajectoryData: TrajectoryPrediction;
   performanceMetrics: PerformanceMetrics;
 }
+
+// Helper functions moved outside the component to be accessible
+const getMetricDisplayName = (metricKey: string): string => {
+  const displayNames: Record<string, string> = {
+    speed: 'السرعة',
+    endurance: 'التحمل',
+    agility: 'الرشاقة',
+    control: 'التحكم',
+    positioning: 'التمركز',
+    decisionMaking: 'اتخاذ القرار',
+    explosiveness: 'القوة الانفجارية',
+    recoveryRate: 'معدل الاستشفاء',
+    tacticalAwareness: 'الوعي التكتيكي',
+    pressureResistance: 'مقاومة الضغط',
+    consistency: 'الثبات'
+  };
+  
+  return displayNames[metricKey] || metricKey;
+};
+
+const getStrengthDescription = (strength: string): string => {
+  const descriptions: Record<string, string> = {
+    'السرعة': 'قدرة فائقة على الحركة بسرعة عالية وتنفيذ انطلاقات سريعة',
+    'التحمل': 'قدرة ممتازة على الاستمرار بنفس المستوى طوال المباراة',
+    'الرشاقة': 'قدرة متميزة على تغيير الاتجاه بسرعة والمناورة',
+    'التحكم': 'مستوى عالٍ من السيطرة والتحكم في الحركة',
+    'التمركز': 'ذكاء تكتيكي عالٍ في اختيار المواقع المناسبة',
+    'اتخاذ القرار': 'قدرة متميزة على اتخاذ القرارات السريعة والصحيحة',
+    'القوة الانفجارية': 'قدرة عالية على الانطلاق السريع والتسارع المفاجئ',
+    'معدل الاستشفاء': 'قدرة ممتازة على استعادة اللياقة بسرعة بعد المجهود',
+    'الوعي التكتيكي': 'فهم ممتاز للمواقف التكتيكية وقراءة اللعب',
+    'مقاومة الضغط': 'أداء ثابت ومتميز تحت الضغط',
+    'الثبات': 'مستوى أداء ثابت ومتوازن طوال المباراة'
+  };
+  
+  return descriptions[strength] || 'نقطة قوة متميزة تساهم في الأداء العام';
+};
 
 const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
   enhancedMovement,
@@ -182,7 +219,7 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
                     {Object.entries(performanceMetrics.breakdown).map(([key, value]) => (
                       <div key={key} className="space-y-1">
                         <div className="flex justify-between text-sm">
-                          <span>{AdvancedAnalysisPanel.getMetricDisplayName(key)}</span>
+                          <span>{getMetricDisplayName(key)}</span>
                           <span className="font-medium">{value.toFixed(0)}/100</span>
                         </div>
                         <div className="w-full bg-gray-100 dark:bg-gray-800 h-1.5 rounded-full">
@@ -217,7 +254,7 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
                         <div>
                           <div className="font-medium">{strength}</div>
                           <p className="text-sm text-muted-foreground">
-                            {AdvancedAnalysisPanel.getStrengthDescription(strength)}
+                            {getStrengthDescription(strength)}
                           </p>
                         </div>
                       </li>
@@ -260,43 +297,6 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
       </Tabs>
     </div>
   );
-};
-
-// وظائف مساعدة للعرض
-AdvancedAnalysisPanel.getMetricDisplayName = (metricKey: string): string => {
-  const displayNames: Record<string, string> = {
-    speed: 'السرعة',
-    endurance: 'التحمل',
-    agility: 'الرشاقة',
-    control: 'التحكم',
-    positioning: 'التمركز',
-    decisionMaking: 'اتخاذ القرار',
-    explosiveness: 'القوة الانفجارية',
-    recoveryRate: 'معدل الاستشفاء',
-    tacticalAwareness: 'الوعي التكتيكي',
-    pressureResistance: 'مقاومة الضغط',
-    consistency: 'الثبات'
-  };
-  
-  return displayNames[metricKey] || metricKey;
-};
-
-AdvancedAnalysisPanel.getStrengthDescription = (strength: string): string => {
-  const descriptions: Record<string, string> = {
-    'السرعة': 'قدرة فائقة على الحركة بسرعة عالية وتنفيذ انطلاقات سريعة',
-    'التحمل': 'قدرة ممتازة على الاستمرار بنفس المستوى طوال المباراة',
-    'الرشاقة': 'قدرة متميزة على تغيير الاتجاه بسرعة والمناورة',
-    'التحكم': 'مستوى عالٍ من السيطرة والتحكم في الحركة',
-    'التمركز': 'ذكاء تكتيكي عالٍ في اختيار المواقع المناسبة',
-    'اتخاذ القرار': 'قدرة متميزة على اتخاذ القرارات السريعة والصحيحة',
-    'القوة الانفجارية': 'قدرة عالية على الانطلاق السريع والتسارع المفاجئ',
-    'معدل الاستشفاء': 'قدرة ممتازة على استعادة اللياقة بسرعة بعد المجهود',
-    'الوعي التكتيكي': 'فهم ممتاز للمواقف التكتيكية وقراءة اللعب',
-    'مقاومة الضغط': 'أداء ثابت ومتميز تحت الضغط',
-    'الثبات': 'مستوى أداء ثابت ومتوازن طوال المباراة'
-  };
-  
-  return descriptions[strength] || 'نقطة قوة متميزة تساهم في الأداء العام';
 };
 
 export default AdvancedAnalysisPanel;
