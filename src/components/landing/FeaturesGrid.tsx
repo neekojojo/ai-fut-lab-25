@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { DollarSign } from 'lucide-react';
 
 interface FeaturesGridProps {
   isMobile?: boolean;
@@ -7,7 +8,7 @@ interface FeaturesGridProps {
 
 export const FeaturesGrid: React.FC<FeaturesGridProps> = ({ isMobile }) => {
   return (
-    <div className={`grid grid-cols-1 ${isMobile ? 'gap-6' : 'md:grid-cols-2 gap-8'} max-w-4xl mx-auto animate-slide-up`}>
+    <div className={`grid grid-cols-1 ${isMobile ? 'gap-6' : 'md:grid-cols-3 gap-8'} max-w-4xl mx-auto animate-slide-up`}>
       <FeatureCard 
         title="Technical Analysis"
         description="Our AI evaluates passing accuracy, shooting power, dribbling skills, and positioning with professional precision."
@@ -47,6 +48,13 @@ export const FeaturesGrid: React.FC<FeaturesGridProps> = ({ isMobile }) => {
             <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
           </svg>
         }
+        isMobile={isMobile}
+      />
+
+      <FeatureCard 
+        title="Market Valuation"
+        description="AI-powered market value prediction based on comprehensive performance metrics and comparison with similar players."
+        icon={<DollarSign className="w-6 h-6 text-primary" />}
         isMobile={isMobile}
       />
     </div>

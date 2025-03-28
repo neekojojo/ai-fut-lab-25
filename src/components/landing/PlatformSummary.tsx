@@ -5,7 +5,8 @@ import {
   Brain, 
   Target, 
   LineChart, 
-  Zap
+  Zap,
+  DollarSign
 } from 'lucide-react';
 
 interface PlatformSummaryProps {
@@ -26,7 +27,7 @@ const PlatformSummary: React.FC<PlatformSummaryProps> = ({ isMobile }) => {
           </p>
         </div>
 
-        <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'md:grid-cols-3 gap-6'}`}>
+        <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'md:grid-cols-4 gap-6'}`}>
           <FeatureCard
             icon={<Brain className="w-5 h-5 text-primary" />}
             title="Advanced Video Analysis"
@@ -45,6 +46,13 @@ const PlatformSummary: React.FC<PlatformSummaryProps> = ({ isMobile }) => {
             icon={<Zap className="w-5 h-5 text-primary" />}
             title="Development Plans"
             description="AI-generated training recommendations and exercises tailored to player profiles"
+            isMobile={isMobile}
+          />
+
+          <FeatureCard
+            icon={<DollarSign className="w-5 h-5 text-primary" />}
+            title="Market Valuation"
+            description="Predict player market value based on performance metrics and growth potential"
             isMobile={isMobile}
           />
         </div>

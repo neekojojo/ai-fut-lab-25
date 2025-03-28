@@ -57,24 +57,24 @@ const HeroContent: React.FC<HeroContentProps> = ({
             onClick={onGoToDashboard}
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
           >
-            عرض تحليلاتي السابقة
+            View My Previous Analyses
           </button>
         </div>
       ) : (
         <div className={`${isMobile ? 'mt-4' : 'mt-6'} text-center`}>
-          <p className="text-sm text-gray-600 mb-2">قم بتسجيل الدخول لحفظ التحليلات ومشاهدتها لاحقًا</p>
-          <div className={`${isMobile ? 'flex flex-col gap-2' : 'space-x-4 rtl:space-x-reverse'}`}>
+          <p className="text-sm text-gray-600 mb-2">Sign in to save analyses and view them later</p>
+          <div className={`${isMobile ? 'flex flex-col gap-2' : 'space-x-4'}`}>
             <button
               onClick={() => window.location.href = '/sign-in'}
               className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-primary bg-primary/10 hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ${isMobile ? 'justify-center' : ''}`}
             >
-              تسجيل الدخول
+              Sign In
             </button>
             <button
               onClick={() => window.location.href = '/sign-up'}
               className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ${isMobile ? 'justify-center' : ''}`}
             >
-              إنشاء حساب
+              Create Account
             </button>
           </div>
         </div>

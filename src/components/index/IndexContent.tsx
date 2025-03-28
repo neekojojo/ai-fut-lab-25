@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { NavigateFunction } from 'react-router-dom';
 import LoadingAnimation from '@/components/LoadingAnimation';
@@ -81,8 +82,8 @@ const IndexContent: React.FC<IndexContentProps> = ({ navigate, isMobile }) => {
       navigate('/dashboard');
     } else {
       toast({
-        title: "مطلوب تسجيل الدخول",
-        description: "يرجى تسجيل الدخول لعرض لوحة التحكم الخاصة بك.",
+        title: "Login Required",
+        description: "Please log in to view your dashboard.",
         duration: 3000,
       });
       navigate('/sign-in');
@@ -114,12 +115,12 @@ const IndexContent: React.FC<IndexContentProps> = ({ navigate, isMobile }) => {
       {showPeopleDetection && analysisState === 'idle' && (
         <div className="space-y-6">
           <div className={`flex justify-between items-center ${isMobile ? 'flex-col gap-3' : ''}`}>
-            <h2 className="text-2xl font-bold">اكتشاف الأشخاص في الفيديو</h2>
+            <h2 className="text-2xl font-bold">People Detection in Video</h2>
             <button
               onClick={togglePeopleDetection}
               className="px-4 py-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
             >
-              العودة إلى تحليل كرة القدم
+              Return to Football Analysis
             </button>
           </div>
           

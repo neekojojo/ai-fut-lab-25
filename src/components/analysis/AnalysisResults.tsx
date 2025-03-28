@@ -29,19 +29,19 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
       
       <Separator />
       
-      <div className="flex justify-center space-x-4 rtl:space-x-reverse">
+      <div className="flex justify-center space-x-4">
         <button
           onClick={onResetAnalysis}
           className="px-4 py-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
         >
-          تحليل فيديو آخر
+          Analyze Another Video
         </button>
         
         <button
           onClick={onAdvancedAnalysis}
           className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:bg-primary/90 transition-colors"
         >
-          تحليل الحركة المتقدم
+          Advanced Movement Analysis
         </button>
       </div>
     </div>
