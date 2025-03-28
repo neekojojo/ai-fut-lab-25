@@ -9,7 +9,8 @@ export const ChartLegend = RechartsPrimitive.Legend;
 
 export const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<typeof RechartsPrimitive.Legend> & {
+  Omit<React.ComponentPropsWithoutRef<"div">, "content"> & 
+  Partial<Pick<React.ComponentProps<typeof RechartsPrimitive.Legend>, "payload">> & {
     className?: string;
     itemClassName?: string;
     orientation?: "horizontal" | "vertical";

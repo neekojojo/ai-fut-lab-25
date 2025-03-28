@@ -12,12 +12,15 @@ const convertTheme = (theme: string) => {
   };
 };
 
+// Define type for valid curve values
+type CurveType = "linear" | "monotone" | "step" | "stepBefore" | "stepAfter" | "natural" | "basis";
+
 export const adaptChartConfig = (colors: Record<string, string>, chartType: 'line' | 'bar' | 'area'): ChartConfig => {
   const config: ChartConfig = {};
   
   Object.entries(colors).forEach(([key, color]) => {
     let icon;
-    let curve = 'monotone';
+    let curve: CurveType = 'monotone';
     
     // Assign icons based on chart type
     if (chartType === 'line') {

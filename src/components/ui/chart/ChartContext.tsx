@@ -1,17 +1,24 @@
 
 import * as React from "react";
-import { ChartContextProps } from "./types";
+import { ChartConfig, ChartContextProps } from "./types";
 
-const ChartContext = React.createContext<ChartContextProps | null>(null);
+const ChartContext = React.createContext<ChartContextProps>({
+  config: {},
+});
 
-export function useChart() {
-  const context = React.useContext(ChartContext);
-
-  if (!context) {
-    throw new Error("useChart must be used within a <ChartContainer />");
-  }
-
-  return context;
+interface ChartProviderProps {
+  value: ChartConfig;
+  children: React.ReactNode;
 }
 
-export { ChartContext };
+export function ChartProvider({ value, children }: ChartProviderProps) {
+  return (
+    <ChartContext.Provider value={{ config: value }}>
+      {children}
+    </ChartContext.Provider>
+  );
+}
+
+export const useChart = () => {
+  return React.useContext(ChartContext);
+};

@@ -1,60 +1,76 @@
 
-import * as React from 'react';
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon } from "lucide-react";
 
-export interface ChartConfigItem {
-  theme?: {
-    light: string;
-    dark: string;
-  };
-  label?: string;
-  color?: string;
+export interface ChartItem {
+  theme?: { light: string; dark: string };
   curve?: "linear" | "monotone" | "step" | "stepBefore" | "stepAfter" | "natural" | "basis";
   icon?: LucideIcon;
+  color?: string;
+  label?: string;
 }
 
 export interface ChartConfig {
-  [key: string]: ChartConfigItem;
+  [key: string]: ChartItem;
 }
 
 export interface ChartContextProps {
   config: ChartConfig;
 }
 
-// Helper function to get config from payload
-export const getPayloadConfigFromPayload = (
-  config: ChartConfig,
-  item: any,
-  key: string
-): ChartConfigItem | undefined => {
-  return (
-    config[key] ||
-    config[item?.name || ""] ||
-    config[item?.dataKey || ""] ||
-    undefined
-  );
-};
-
-// Theme constants
 export const THEMES = {
   blue: {
-    light: "#0085FF",
-    dark: "#0085FF",
+    light: "#0091ff",
+    dark: "#0091ff",
   },
   green: {
-    light: "#22C55E",
-    dark: "#22C55E",
-  },
-  red: {
-    light: "#EF4444",
-    dark: "#EF4444",
-  },
-  yellow: {
-    light: "#F59E0B",
-    dark: "#F59E0B",
+    light: "#17c964",
+    dark: "#17c964",
   },
   purple: {
-    light: "#8B5CF6",
-    dark: "#8B5CF6",
+    light: "#9750dd",
+    dark: "#9750dd",
   },
+  red: {
+    light: "#f31260",
+    dark: "#f31260",
+  },
+  yellow: {
+    light: "#ffc107",
+    dark: "#ffc107",
+  },
+  cyan: {
+    light: "#06b6d4",
+    dark: "#06b6d4",
+  },
+  pink: {
+    light: "#ff4ecd",
+    dark: "#ff4ecd",
+  },
+  gray: {
+    light: "#71717a",
+    dark: "#a1a1aa",
+  },
+};
+
+// Utility function to extract config from payload
+export const getPayloadConfigFromPayload = (
+  config: ChartConfig,
+  payload: any,
+  dataKey: string
+): ChartItem | undefined => {
+  if (!config || !dataKey) {
+    return undefined;
+  }
+
+  // Try to match by dataKey first
+  if (config[dataKey]) {
+    return config[dataKey];
+  }
+
+  // Fall back to value if dataKey is not found
+  if (payload.value && config[payload.value]) {
+    return config[payload.value];
+  }
+
+  return undefined;
 };
