@@ -3,7 +3,7 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NumberMovementChart from "./NumberMovementChart";
-import type { PlayerAnalysis } from "./AnalysisReport.d";
+import type { PlayerAnalysis } from "@/types/playerAnalysis";
 import type { DataPoint } from "./charts/DataTypes";
 
 interface MovementAnalysisProps {
@@ -172,7 +172,7 @@ const MovementAnalysis: React.FC<MovementAnalysisProps> = ({ analysis }) => {
                 <li><span className="font-medium text-gray-500">Previous (Gray):</span> Physical metrics from previous assessment</li>
                 <li><span className="font-medium text-orange-500">Alternative (Orange):</span> Projected metrics with specialized conditioning</li>
               </ul>
-              <p className="mt-2">Overall physical score: {analysis.performance.physical}/100</p>
+              <p className="mt-2">Overall physical score: {analysis.performance?.physical || 75}/100</p>
             </div>
           </TabsContent>
         </Tabs>

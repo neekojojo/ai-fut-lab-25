@@ -13,11 +13,13 @@ import {
   PlayerMovement, 
   PassAttempt, 
   PositionHeatmap 
-} from '@/components/AnalysisReport.d';
+} from '@/types/playerAnalysis';
 import ClubCompatibilityPanel from './ClubCompatibilityPanel';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import MovementAnalysis from '../MovementAnalysis';
 import {
   Radar,
   RadarChart,
@@ -33,6 +35,8 @@ import {
   Legend,
   BarChart,
   Bar,
+  AreaChart,
+  Area,
 } from 'recharts';
 
 // Define interfaces for props
@@ -52,6 +56,7 @@ interface AnalysisContentProps {
     similarProfessionals: ProfessionalPlayer[];
     similarityMetrics: SimilarityMetric[];
   };
+  onViewAdvanced?: () => void;
 }
 
 const AnalysisContent: React.FC<AnalysisContentProps> = ({ 
@@ -59,7 +64,8 @@ const AnalysisContent: React.FC<AnalysisContentProps> = ({
   playerStats, 
   mockAnalysis, 
   trainingRecommendations, 
-  playerComparison 
+  playerComparison,
+  onViewAdvanced
 }) => {
   // We'll use the analysis from mockAnalysis for consistency
   const analysis = mockAnalysis.analysis;
@@ -75,84 +81,97 @@ const AnalysisContent: React.FC<AnalysisContentProps> = ({
   return (
     <div className="space-y-4">
       {activeTab === 'movement' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>تحليل الحركة</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-medium">السرعة المتوسطة</h3>
-                  <Progress value={playerStats.avgSpeed / 2} className="mt-2" />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {playerStats.avgSpeed.toFixed(1)} كم/ساعة
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium">السرعة القصوى</h3>
-                  <Progress value={playerStats.maxSpeed / 3} className="mt-2" />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {playerStats.maxSpeed.toFixed(1)} كم/ساعة
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium">المسافة المقطوعة</h3>
-                  <Progress value={playerStats.distanceCovered / 50} className="mt-2" />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {playerStats.distanceCovered.toFixed(1)} متر
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h3 className="text-xl font-semibold">تحليل الحركة المتقدم</h3>
+            {onViewAdvanced && (
+              <Button onClick={onViewAdvanced} variant="outline" size="sm">
+                عرض التقرير بالتفصيل
+              </Button>
+            )}
+          </div>
+
+          <MovementAnalysis analysis={analysis} />
           
-          <Card>
-            <CardHeader>
-              <CardTitle>تحليل الحركة بمرور الوقت</CardTitle>
-            </CardHeader>
-            <CardContent className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={movementData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="speed" stroke="#10b981" activeDot={{ r: 8 }} name="السرعة" />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-          
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle>خريطة الحرارة</CardTitle>
-            </CardHeader>
-            <CardContent className="h-[300px] flex items-center justify-center bg-muted/30 rounded-md">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full h-full">
-                <div className="flex flex-col justify-center items-center">
-                  <p className="text-muted-foreground">بيانات خريطة الحرارة للاعب</p>
-                  <p className="text-sm text-muted-foreground mt-2">تركز اللاعب في وسط الملعب مع تحرك جيد على الأجنحة</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>تحليل الحركة</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-medium">السرعة المتوسطة</h3>
+                    <Progress value={playerStats.avgSpeed / 2} className="mt-2" />
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {playerStats.avgSpeed.toFixed(1)} كم/ساعة
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-medium">السرعة القصوى</h3>
+                    <Progress value={playerStats.maxSpeed / 3} className="mt-2" />
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {playerStats.maxSpeed.toFixed(1)} كم/ساعة
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-medium">المسافة المقطوعة</h3>
+                    <Progress value={playerStats.distanceCovered / 50} className="mt-2" />
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {playerStats.distanceCovered.toFixed(1)} متر
+                    </p>
+                  </div>
                 </div>
-                <div className="relative h-full w-full border border-border rounded-md bg-[#e9f5e9]">
-                  {/* Field visual representation */}
-                  <div className="absolute inset-2 border border-dashed border-primary/50 rounded"></div>
-                  <div className="absolute left-1/2 top-0 bottom-0 w-px bg-primary/50"></div>
-                  <div className="absolute left-0 right-0 top-1/2 h-px bg-primary/50"></div>
-                  <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border border-primary/30 bg-primary/20"></div>
-                  {/* Heat points */}
-                  <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-primary/60"></div>
-                  <div className="absolute left-[60%] top-[40%] w-6 h-6 rounded-full bg-primary/50"></div>
-                  <div className="absolute left-[40%] top-[60%] w-6 h-6 rounded-full bg-primary/50"></div>
-                  <div className="absolute left-[70%] top-[30%] w-4 h-4 rounded-full bg-primary/40"></div>
-                  <div className="absolute left-[30%] top-[70%] w-4 h-4 rounded-full bg-primary/40"></div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>تحليل الحركة بمرور الوقت</CardTitle>
+              </CardHeader>
+              <CardContent className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={movementData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="speed" stroke="#10b981" activeDot={{ r: 8 }} name="السرعة" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+            
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle>خريطة الحرارة</CardTitle>
+              </CardHeader>
+              <CardContent className="h-[300px] flex items-center justify-center bg-muted/30 rounded-md">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full h-full">
+                  <div className="flex flex-col justify-center items-center">
+                    <p className="text-muted-foreground">بيانات خريطة الحرارة للاعب</p>
+                    <p className="text-sm text-muted-foreground mt-2">تركز اللاعب في وسط الملعب مع تحرك جيد على الأجنحة</p>
+                  </div>
+                  <div className="relative h-full w-full border border-border rounded-md bg-[#e9f5e9]">
+                    {/* Field visual representation */}
+                    <div className="absolute inset-2 border border-dashed border-primary/50 rounded"></div>
+                    <div className="absolute left-1/2 top-0 bottom-0 w-px bg-primary/50"></div>
+                    <div className="absolute left-0 right-0 top-1/2 h-px bg-primary/50"></div>
+                    <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border border-primary/30 bg-primary/20"></div>
+                    {/* Heat points */}
+                    <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-primary/60"></div>
+                    <div className="absolute left-[60%] top-[40%] w-6 h-6 rounded-full bg-primary/50"></div>
+                    <div className="absolute left-[40%] top-[60%] w-6 h-6 rounded-full bg-primary/50"></div>
+                    <div className="absolute left-[70%] top-[30%] w-4 h-4 rounded-full bg-primary/40"></div>
+                    <div className="absolute left-[30%] top-[70%] w-4 h-4 rounded-full bg-primary/40"></div>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       )}
       
@@ -396,6 +415,34 @@ const AnalysisContent: React.FC<AnalysisContentProps> = ({
                   <PolarAngleAxis dataKey="subject" />
                   <Radar name="القدرات البدنية" dataKey="A" fill="#f97316" fillOpacity={0.6} />
                 </RadarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+          
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <CardTitle>Physical Metrics Progression</CardTitle>
+            </CardHeader>
+            <CardContent className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart 
+                  data={[
+                    { name: "Speed", current: 80, previous: 73, alternative: 86 },
+                    { name: "Strength", current: 75, previous: 68, alternative: 82 },
+                    { name: "Stamina", current: 82, previous: 75, alternative: 88 },
+                    { name: "Jumping", current: 77, previous: 70, alternative: 84 },
+                    { name: "Agility", current: 81, previous: 74, alternative: 87 }
+                  ]}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Area type="monotone" dataKey="current" name="Current" stroke="#D946EF" fill="#D946EF33" />
+                  <Area type="monotone" dataKey="previous" name="Previous" stroke="#9CA3AF" fill="#9CA3AF33" />
+                  <Area type="monotone" dataKey="alternative" name="Alternative" stroke="#F97316" fill="#F9731633" />
+                </AreaChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
