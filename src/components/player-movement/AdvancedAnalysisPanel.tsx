@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import EnhancedMovementChart from './EnhancedMovementChart';
 import MovementAnalysisChart from './MovementAnalysisChart';
@@ -682,4 +683,75 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
                   <ul className="space-y-2">
                     {performanceMetrics.strengths.map((strength, index) => (
                       <li key={index} className="flex items-start gap-2">
-                        <div className="mt-1
+                        <div className="mt-1 h-5 w-5 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">{getMetricDisplayName(strength)}</p>
+                          <p className="text-xs text-muted-foreground">{getStrengthDescription(getMetricDisplayName(strength))}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-medium mb-3">مجالات التحسين</h3>
+                  <ul className="space-y-2">
+                    {performanceMetrics.weaknesses.map((weakness, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <div className="mt-1 h-5 w-5 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">{getMetricDisplayName(weakness)}</p>
+                          <p className="text-xs text-muted-foreground">بحاجة إلى تمارين تطويرية مخصصة</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="mt-8">
+                <h3 className="text-lg font-medium mb-3">تدريبات مخصصة</h3>
+                <div className="space-y-4">
+                  {performanceMetrics.recommendations.map((rec, index) => (
+                    <div key={index} className="p-4 border rounded-lg">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="font-medium">{rec.title}</h4>
+                        <Badge variant="outline" className="bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800">
+                          {rec.duration} أسابيع
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-3">{rec.description}</p>
+                      
+                      <div className="text-sm">
+                        <div className="font-medium text-xs text-muted-foreground mb-1">التأثير المتوقع</div>
+                        <div className="grid grid-cols-3 gap-2">
+                          {rec.expectedImpact.map((impact, i) => (
+                            <div key={i} className="text-center p-1 border rounded">
+                              <div className="text-xs">{getMetricDisplayName(impact.metric)}</div>
+                              <div className="text-xs font-medium text-green-600">+{impact.expectedGain}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default AdvancedAnalysisPanel;
