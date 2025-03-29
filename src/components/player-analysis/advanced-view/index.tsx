@@ -57,7 +57,20 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
     { name: '40+ دقيقة', value: 65 }
   ];
   
-  const movementData = {
+  // Convert the movement data to an array format as expected by PerformanceMetricsTab
+  const movementDataArray = [
+    { timestamp: 1, speed: 15.2, acceleration: 2.1 },
+    { timestamp: 2, speed: 18.3, acceleration: 3.2 },
+    { timestamp: 3, speed: 22.5, acceleration: 4.2 },
+    { timestamp: 4, speed: 28.4, acceleration: 5.9 },
+    { timestamp: 5, speed: 25.1, acceleration: -3.3 },
+    { timestamp: 6, speed: 20.7, acceleration: -4.4 },
+    { timestamp: 7, speed: 18.9, acceleration: -1.8 },
+    { timestamp: 8, speed: 16.3, acceleration: -2.6 }
+  ];
+  
+  // Add the movement metrics as separate properties for reference
+  const movementMetrics = {
     avgSpeed: 15.2,
     maxSpeed: 28.4,
     totalDistance: 7.6,
@@ -81,7 +94,8 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
     });
     
     console.log("Advanced analysis view mounted with data:", combinedAnalysis);
-  }, [toast, combinedAnalysis]);
+    console.log("Movement data array:", movementDataArray);
+  }, [toast, combinedAnalysis, movementDataArray]);
   
   return (
     <div className="space-y-6 animate-fade-in">
@@ -100,7 +114,7 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
 
       <TabsContent value="metrics" className="mt-4">
         <PerformanceMetricsTab 
-          movementData={movementData}
+          movementData={movementDataArray}
           speedZones={speedZones}
           analysis={combinedAnalysis}
         />
