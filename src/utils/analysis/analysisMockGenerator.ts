@@ -1,8 +1,10 @@
+
 import type { PlayerAnalysis } from "@/components/AnalysisReport.d";
 import { PROFESSIONAL_PLAYERS } from "./constants";
 import { generateInjuryRiskAssessment } from "./injuryRiskAnalysis";
 import { determineEarnedBadges } from "./badgeService";
 import { Badge } from "@/types/badges";
+import { ProgressData } from "@/types/progress";
 
 // Create a deterministic random generator using a seed
 const getSeededRandom = (seed: number): () => number => {
@@ -295,8 +297,8 @@ export const generateEnhancedAnalysis = (seed: number = Date.now()): PlayerAnaly
   // Determine earned badges
   const badges: Badge[] = determineEarnedBadges(analysis);
   
-  // Add progress tracking (simulated)
-  const progress = {
+  // Create proper ProgressData structure
+  const progress: ProgressData = {
     lastAnalysis: new Date(),
     improvement: Math.floor(random() * 15) + 1, // 1-15% improvement
     areas: [

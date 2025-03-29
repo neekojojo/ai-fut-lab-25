@@ -1,5 +1,5 @@
-
 import { faker } from '@faker-js/faker';
+import { ProgressData } from '@/types/progress';
 
 // Mock player stats data
 export const getPlayerStats = () => {
@@ -60,6 +60,33 @@ export const getPlayerStats = () => {
 // Mock player analysis data
 export const getMockAnalysis = () => {
   const playerStats = getPlayerStats();
+  
+  const progressData: ProgressData = {
+    lastAnalysis: new Date(),
+    improvement: faker.number.int({ min: 5, max: 15 }),
+    areas: [
+      {
+        skill: "Technical",
+        before: faker.number.int({ min: 60, max: 70 }),
+        after: faker.number.int({ min: 70, max: 85 }),
+      },
+      {
+        skill: "Tactical",
+        before: faker.number.int({ min: 60, max: 70 }),
+        after: faker.number.int({ min: 70, max: 80 }),
+      },
+      {
+        skill: "Physical",
+        before: faker.number.int({ min: 60, max: 70 }),
+        after: faker.number.int({ min: 70, max: 80 }),
+      },
+      {
+        skill: "Mental",
+        before: faker.number.int({ min: 65, max: 75 }),
+        after: faker.number.int({ min: 70, max: 85 }),
+      },
+    ]
+  };
   
   return {
     analysis: {
@@ -146,6 +173,8 @@ export const getMockAnalysis = () => {
       marketValue: `$${faker.number.int({ min: 500, max: 2000 })}K`,
       compatibilityScore: faker.number.float({ min: 6.5, max: 8.5, precision: 0.1 }),
       
+      progress: progressData,
+      
       // Additional fields with more detailed metrics
       performance: {
         technical: faker.number.int({ min: 70, max: 85 }),
@@ -173,29 +202,6 @@ export const getMockAnalysis = () => {
           shooting: faker.number.int({ min: 80, max: 90 }),
           movement: faker.number.int({ min: 80, max: 90 }),
           positioning: faker.number.int({ min: 80, max: 90 }),
-        }
-      },
-      
-      progress: {
-        technical: {
-          current: faker.number.int({ min: 70, max: 85 }),
-          previous: faker.number.int({ min: 65, max: 75 }),
-          change: faker.number.int({ min: 5, max: 15 }),
-        },
-        tactical: {
-          current: faker.number.int({ min: 65, max: 80 }),
-          previous: faker.number.int({ min: 60, max: 70 }),
-          change: faker.number.int({ min: 5, max: 15 }),
-        },
-        physical: {
-          current: faker.number.int({ min: 65, max: 80 }),
-          previous: faker.number.int({ min: 60, max: 70 }),
-          change: faker.number.int({ min: 5, max: 15 }),
-        },
-        mental: {
-          current: faker.number.int({ min: 70, max: 85 }),
-          previous: faker.number.int({ min: 65, max: 75 }),
-          change: faker.number.int({ min: 5, max: 15 }),
         }
       },
       
