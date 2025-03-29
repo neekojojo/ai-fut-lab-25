@@ -8,6 +8,19 @@ import { useToast } from '@/hooks/use-toast';
 
 // Define the features for each plan
 const planFeatures = {
+  amateur: [
+    { name: 'تحليل أساسي للاعب', included: true },
+    { name: 'تقييم مهارات أساسي', included: true },
+    { name: 'رؤية شخصية للأداء', included: true },
+    { name: 'تقارير مختصرة', included: true },
+    { name: 'مقارنة مبسطة مع اللاعبين', included: true },
+    { name: 'تحديث البيانات شهرياً', included: true },
+    { name: 'تحليل ذاتي للاعب الواحد', included: true },
+    { name: 'توصيات تدريبية محدودة', included: false },
+    { name: 'تحليل متقدم للمهارات', included: false },
+    { name: 'مقارنة مع لاعبين محترفين', included: false },
+    { name: 'تحليل بالتكنولوجيا المتقدمة', included: false },
+  ],
   standard: [
     { name: 'تحليل أساسي للاعب', included: true },
     { name: 'اكتشاف وتتبع اللاعبين', included: true },
@@ -129,7 +142,14 @@ const SubscriptionPlans: React.FC = () => {
         </p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
+        <PlanCard
+          title="الباقة الهاوية"
+          price="١٩٩ ريال"
+          description="للاعبين الهواة لتحليل أدائهم الشخصي"
+          features={planFeatures.amateur}
+        />
+
         <PlanCard
           title="الباقة العادية"
           price="٤٩٩ ريال"
