@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,6 +10,13 @@ import { TrainingPlanGenerator } from './TrainingPlanGenerator';
 import { Button } from '@/components/ui/button';
 import { Download, Share2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import StrengthsWeaknessesPanel from '@/components/player-analysis/StrengthsWeaknessesPanel';
+import PerformanceOverviewPanel from '@/components/player-analysis/PerformanceOverviewPanel';
+import InjuryRiskPanel from '@/components/player-analysis/InjuryRiskPanel';
+import ComprehensiveSkillsPanel from '@/components/player-analysis/ComprehensiveSkillsPanel';
+import ProfessionalComparisonPanel from '@/components/player-analysis/ProfessionalComparisonPanel';
+import AdvancedPlayerReportPanel from '@/components/player-analysis/AdvancedPlayerReportPanel';
+import { generateInjuryRiskAssessment } from '@/utils/analysis/injuryRiskAnalysis';
 
 interface AdvancedPlayerDashboardProps {
   analysis: PlayerAnalysis;
@@ -19,8 +27,27 @@ const AdvancedPlayerDashboard: React.FC<AdvancedPlayerDashboardProps> = ({
   analysis, 
   previousAnalyses = [] 
 }) => {
-  const [activeTab, setActiveTab] = useState('metrics');
+  const [activeTab, setActiveTab] = useState('overview');
   const { toast } = useToast();
+  
+  // Generate default strengths if not present
+  const strengthsData = analysis.strengths || [
+    'Good distribution with both hands and feet',
+    'Strong command of the penalty area',
+    'Strong decision-making on when to leave the line',
+    'Excellent positioning to narrow shooting angles'
+  ];
+
+  // Generate default weaknesses if not present
+  const weaknessesData = analysis.weaknesses || [
+    'Sometimes hesitant when coming for crosses',
+    'Command of penalty area inconsistent in crowded situations',
+    'Occasionally slow to get down for low shots'
+  ];
+
+  // Generate injury risk data if not present
+  const injuryRiskData = analysis.injuryRisk || 
+    generateInjuryRiskAssessment(analysis.position || 'Goalkeeper', analysis.stats?.physical || 75);
   
   const handleExportData = () => {
     toast({
@@ -56,22 +83,44 @@ const AdvancedPlayerDashboard: React.FC<AdvancedPlayerDashboardProps> = ({
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-4 w-full">
-          <TabsTrigger value="metrics">المقاييس المتقدمة</TabsTrigger>
+        <TabsList className="grid grid-cols-6 w-full">
+          <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
+          <TabsTrigger value="advanced-metrics">المقاييس المتقدمة</TabsTrigger>
           <TabsTrigger value="comparison">المقارنة بين اللاعبين</TabsTrigger>
           <TabsTrigger value="development">تطور الأداء</TabsTrigger>
           <TabsTrigger value="training">خطة التدريب</TabsTrigger>
+          <TabsTrigger value="comprehensive">التقرير الشامل</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="metrics" className="mt-6">
+        <TabsContent value="overview" className="mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <StrengthsWeaknessesPanel strengths={strengthsData} weaknesses={weaknessesData} />
+            <PerformanceOverviewPanel 
+              compatibilityScore={analysis.compatibilityScore}
+              position={analysis.position}
+              primaryMetrics={{
+                technical: analysis.performance?.technical || 67,
+                physical: analysis.performance?.physical || 71,
+                tactical: analysis.performance?.tactical || 81,
+                mental: analysis.performance?.mental || 67
+              }}
+            />
+            <InjuryRiskPanel injuryRisk={injuryRiskData} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="advanced-metrics" className="mt-6">
           <AdvancedMetricsPanel analysis={analysis} />
         </TabsContent>
 
         <TabsContent value="comparison" className="mt-6">
-          <PlayerComparisonChart 
-            currentAnalysis={analysis} 
-            otherAnalyses={previousAnalyses} 
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <ProfessionalComparisonPanel />
+            <PlayerComparisonChart 
+              currentAnalysis={analysis} 
+              otherAnalyses={previousAnalyses} 
+            />
+          </div>
         </TabsContent>
 
         <TabsContent value="development" className="mt-6">
@@ -84,6 +133,13 @@ const AdvancedPlayerDashboard: React.FC<AdvancedPlayerDashboardProps> = ({
 
         <TabsContent value="training" className="mt-6">
           <TrainingPlanGenerator analysis={analysis} />
+        </TabsContent>
+
+        <TabsContent value="comprehensive" className="mt-6">
+          <div className="space-y-6">
+            <AdvancedPlayerReportPanel analysis={analysis} />
+            <ComprehensiveSkillsPanel />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

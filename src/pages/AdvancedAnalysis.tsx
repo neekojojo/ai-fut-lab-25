@@ -28,8 +28,7 @@ const AdvancedAnalysis: React.FC = () => {
         if (!id) {
           console.log("No ID provided, using mock data");
           const mockData = getMockAnalysis();
-          // Use type assertion after making sure the structure is compatible
-          setAnalysis(mockData.analysis as unknown as PlayerAnalysis);
+          setAnalysis(mockData.analysis as PlayerAnalysis);
           setPreviousAnalyses([]);
           return;
         }
@@ -39,7 +38,7 @@ const AdvancedAnalysis: React.FC = () => {
           const currentAnalysis = await fetchPlayerAnalysisById(id);
           if (currentAnalysis) {
             console.log("Analysis found:", currentAnalysis);
-            setAnalysis(currentAnalysis);
+            setAnalysis(currentAnalysis as PlayerAnalysis);
             
             // Try to fetch previous analyses
             try {
@@ -48,7 +47,7 @@ const AdvancedAnalysis: React.FC = () => {
                 .filter((a: any) => a.id !== id && a.playerId === currentAnalysis.playerId)
                 .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
               
-              setPreviousAnalyses(previousPlayerAnalyses);
+              setPreviousAnalyses(previousPlayerAnalyses as PlayerAnalysis[]);
             } catch (e) {
               console.warn("Could not fetch previous analyses:", e);
               setPreviousAnalyses([]);
@@ -59,8 +58,7 @@ const AdvancedAnalysis: React.FC = () => {
           // Use mock data as fallback
           console.log("Using mock data as fallback");
           const mockData = getMockAnalysis();
-          // Use type assertion after making sure the structure is compatible
-          setAnalysis(mockData.analysis as unknown as PlayerAnalysis);
+          setAnalysis(mockData.analysis as PlayerAnalysis);
           setPreviousAnalyses([]);
         }
       } finally {
