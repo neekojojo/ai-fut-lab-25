@@ -15,6 +15,8 @@ import AnalysisResults from '@/components/analysis/AnalysisResults';
 import FeaturesSection from '@/components/features/FeaturesSection';
 import PeopleDetection from '@/components/PeopleDetection';
 import SubscriptionPlans from '@/components/subscription/SubscriptionPlans';
+import FloatingElements from '@/components/landing/FloatingElements';
+import ImageGallery from '@/components/landing/ImageGallery';
 import type { PlayerAnalysis } from '@/components/AnalysisReport.d';
 import type { FileWithPreview } from '@/types';
 
@@ -22,6 +24,14 @@ interface StageArticle {
   title: string;
   content: React.ReactNode;
 }
+
+const FOOTBALL_IMAGES = [
+  { src: "/player1.jpg", alt: "Football player" },
+  { src: "/player2.jpg", alt: "Football match" },
+  { src: "/player3.jpg", alt: "Football training" },
+];
+
+const PLAYER_SILHOUETTE = "/player-silhouette.png";
 
 const IndexContent: React.FC = () => {
   const [videoFile, setVideoFile] = useState<FileWithPreview | null>(null);
@@ -433,99 +443,116 @@ const IndexContent: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="space-y-8 md:space-y-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-          <div className="md:col-span-2">
-            <div className="max-w-3xl mx-auto text-center space-y-3 md:space-y-4 animate-fade-in">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div className="z-10">
+            <div className="max-w-3xl mx-auto text-center md:text-left space-y-3 md:space-y-4 animate-fade-in">
               <div className="inline-block px-3 py-1 text-xs font-medium bg-secondary text-secondary-foreground rounded-full">
                 تحليل بالذكاء الاصطناعي
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-primary/80">
                 FUT LAB Analyzer
               </h1>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-lg text-muted-foreground max-w-2xl">
                 <span className="text-primary font-semibold">تحليل</span> أداء لاعبي كرة القدم وتقييم المواهب بالذكاء الاصطناعي
               </p>
             </div>
+            
+            <div className="mt-8 md:hidden">
+              <ImageGallery images={FOOTBALL_IMAGES} />
+            </div>
+            
+            {!videoFile && (
+              <div className="mt-8 flex flex-col md:flex-row gap-4 justify-center md:justify-start">
+                <VideoUpload onUpload={handleFileSelected} />
+                
+                <button 
+                  onClick={handleTogglePeopleDetection}
+                  className="mt-4 px-4 py-2 text-sm font-medium text-primary border border-primary rounded-md hover:bg-primary/10 transition-colors backdrop-blur-sm"
+                >
+                  تجربة كشف اللاعبين
+                </button>
+              </div>
+            )}
           </div>
-          <div className="hidden md:flex justify-center items-center relative">
-            <div className="absolute w-48 h-48 bg-primary/20 rounded-full blur-3xl -z-10"></div>
-            <div className="relative">
-              <Target className="absolute -top-10 -left-10 text-primary w-16 h-16 animate-bounce-slow" />
-              <Trophy className="text-yellow-500 w-32 h-32 drop-shadow-xl animate-float" />
-              <Target className="absolute -bottom-8 -right-8 text-primary w-12 h-12 animate-spin-slow" />
+          
+          <div className="hidden md:block relative">
+            <div className="relative overflow-hidden rounded-2xl shadow-2xl">
+              <ImageGallery 
+                images={FOOTBALL_IMAGES} 
+                className="z-10"
+              />
+            </div>
+            
+            <div className="absolute top-1/2 -right-8 transform -translate-y-1/2 z-0">
+              <FloatingElements playerSilhouetteSrc={PLAYER_SILHOUETTE} />
             </div>
           </div>
         </div>
       </div>
       
-      <FeaturesSection />
-      
       {!videoFile ? (
         <>
-          <div className="flex flex-col md:flex-row gap-4 justify-center">
-            <VideoUpload onUpload={handleFileSelected} />
-            
-            <button 
-              onClick={handleTogglePeopleDetection}
-              className="mt-4 px-4 py-2 text-sm font-medium text-primary border border-primary rounded-md hover:bg-primary/10 transition-colors"
-            >
-              تجربة كشف اللاعبين
-            </button>
-          </div>
-          
+          <FeaturesSection />
           <SubscriptionPlans />
           
-          <div className="mt-12">
-            <h2 className="text-2xl font-bold text-center mb-6">مراحل تطوير تطبيق تحليل أداء لاعبي كرة القدم</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <StageCard
-                number={1}
-                title="اكتشاف اللاعبين والتعرف عليهم"
-                description="تحديد وتتبع اللاعبين في الفيديو"
-                icon={<FileVideo className="h-8 w-8 text-primary" />}
-                onReadMore={() => handleOpenStageArticle(1)}
-              />
-              
-              <StageCard
-                number={2}
-                title="تحليل الحركة والأداء"
-                description="تحليل أنماط الحركة والإحصاءات الفنية"
-                icon={<BarChart3 className="h-8 w-8 text-primary" />}
-                onReadMore={() => handleOpenStageArticle(2)}
-              />
-              
-              <StageCard
-                number={3}
-                title="التقييم المتقدم للمهارات"
-                description="تقييم شامل للمهارات الفنية والتكتيكية"
-                icon={<Sparkles className="h-8 w-8 text-primary" />}
-                onReadMore={() => handleOpenStageArticle(3)}
-              />
-              
-              <StageCard
-                number={4}
-                title="مقارنة النتائج مع لاعبين محترفين"
-                description="مقارنة المؤشرات مع معايير اللاعبين المحترفين"
-                icon={<Medal className="h-8 w-8 text-primary" />}
-                onReadMore={() => handleOpenStageArticle(4)}
-              />
-              
-              <StageCard
-                number={5}
-                title="تتبع التقدم مع مرور الوقت"
-                description="تحليل التطور وتحديد مجالات التحسين"
-                icon={<CalendarCheck className="h-8 w-8 text-primary" />}
-                onReadMore={() => handleOpenStageArticle(5)}
-              />
-              
-              <StageCard
-                number={6}
-                title="التكامل مع الأنظمة الخارجية"
-                description="ربط مع أنظمة FIFA وتحسين الأداء"
-                icon={<Globe className="h-8 w-8 text-primary" />}
-                onReadMore={() => handleOpenStageArticle(6)}
-              />
-            </div>
+          <div className="mt-12 relative z-10">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-3xl -z-10 transform rotate-1 scale-105"></div>
+            <Card className="border-0 bg-background/40 backdrop-blur-md shadow-xl">
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold text-center">مراحل تطوير تطبيق تحليل أداء لاعبي كرة القدم</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <StageCard
+                    number={1}
+                    title="اكتشاف اللاعبين والتعرف عليهم"
+                    description="تحديد وتتبع اللاعبين في الفيديو"
+                    icon={<FileVideo className="h-8 w-8 text-primary" />}
+                    onReadMore={() => handleOpenStageArticle(1)}
+                  />
+                  
+                  <StageCard
+                    number={2}
+                    title="تحليل الحركة والأداء"
+                    description="تحليل أنماط الحركة والإحصاءات الفنية"
+                    icon={<BarChart3 className="h-8 w-8 text-primary" />}
+                    onReadMore={() => handleOpenStageArticle(2)}
+                  />
+                  
+                  <StageCard
+                    number={3}
+                    title="التقييم المتقدم للمهارات"
+                    description="تقييم شامل للمهارات الفنية والتكتيكية"
+                    icon={<Sparkles className="h-8 w-8 text-primary" />}
+                    onReadMore={() => handleOpenStageArticle(3)}
+                  />
+                  
+                  <StageCard
+                    number={4}
+                    title="مقارنة النتائج مع لاعبين محترفين"
+                    description="مقارنة المؤشرات مع معايير اللاعبين المحترفين"
+                    icon={<Medal className="h-8 w-8 text-primary" />}
+                    onReadMore={() => handleOpenStageArticle(4)}
+                  />
+                  
+                  <StageCard
+                    number={5}
+                    title="تتبع التقدم مع مرور الوقت"
+                    description="تحليل التطور وتحديد مجالات التحسين"
+                    icon={<CalendarCheck className="h-8 w-8 text-primary" />}
+                    onReadMore={() => handleOpenStageArticle(5)}
+                  />
+                  
+                  <StageCard
+                    number={6}
+                    title="التكامل مع الأنظمة الخارجية"
+                    description="ربط مع أنظمة FIFA وتحسين الأداء"
+                    icon={<Globe className="h-8 w-8 text-primary" />}
+                    onReadMore={() => handleOpenStageArticle(6)}
+                  />
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </>
       ) : (
@@ -567,10 +594,10 @@ interface StageCardProps {
 
 const StageCard: React.FC<StageCardProps> = ({ number, title, description, icon, action, onReadMore }) => {
   return (
-    <Card className="border-primary/10 hover:border-primary/30 transition-colors h-full">
+    <Card className="border-primary/10 hover:border-primary/30 transition-all duration-500 group h-full bg-background/60 backdrop-blur-sm hover:bg-background/80">
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
-          <div className="bg-primary/10 p-3 rounded-lg">
+          <div className="bg-primary/10 p-3 rounded-lg group-hover:bg-primary/20 transition-colors duration-500">
             {icon}
           </div>
           <div className="bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center font-bold">
