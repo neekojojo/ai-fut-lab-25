@@ -87,11 +87,20 @@ const PerformanceMetricsTab: React.FC<PerformanceMetricsTabProps> = ({
   
   console.log("PerformanceMetricsTab render with:", { movementData, metrics, speedZones });
   
+  // Convert speedZones array to the format expected by MovementAnalysisChart
+  // This adapts our SpeedZone[] to the format the chart component expects
+  const adaptedSpeedZones = {
+    walking: speedZones.find(zone => zone.name === 'مشي')?.percentage / 100 || 0.2,
+    jogging: speedZones.find(zone => zone.name === 'جري خفيف')?.percentage / 100 || 0.45,
+    running: speedZones.find(zone => zone.name === 'جري')?.percentage / 100 || 0.25,
+    sprinting: speedZones.find(zone => zone.name === 'سرعة قصوى')?.percentage / 100 || 0.1
+  };
+  
   return (
     <div className="space-y-6">
       <MovementAnalysisChart 
         movementData={movementData}
-        speedZones={speedZones}
+        speedZones={adaptedSpeedZones}
         sprintCount={metrics.sprintCount}
         efficiencyScore={efficiencyScore}
       />

@@ -10,7 +10,7 @@ interface MovementAnalysisChartProps {
     speed: number;
     acceleration: number;
   }[];
-  speedZones?: {
+  speedZones: {
     walking: number;
     jogging: number;
     running: number;
