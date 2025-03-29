@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { PlayerPosition } from '@/utils/videoDetection/types';
@@ -18,27 +17,22 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
   const lastTimeRef = useRef<number>(0);
   const frameRateRef = useRef<number>(30); // 30 fps
   
-  // Draw skeleton connections between keypoints
   const drawSkeleton = (
     ctx: CanvasRenderingContext2D, 
     keypoints: {x: number; y: number; part: string; confidence: number;}[]
   ) => {
-    // Define connections between keypoints
     const connections = [
-      // Face
       ["nose", "left_eye"],
       ["nose", "right_eye"],
       ["left_eye", "left_ear"],
       ["right_eye", "right_ear"],
       
-      // Body
       ["left_shoulder", "right_shoulder"],
       ["left_shoulder", "left_elbow"],
       ["right_shoulder", "right_elbow"],
       ["left_elbow", "left_wrist"],
       ["right_elbow", "right_wrist"],
       
-      // Lower body
       ["left_shoulder", "left_hip"],
       ["right_shoulder", "right_hip"],
       ["left_hip", "right_hip"],
@@ -48,8 +42,8 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
       ["right_knee", "right_ankle"],
     ];
 
-    ctx.strokeStyle = "#22D3EE"; // ازرق ساطع للعظام
-    ctx.lineWidth = 4; // خط اكثر سماكة
+    ctx.strokeStyle = "#22D3EE"; // أزرق ساطع للعظام
+    ctx.lineWidth = 4; // خط أكثر سماكة
     ctx.shadowColor = 'rgba(34, 211, 238, 0.6)';
     ctx.shadowBlur = 8;
     
@@ -65,39 +59,33 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
       }
     });
     
-    // إزالة تأثير الظل بعد رسم العظام
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
   };
   
-  // Draw keypoints
   const drawKeypoints = (
     ctx: CanvasRenderingContext2D, 
     keypoints: {x: number; y: number; part: string; confidence: number;}[]
   ) => {
     keypoints.forEach(keypoint => {
       if (keypoint.confidence > 0.5) {
-        // رسم دائرة بتوهج للمفاصل
         ctx.fillStyle = "#F471B5"; // وردي ساطع للمفاصل
         ctx.beginPath();
         ctx.arc(keypoint.x, keypoint.y, 6, 0, 2 * Math.PI);
         ctx.fill();
         
-        // إضافة توهج حول المفاصل
         ctx.shadowColor = 'rgba(244, 113, 181, 0.7)';
         ctx.shadowBlur = 10;
         ctx.beginPath();
         ctx.arc(keypoint.x, keypoint.y, 3, 0, 2 * Math.PI);
         ctx.fill();
         
-        // إزالة تأثير الظل
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
       }
     });
   };
   
-  // Animation loop
   const animate = (timestamp: number) => {
     if (!lastTimeRef.current) {
       lastTimeRef.current = timestamp;
@@ -107,7 +95,6 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
     const frameInterval = 1000 / frameRateRef.current;
     
     if (elapsed > frameInterval) {
-      // Update frame
       setCurrentFrame(prev => {
         const nextFrame = (prev + 1) % playerPositions.length;
         return nextFrame;
@@ -121,7 +108,6 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
     }
   };
   
-  // Start/stop animation
   useEffect(() => {
     if (isPlaying) {
       animationRef.current = requestAnimationFrame(animate);
@@ -136,7 +122,6 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
     };
   }, [isPlaying]);
   
-  // Draw current frame
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -144,63 +129,48 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
-    // Clear canvas with black background
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Get current position data
     const position = playerPositions[currentFrame];
     if (!position) return;
     
-    // Draw skeleton and keypoints
     drawSkeleton(ctx, position.keypoints);
     drawKeypoints(ctx, position.keypoints);
     
-    // Function to draw text with enhanced visibility
     const drawTextWithBackground = (text: string, x: number, y: number, isHighlighted: boolean = false) => {
-      // تحسين مظهر خلفية النص - استخدام خلفية سوداء داكنة مع حدود متوهجة ملونة
-      const bgColor = isHighlighted ? "rgba(34, 211, 238, 0.85)" : "rgba(0, 0, 0, 0.85)";
-      const borderColor = isHighlighted ? "#22D3EE" : CHART_COLORS.highlight;
-      const textColor = "#FFFFFF"; // دائمًا نص أبيض للتباين العالي
+      const bgColor = "#FFFFFF";
+      const borderColor = isHighlighted ? "#0891B2" : "#8B5CF6";
+      const textColor = "#000000";
       
       const padding = 10;
       const textWidth = ctx.measureText(text).width;
       const textHeight = 24;
       
-      // رسم الخلفية مع التوهج
-      ctx.shadowColor = isHighlighted ? 'rgba(34, 211, 238, 0.8)' : 'rgba(244, 113, 181, 0.7)';
-      ctx.shadowBlur = 15;
       ctx.fillStyle = bgColor;
       ctx.fillRect(x - padding, y - textHeight, textWidth + padding * 2, textHeight + padding/2);
       
-      // رسم الحدود الخارجية
-      ctx.shadowBlur = 0;
       ctx.strokeStyle = borderColor;
       ctx.lineWidth = 2;
       ctx.strokeRect(x - padding, y - textHeight, textWidth + padding * 2, textHeight + padding/2);
       
-      // رسم النص بلون أبيض ساطع
       ctx.fillStyle = textColor;
       ctx.font = "bold 16px Arial";
       ctx.fillText(text, x, y - 4);
     };
     
-    // Draw frame number and timestamp with enhanced visibility
     drawTextWithBackground(`الإطار: ${position.frameNumber + 1}/${playerPositions.length}`, 10, 30, true);
     drawTextWithBackground(`الوقت: ${(position.timestamp / 1000).toFixed(2)} ثانية`, 10, 70);
     
-    // Draw confidence score if available
     if (position.confidence) {
       drawTextWithBackground(`الثقة: ${(position.confidence * 100).toFixed(0)}%`, 10, 110);
     }
   }, [currentFrame, playerPositions]);
   
-  // Initialize canvas size
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     
-    // Set canvas size based on the first frame bbox if available
     if (playerPositions.length > 0) {
       canvas.width = 600;
       canvas.height = 400;
@@ -242,7 +212,7 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
             </button>
           </div>
           
-          <div className="bg-gray-900/90 p-4 rounded-lg border border-primary/30">
+          <div className="bg-white p-4 rounded-lg border border-primary/30">
             <input
               type="range"
               min="0"
@@ -252,15 +222,15 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
               className="w-full accent-primary h-3"
             />
             
-            <div className="text-center text-white mt-4 bg-black/80 py-3 rounded-md border border-primary/30 shadow-[0_0_10px_rgba(139,92,246,0.2)]">
+            <div className="text-center mt-4 bg-white py-3 rounded-md border border-primary/30 shadow-[0_0_10px_rgba(139,92,246,0.2)]">
               {playerPositions.length > 0 && (
                 <div className="flex items-center justify-center">
                   <span className="font-bold text-primary ml-2">الإطار الحالي:</span>
-                  <span className="inline-block min-w-10 bg-primary/20 px-3 py-1 rounded-md text-white font-bold">
+                  <span className="inline-block min-w-10 bg-primary/20 px-3 py-1 rounded-md text-black font-bold">
                     {currentFrame + 1}
                   </span>
-                  <span className="mx-2 text-gray-400">/</span>
-                  <span className="text-white">{playerPositions.length}</span>
+                  <span className="mx-2 text-gray-600">/</span>
+                  <span className="text-black">{playerPositions.length}</span>
                 </div>
               )}
             </div>
