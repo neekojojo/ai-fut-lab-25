@@ -1,4 +1,5 @@
 
+
 import { DetectionResult, PlayerPosition } from './types';
 import { extractVideoFrames } from './frameExtraction';
 
@@ -114,3 +115,4 @@ export const detectWithOpenPose = async (
     throw new Error(`OpenPose detection failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };
+

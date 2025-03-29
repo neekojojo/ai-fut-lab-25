@@ -17,9 +17,9 @@ interface NumberMovementChartProps {
 }
 
 const DEFAULT_COLORS = {
-  current: "#8B5CF6", // Purple
-  previous: "#9CA3AF", // Gray
-  alternative: "#F97316", // Orange
+  current: "#8B5CF6", // Vibrant Purple
+  previous: "#64748B", // Darker Gray for better contrast
+  alternative: "#F97316", // Bright Orange
 };
 
 const NumberMovementChart: React.FC<NumberMovementChartProps> = ({
@@ -38,16 +38,19 @@ const NumberMovementChart: React.FC<NumberMovementChartProps> = ({
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="name" />
             <YAxis domain={[0, 100]} />
-            <Tooltip />
+            <Tooltip 
+              contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.8)', border: 'none', borderRadius: '4px', color: 'white' }}
+              labelStyle={{ fontWeight: 'bold', color: 'white' }}
+            />
             <Legend />
             <Line 
               type="monotone" 
               dataKey="current" 
               name="الحالي" 
               stroke={colors.current} 
-              strokeWidth={2} 
-              dot={{ r: 4 }} 
-              activeDot={{ r: 6 }} 
+              strokeWidth={3} 
+              dot={{ r: 5, fill: colors.current, strokeWidth: 2, stroke: 'white' }} 
+              activeDot={{ r: 7 }} 
             />
             <Line 
               type="monotone" 
@@ -56,7 +59,7 @@ const NumberMovementChart: React.FC<NumberMovementChartProps> = ({
               stroke={colors.previous} 
               strokeWidth={2} 
               strokeDasharray="5 5" 
-              dot={{ r: 3 }} 
+              dot={{ r: 4, fill: colors.previous, strokeWidth: 2, stroke: 'white' }} 
             />
             <Line 
               type="monotone" 
@@ -64,7 +67,7 @@ const NumberMovementChart: React.FC<NumberMovementChartProps> = ({
               name="المستهدف" 
               stroke={colors.alternative} 
               strokeWidth={2} 
-              dot={{ r: 3 }} 
+              dot={{ r: 4, fill: colors.alternative, strokeWidth: 2, stroke: 'white' }} 
             />
           </LineChart>
         );
@@ -75,7 +78,10 @@ const NumberMovementChart: React.FC<NumberMovementChartProps> = ({
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="name" />
             <YAxis domain={[0, 100]} />
-            <Tooltip />
+            <Tooltip 
+              contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.8)', border: 'none', borderRadius: '4px', color: 'white' }}
+              labelStyle={{ fontWeight: 'bold', color: 'white' }}
+            />
             <Legend />
             <Bar dataKey="current" name="الحالي" fill={colors.current} radius={[4, 4, 0, 0]} />
             <Bar dataKey="previous" name="السابق" fill={colors.previous} radius={[4, 4, 0, 0]} />
@@ -89,22 +95,25 @@ const NumberMovementChart: React.FC<NumberMovementChartProps> = ({
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="name" />
             <YAxis domain={[0, 100]} />
-            <Tooltip />
+            <Tooltip 
+              contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.8)', border: 'none', borderRadius: '4px', color: 'white' }}
+              labelStyle={{ fontWeight: 'bold', color: 'white' }}
+            />
             <Legend />
             <Area 
               type="monotone" 
               dataKey="current" 
               name="الحالي" 
               stroke={colors.current} 
-              fill={`${colors.current}20`} 
-              strokeWidth={2} 
+              fill={`${colors.current}40`} 
+              strokeWidth={3} 
             />
             <Area 
               type="monotone" 
               dataKey="previous" 
               name="السابق" 
               stroke={colors.previous} 
-              fill={`${colors.previous}20`} 
+              fill={`${colors.previous}40`} 
               strokeWidth={2} 
               strokeDasharray="5 5" 
             />
@@ -113,7 +122,7 @@ const NumberMovementChart: React.FC<NumberMovementChartProps> = ({
               dataKey="alternative" 
               name="المستهدف" 
               stroke={colors.alternative} 
-              fill={`${colors.alternative}20`} 
+              fill={`${colors.alternative}40`} 
               strokeWidth={2} 
             />
           </AreaChart>

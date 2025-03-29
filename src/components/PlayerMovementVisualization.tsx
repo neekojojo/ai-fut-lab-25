@@ -136,11 +136,28 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
     drawSkeleton(ctx, position.keypoints);
     drawKeypoints(ctx, position.keypoints);
     
-    // Draw frame info
-    ctx.fillStyle = "white";
-    ctx.font = "16px Arial";
-    ctx.fillText(`Frame: ${position.frameNumber + 1}/${playerPositions.length}`, 10, 30);
-    ctx.fillText(`Time: ${(position.timestamp / 1000).toFixed(2)}s`, 10, 60);
+    // Draw frame info with improved visibility
+    // Add background for text to improve readability
+    const drawTextWithBackground = (text: string, x: number, y: number) => {
+      // Draw background rectangle
+      ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+      const textWidth = ctx.measureText(text).width;
+      ctx.fillRect(x - 4, y - 20, textWidth + 8, 26);
+      
+      // Draw text with high contrast
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "bold 16px Arial";
+      ctx.fillText(text, x, y);
+    };
+    
+    // Draw frame number and timestamp with better visibility
+    drawTextWithBackground(`الإطار: ${position.frameNumber + 1}/${playerPositions.length}`, 10, 30);
+    drawTextWithBackground(`الوقت: ${(position.timestamp / 1000).toFixed(2)} ثانية`, 10, 60);
+    
+    // Draw confidence score if available
+    if (position.confidence) {
+      drawTextWithBackground(`الثقة: ${(position.confidence * 100).toFixed(0)}%`, 10, 90);
+    }
   }, [currentFrame, playerPositions]);
   
   // Initialize canvas size
@@ -150,7 +167,6 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
     
     // Set canvas size based on the first frame bbox if available
     if (playerPositions.length > 0) {
-      const firstPosition = playerPositions[0];
       canvas.width = 600;
       canvas.height = 400;
     }
@@ -168,7 +184,7 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Player Movement Analysis</CardTitle>
+        <CardTitle>تحليل حركة اللاعب</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-center">
         <div className="relative border rounded-md w-full max-w-[600px] aspect-[3/2] bg-gray-900">
@@ -179,12 +195,12 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
         </div>
         
         <div className="w-full max-w-[600px] mt-4 space-y-4">
-          <div className="flex items-center justify-center space-x-4">
+          <div className="flex items-center justify-center space-x-4 rtl:space-x-reverse">
             <button
               onClick={handlePlayPause}
               className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
             >
-              {isPlaying ? 'Pause' : 'Play'}
+              {isPlaying ? 'إيقاف' : 'تشغيل'}
             </button>
           </div>
           
@@ -196,6 +212,14 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
             onChange={handleSliderChange}
             className="w-full"
           />
+          
+          <div className="text-center text-sm text-primary">
+            {playerPositions.length > 0 && (
+              <>
+                <span className="font-bold">الإطار الحالي:</span> {currentFrame + 1} / {playerPositions.length}
+              </>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -203,3 +227,4 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
 };
 
 export default PlayerMovementVisualization;
+
