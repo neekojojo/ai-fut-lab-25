@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Trophy, Target } from 'lucide-react';
+import { Trophy, Target, Flame, SoccerBall } from 'lucide-react';
 
 interface FloatingElementsProps {
   playerSilhouetteSrc: string;
@@ -15,8 +15,13 @@ const FloatingElements: React.FC<FloatingElementsProps> = ({ playerSilhouetteSrc
       </div>
       
       {/* Trophy animation */}
-      <div className="relative">
+      <div className="relative flex items-center">
         <Trophy className="text-yellow-500 w-32 h-32 drop-shadow-xl animate-float" />
+        
+        {/* Soccer Ball icon next to Trophy */}
+        <div className="ml-4 mt-2">
+          <SoccerBall className="text-white w-16 h-16 drop-shadow-lg animate-bounce-slow" />
+        </div>
       </div>
       
       {/* Another football */}
