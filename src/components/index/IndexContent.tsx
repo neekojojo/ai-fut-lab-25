@@ -14,6 +14,7 @@ import { analyzeFootballVideo } from '@/utils/analysis';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
 import FeaturesSection from '@/components/features/FeaturesSection';
 import PeopleDetection from '@/components/PeopleDetection';
+import SubscriptionPlans from '@/components/subscription/SubscriptionPlans';
 import type { PlayerAnalysis } from '@/components/AnalysisReport.d';
 import type { FileWithPreview } from '@/types';
 
@@ -166,7 +167,7 @@ const IndexContent: React.FC = () => {
           <h3 className="text-lg font-semibold mt-4">قاعدة بيانات المقارنة</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
             <li>بيانات أداء من أكثر من 10,000 لاعب محترف</li>
-            <li>تغطية للبطولات والدوريات العالمية الكبرى</li>
+            <li>تغطية للبطولات والدوريات العالمية ا��كبرى</li>
             <li>مجموعات بيانات مقسمة حسب الفئة العمرية والمستوى</li>
             <li>تحديث البيانات بشكل دوري</li>
           </ul>
@@ -268,7 +269,7 @@ const IndexContent: React.FC = () => {
             <li>تحليلات متقاطعة مع بيانات المنافسات المختلفة</li>
           </ul>
           
-          <h3 className="text-lg font-semibold mt-4">الفوائد والمخرجات</h3>
+          <h3 className="text-lg font-semibold mt-4">الفوائد وا��مخرجات</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
             <li>رؤية شاملة لأداء اللاعب من مصادر متعددة</li>
             <li>تعزيز فرص اكتشاف اللاعب من قبل المراقبين الدوليين</li>
@@ -459,6 +460,8 @@ const IndexContent: React.FC = () => {
               تجربة كشف اللاعبين
             </button>
           </div>
+          
+          <SubscriptionPlans />
           
           <div className="mt-12">
             <h2 className="text-2xl font-bold text-center mb-6">مراحل تطوير تطبيق تحليل أداء لاعبي كرة القدم</h2>
