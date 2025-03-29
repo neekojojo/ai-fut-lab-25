@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import VideoUpload from '../VideoUpload';
 import { ANALYSIS_STAGES } from '@/utils/analysis/constants';
 import { Separator } from '@/components/ui/separator';
-import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, Globe, ChevronRight, Trophy, Ball } from 'lucide-react';
+import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, Globe, ChevronRight, Trophy, Target } from 'lucide-react';
 import AnalysisProcessing from './analysis-processing/AnalysisProcessing';
 import AnalysisOptions from '@/components/analysis/ModelSelection';
 import { analyzeFootballVideo } from '@/utils/analysis';
@@ -443,16 +443,16 @@ const IndexContent: React.FC = () => {
                 FUT LAB Analyzer
               </h1>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                <span className="text-primary font-semibold">��حليل</span> أداء لاعبي كرة القدم وتقييم المواهب بالذكاء الاصطناعي
+                <span className="text-primary font-semibold">تحليل</span> أداء لاعبي كرة القدم وتقييم المواهب بالذكاء الاصطناعي
               </p>
             </div>
           </div>
           <div className="hidden md:flex justify-center items-center relative">
             <div className="absolute w-48 h-48 bg-primary/20 rounded-full blur-3xl -z-10"></div>
             <div className="relative">
-              <Ball className="absolute -top-10 -left-10 text-primary w-16 h-16 animate-bounce-slow" />
+              <Target className="absolute -top-10 -left-10 text-primary w-16 h-16 animate-bounce-slow" />
               <Trophy className="text-yellow-500 w-32 h-32 drop-shadow-xl animate-float" />
-              <Ball className="absolute -bottom-8 -right-8 text-primary w-12 h-12 animate-spin-slow" />
+              <Target className="absolute -bottom-8 -right-8 text-primary w-12 h-12 animate-spin-slow" />
             </div>
           </div>
         </div>
