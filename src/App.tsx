@@ -8,8 +8,6 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import AdvancedAnalysis from "./pages/AdvancedAnalysis";
-import ProfessionalTips from "./pages/ProfessionalTips";
-import StressManagement from "./pages/StressManagement";
 import SignIn from "./components/auth/SignIn";
 import SignUp from "./components/auth/SignUp";
 
@@ -47,16 +45,6 @@ function App() {
             <Route path="/dashboard" element={
               <AuthRoute>
                 <Dashboard />
-              </AuthRoute>
-            } />
-            <Route path="/professional-tips" element={
-              <AuthRoute>
-                <ProfessionalTips />
-              </AuthRoute>
-            } />
-            <Route path="/stress-management" element={
-              <AuthRoute>
-                <StressManagement />
               </AuthRoute>
             } />
             

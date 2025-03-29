@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +11,7 @@ import AnalysisProcessing from './analysis-processing/AnalysisProcessing';
 import AnalysisOptions from '@/components/analysis/ModelSelection';
 import { analyzeFootballVideo } from '@/utils/analysis';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
+import FeaturesSection from '@/components/features/FeaturesSection';
 import type { PlayerAnalysis } from '@/components/AnalysisReport.d';
 import type { FileWithPreview } from '@/types';
 
@@ -149,6 +151,9 @@ const IndexContent: React.FC = () => {
           </p>
         </div>
       </div>
+      
+      {/* إضافة قسم المميزات الرئيسية هنا */}
+      <FeaturesSection />
       
       {!videoFile ? (
         <>
