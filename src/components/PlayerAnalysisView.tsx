@@ -37,7 +37,7 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
 
   // معالج لعرض التحليل المتقدم للحركة
   const handleViewAdvanced = () => {
-    console.log("Switching to advanced view mode");
+    console.log("Opening advanced view mode");
     setViewMode('advanced');
     
     // إضافة إشعار لتأكيد التنفيذ

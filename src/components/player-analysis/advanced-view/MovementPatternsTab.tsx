@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { Line, Area, Bar, ResponsiveContainer } from 'recharts';
-import { ChartContainer } from '@/components/ui/chart';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ResponsiveContainer, LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 interface MovementPatternsTabProps {
   speedData: any[];
@@ -18,96 +17,151 @@ const MovementPatternsTab: React.FC<MovementPatternsTabProps> = ({
   energyEfficiencyData
 }) => {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>السرعة والتسارع</CardTitle>
+          <CardTitle className="text-lg font-medium">منحنى السرعة</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium">منحنى السرعة</h3>
-            <div className="bg-muted/20 p-4 rounded-lg">
-              <ChartContainer className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <Line 
-                    data={speedData} 
-                    type="monotone" 
-                    dataKey="current" 
-                    name="الحالي"
-                    stroke="#8B5CF6" 
-                    strokeWidth={2}
-                    activeDot={{ r: 6 }}
-                  />
-                </ResponsiveContainer>
-              </ChartContainer>
-            </div>
-            <p className="text-xs text-muted-foreground">تحليل سرعة اللاعب خلال مسافات مختلفة مقارنة بالأداء السابق</p>
-          </div>
-
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium">معدل التسارع</h3>
-            <div className="bg-muted/20 p-4 rounded-lg">
-              <ChartContainer className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <Area 
-                    data={accelerationData} 
-                    type="monotone" 
-                    dataKey="current" 
-                    name="الحالي"
-                    stroke="#10B981" 
-                    fill="#10B98120"
-                    strokeWidth={2}
-                  />
-                </ResponsiveContainer>
-              </ChartContainer>
-            </div>
-            <p className="text-xs text-muted-foreground">تحليل معدل التسارع للاعب خلال فترات زمنية مختلفة</p>
+        <CardContent>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={speedData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip 
+                  formatter={(value: number) => [`${value} كم/س`, 'السرعة']}
+                  labelFormatter={(label) => `المسافة: ${label}`}
+                />
+                <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                <Line 
+                  type="monotone" 
+                  dataKey="current" 
+                  stroke="#3b82f6" 
+                  strokeWidth={2} 
+                  name="الحالي" 
+                  activeDot={{ r: 8 }} 
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="previous" 
+                  stroke="#9ca3af" 
+                  strokeWidth={2} 
+                  name="السابق" 
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </CardContent>
       </Card>
-
+      
       <Card>
         <CardHeader>
-          <CardTitle>أنماط الحركة وكفاءة الطاقة</CardTitle>
+          <CardTitle className="text-lg font-medium">منحنى التسارع</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium">نمط الحركة</h3>
-            <div className="bg-muted/20 p-4 rounded-lg">
-              <ChartContainer className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <Bar 
-                    data={movementPatternData} 
-                    dataKey="current" 
-                    name="الحالي"
-                    fill="#3B82F6" 
-                    radius={[4, 4, 0, 0]}
-                  />
-                </ResponsiveContainer>
-              </ChartContainer>
-            </div>
-            <p className="text-xs text-muted-foreground">تحليل أنماط حركة اللاعب ومقارنتها بالأداء السابق</p>
+        <CardContent>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={accelerationData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip 
+                  formatter={(value: number) => [`${value} م/ث²`, 'التسارع']}
+                  labelFormatter={(label) => `الوقت: ${label}`}
+                />
+                <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                <Line 
+                  type="monotone" 
+                  dataKey="current" 
+                  stroke="#f59e0b" 
+                  strokeWidth={2} 
+                  name="الحالي" 
+                  activeDot={{ r: 8 }} 
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="previous" 
+                  stroke="#9ca3af" 
+                  strokeWidth={2} 
+                  name="السابق" 
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
-
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium">كفاءة الطاقة</h3>
-            <div className="bg-muted/20 p-4 rounded-lg">
-              <ChartContainer className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <Line 
-                    data={energyEfficiencyData} 
-                    type="monotone" 
-                    dataKey="current" 
-                    name="الحالي"
-                    stroke="#F59E0B" 
-                    strokeWidth={2}
-                    dot={{ r: 4 }}
-                    activeDot={{ r: 6 }}
-                  />
-                </ResponsiveContainer>
-              </ChartContainer>
-            </div>
-            <p className="text-xs text-muted-foreground">تحليل كفاءة استهلاك الطاقة خلال المباراة</p>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-medium">أنماط الحركة</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={movementPatternData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip 
+                  formatter={(value: number) => [`${value}`, 'التكرار']}
+                  labelFormatter={(label) => `مستوى الشدة: ${label}`}
+                />
+                <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                <Area 
+                  type="monotone" 
+                  dataKey="current" 
+                  stackId="1"
+                  stroke="#8b5cf6" 
+                  fill="#8b5cf685" 
+                  name="الحالي" 
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="previous" 
+                  stackId="2"
+                  stroke="#9ca3af" 
+                  fill="#9ca3af85" 
+                  name="السابق" 
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-medium">كفاءة استهلاك الطاقة</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={energyEfficiencyData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis domain={[60, 100]} />
+                <Tooltip 
+                  formatter={(value: number) => [`${value}%`, 'الكفاءة']}
+                  labelFormatter={(label) => `الوقت: ${label}`}
+                />
+                <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                <Line 
+                  type="monotone" 
+                  dataKey="current" 
+                  stroke="#10b981" 
+                  strokeWidth={2} 
+                  name="الحالي" 
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="previous" 
+                  stroke="#9ca3af" 
+                  strokeWidth={2} 
+                  name="السابق" 
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </CardContent>
       </Card>

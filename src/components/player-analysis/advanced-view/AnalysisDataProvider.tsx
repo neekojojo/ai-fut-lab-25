@@ -1,9 +1,9 @@
 
 import React from 'react';
 
-// Define sample data that will be used across multiple components
+// تعريف بيانات عينة لاستخدامها في عدة مكونات
 export const useAnalysisData = (analysis: any) => {
-  // مثال لبيانات الحركة للرسوم البيانية
+  // بيانات السرعة للرسومات البيانية
   const speedData = [
     { name: "0م", current: 0, previous: 0 },
     { name: "5م", current: 12, previous: 10 },
@@ -14,6 +14,7 @@ export const useAnalysisData = (analysis: any) => {
     { name: "30م", current: 10, previous: 8 }
   ];
 
+  // بيانات التسارع
   const accelerationData = [
     { name: "0ث", current: 0, previous: 0 },
     { name: "1ث", current: 4.2, previous: 3.8 },
@@ -23,6 +24,7 @@ export const useAnalysisData = (analysis: any) => {
     { name: "5ث", current: 0.9, previous: 0.8 }
   ];
 
+  // أنماط الحركة
   const movementPatternData = [
     { name: "0%", current: 5, previous: 3 },
     { name: "20%", current: 15, previous: 12 },
@@ -32,6 +34,7 @@ export const useAnalysisData = (analysis: any) => {
     { name: "100%", current: 10, previous: 8 }
   ];
 
+  // كفاءة استهلاك الطاقة
   const energyEfficiencyData = [
     { name: "0د", current: 100, previous: 100 },
     { name: "15د", current: 95, previous: 90 },
@@ -42,19 +45,42 @@ export const useAnalysisData = (analysis: any) => {
     { name: "90د", current: 80, previous: 65 }
   ];
 
-  // بيانات حركة اللاعب الإضافية
+  // بيانات حركة اللاعب مع الوقت
   const movementData = Array.from({ length: 30 }, (_, i) => ({
     timestamp: i,
     speed: 5 + Math.sin(i / 3) * 3 + Math.random() * 2,
     acceleration: 1 + Math.cos(i / 4) * 0.8 + Math.random() * 0.5,
   }));
 
-  // بيانات مناطق السرعة
+  // مناطق السرعة المختلفة
   const speedZones = {
     walking: 0.45,
     jogging: 0.32,
     running: 0.18,
     sprinting: 0.05
+  };
+
+  // نسخة معززة من بيانات التحليل مع قيم إضافية
+  const enhancedAnalysis = {
+    ...analysis,
+    movementAnalysis: {
+      movementEfficiency: 78,
+      speedZones: speedZones,
+      maxSpeed: 24.5,
+      totalDistance: 9870,
+      directionChanges: 37,
+      maxAcceleration: 5.2
+    },
+    enhancedMovement: {
+      stamina: 84,
+      accelerationProfile: {
+        explosive: 0.72,
+        sustained: 0.68
+      },
+      consistency: 77,
+      tacticaAwareness: 81,
+      recoverySpeed: 4.2
+    }
   };
 
   return {
@@ -63,6 +89,7 @@ export const useAnalysisData = (analysis: any) => {
     movementPatternData,
     energyEfficiencyData,
     movementData,
-    speedZones
+    speedZones,
+    enhancedAnalysis
   };
 };

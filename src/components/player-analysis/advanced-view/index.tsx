@@ -41,7 +41,7 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
 
       <AnalysisTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <TabsContent value="patterns">
+      <TabsContent value="patterns" className="mt-4">
         <MovementPatternsTab 
           speedData={speedData}
           accelerationData={accelerationData}
@@ -50,7 +50,7 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
         />
       </TabsContent>
 
-      <TabsContent value="metrics">
+      <TabsContent value="metrics" className="mt-4">
         <PerformanceMetricsTab 
           movementData={movementData}
           speedZones={speedZones}

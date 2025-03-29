@@ -21,11 +21,12 @@ const MovementTabContent: React.FC<MovementTabContentProps> = ({ analysis, onVie
   return (
     <div className="space-y-6">
       <MovementPanel analysis={analysis} />
-      <div className="text-center">
+      <div className="text-center mt-6">
         <Button 
           onClick={handleAdvancedView} 
           variant="outline" 
-          className="gap-2"
+          className="gap-2 px-6 py-2"
+          size="lg"
         >
           <ExternalLink className="h-4 w-4 mr-1 rtl:ml-1 rtl:mr-0" />
           عرض تحليل الحركة المتقدم
