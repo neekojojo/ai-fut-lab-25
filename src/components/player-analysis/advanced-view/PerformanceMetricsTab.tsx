@@ -106,11 +106,11 @@ const PerformanceMetricsTab: React.FC<PerformanceMetricsTabProps> = ({
   };
 
   // Create a deterministic seed from the provided analysis
-  const createDeterministicValues = (base: number) => {
+  const createDeterministicValues = (baseSeed: number) => {
     // Simple deterministic random generator
-    const seed = base || 12345;
+    let generatorSeed = baseSeed || 12345;
     const rand = () => {
-      const x = Math.sin(seed++) * 10000;
+      const x = Math.sin(generatorSeed++) * 10000;
       return x - Math.floor(x);
     };
     
@@ -133,11 +133,14 @@ const PerformanceMetricsTab: React.FC<PerformanceMetricsTabProps> = ({
   };
   
   // Create a seed from analysis data to ensure consistency
-  const seed = analysis?.id ? 
-    analysis.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0) : 
-    totalDistance * 100 + avgSpeed * 10 + maxSpeed;
+  const generateSeed = () => {
+    if (analysis?.id) {
+      return analysis.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+    }
+    return totalDistance * 100 + avgSpeed * 10 + maxSpeed;
+  };
   
-  const deterministicValues = createDeterministicValues(seed);
+  const deterministicValues = createDeterministicValues(generateSeed());
   
   // Update mockEnhancedMovement with deterministic values
   const deterministicEnhancedMovement = {
