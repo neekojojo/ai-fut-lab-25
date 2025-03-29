@@ -47,8 +47,10 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
       ["right_knee", "right_ankle"],
     ];
 
-    ctx.strokeStyle = "#0EA5E9";
-    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#22D3EE"; // ازرق ساطع للعظام
+    ctx.lineWidth = 4; // خط اكثر سماكة
+    ctx.shadowColor = 'rgba(34, 211, 238, 0.6)';
+    ctx.shadowBlur = 8;
     
     connections.forEach(([from, to]) => {
       const fromPoint = keypoints.find(kp => kp.part === from);
@@ -61,6 +63,10 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
         ctx.stroke();
       }
     });
+    
+    // إزالة تأثير الظل بعد رسم العظام
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
   };
   
   // Draw keypoints
@@ -70,10 +76,22 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
   ) => {
     keypoints.forEach(keypoint => {
       if (keypoint.confidence > 0.5) {
-        ctx.fillStyle = "#F97316";
+        // رسم دائرة بتوهج للمفاصل
+        ctx.fillStyle = "#F471B5"; // وردي ساطع للمفاصل
         ctx.beginPath();
-        ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
+        ctx.arc(keypoint.x, keypoint.y, 6, 0, 2 * Math.PI);
         ctx.fill();
+        
+        // إضافة توهج حول المفاصل
+        ctx.shadowColor = 'rgba(244, 113, 181, 0.7)';
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(keypoint.x, keypoint.y, 3, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // إزالة تأثير الظل
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
       }
     });
   };
@@ -137,26 +155,34 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
     drawSkeleton(ctx, position.keypoints);
     drawKeypoints(ctx, position.keypoints);
     
-    // Improved text visibility with dark background and white text
-    const drawTextWithBackground = (text: string, x: number, y: number) => {
-      // Draw black background rectangle with higher opacity
-      ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
+    // Function to draw text with enhanced visibility
+    const drawTextWithBackground = (text: string, x: number, y: number, isHighlighted: boolean = false) => {
+      // الخلفية السوداء مع حدود متوهجة
+      ctx.fillStyle = isHighlighted ? "rgba(34, 211, 238, 0.3)" : "rgba(0, 0, 0, 0.9)";
+      const padding = 8;
       const textWidth = ctx.measureText(text).width;
-      ctx.fillRect(x - 4, y - 20, textWidth + 8, 26);
+      ctx.shadowColor = isHighlighted ? 'rgba(34, 211, 238, 0.7)' : 'rgba(255, 255, 255, 0.5)';
+      ctx.shadowBlur = 10;
+      ctx.fillRect(x - padding, y - 20, textWidth + padding * 2, 28);
+      ctx.strokeStyle = isHighlighted ? "#22D3EE" : "#FFFFFF";
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(x - padding, y - 20, textWidth + padding * 2, 28);
       
-      // Draw white text with larger font
-      ctx.fillStyle = "#FFFFFF";
+      // النص الأبيض
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = isHighlighted ? "#FFFFFF" : "#FFFFFF";
       ctx.font = "bold 16px Arial";
       ctx.fillText(text, x, y);
     };
     
-    // Draw frame number and timestamp with better visibility
-    drawTextWithBackground(`الإطار: ${position.frameNumber + 1}/${playerPositions.length}`, 10, 30);
-    drawTextWithBackground(`الوقت: ${(position.timestamp / 1000).toFixed(2)} ثانية`, 10, 60);
+    // Draw frame number and timestamp with enhanced visibility
+    drawTextWithBackground(`الإطار: ${position.frameNumber + 1}/${playerPositions.length}`, 10, 30, true);
+    drawTextWithBackground(`الوقت: ${(position.timestamp / 1000).toFixed(2)} ثانية`, 10, 70);
     
     // Draw confidence score if available
     if (position.confidence) {
-      drawTextWithBackground(`الثقة: ${(position.confidence * 100).toFixed(0)}%`, 10, 90);
+      drawTextWithBackground(`الثقة: ${(position.confidence * 100).toFixed(0)}%`, 10, 110);
     }
   }, [currentFrame, playerPositions]);
   
@@ -182,43 +208,49 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
   };
   
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>تحليل حركة اللاعب</CardTitle>
+    <Card className="w-full bg-gradient-to-br from-gray-900 to-black border-primary/20 shadow-lg">
+      <CardHeader className="border-b border-primary/10 bg-black/40">
+        <CardTitle className="text-white flex items-center">
+          <span className="text-primary mr-2">●</span>
+          تحليل حركة اللاعب
+        </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col items-center">
-        <div className="relative border rounded-md w-full max-w-[600px] aspect-[3/2] bg-black">
+      <CardContent className="flex flex-col items-center p-6">
+        <div className="relative border-2 border-primary/30 rounded-md w-full max-w-[600px] aspect-[3/2] bg-black overflow-hidden shadow-[0_0_15px_rgba(139,92,246,0.3)]">
           <canvas 
             ref={canvasRef} 
             className="w-full h-full"
           />
         </div>
         
-        <div className="w-full max-w-[600px] mt-4 space-y-4">
+        <div className="w-full max-w-[600px] mt-6 space-y-5">
           <div className="flex items-center justify-center space-x-4 rtl:space-x-reverse">
             <button
               onClick={handlePlayPause}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+              className="px-6 py-2.5 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 font-bold"
             >
               {isPlaying ? 'إيقاف' : 'تشغيل'}
             </button>
           </div>
           
-          <input
-            type="range"
-            min="0"
-            max={playerPositions.length - 1}
-            value={currentFrame}
-            onChange={handleSliderChange}
-            className="w-full"
-          />
-          
-          <div className="text-center text-sm text-primary">
-            {playerPositions.length > 0 && (
-              <>
-                <span className="font-bold">الإطار الحالي:</span> {currentFrame + 1} / {playerPositions.length}
-              </>
-            )}
+          <div className="bg-gray-900/70 p-3 rounded-lg">
+            <input
+              type="range"
+              min="0"
+              max={playerPositions.length - 1}
+              value={currentFrame}
+              onChange={handleSliderChange}
+              className="w-full accent-primary h-2.5"
+            />
+            
+            <div className="text-center text-sm text-white mt-3 bg-black/50 py-2 rounded-md border border-primary/20">
+              {playerPositions.length > 0 && (
+                <>
+                  <span className="font-bold text-primary">الإطار الحالي:</span>{' '}
+                  <span className="inline-block min-w-10 bg-primary/10 px-2 py-0.5 rounded-md">{currentFrame + 1}</span> / {playerPositions.length}
+                </>
+              )}
+            </div>
           </div>
         </div>
       </CardContent>
