@@ -1,6 +1,6 @@
-
 import { detectPeopleInVideo as detectWithTensorflow } from './detectionService';
 import { detectPlayersWithYOLO } from './yoloDetectionService';
+import { detectWithOpenPose } from './openPoseDetection';
 import { analyzeEyeMovement, type EyeTrackingAnalysis } from './eyeballTracking';
 import type { DetectionResult } from './types';
 import { identifyPlayersInDetectionResult } from './playerIdentifier';
@@ -14,13 +14,16 @@ import { PerformanceAnalyzer, PerformanceMetrics } from '../performance/Performa
 // Export a combined detection function
 export const detectPeopleInVideo = async (
   videoFile: File,
-  method: 'tensorflow' | 'yolo' = 'tensorflow',
+  method: 'tensorflow' | 'yolo' | 'openpose' = 'tensorflow',
   yoloModelSize?: 'n' | 's' | 'm' | 'l' | 'x',
   progressCallback?: (progress: number) => void
 ): Promise<DetectionResult> => {
   if (method === 'yolo') {
     // Use YOLO detection
     return detectPlayersWithYOLO(videoFile, yoloModelSize || 'm', progressCallback);
+  } else if (method === 'openpose') {
+    // Use OpenPose detection
+    return detectWithOpenPose(videoFile, progressCallback);
   } else {
     // Use default TensorFlow detection
     return detectWithTensorflow(videoFile);
@@ -134,7 +137,8 @@ export const analyzePlayerPerformance = async (
 // Also export individual methods for direct access
 export { 
   detectWithTensorflow, 
-  detectPlayersWithYOLO, 
+  detectPlayersWithYOLO,
+  detectWithOpenPose,
   analyzeEyeMovement,
   analyzePlayerMovements,
   analyzeEnhancedPlayerMovements,

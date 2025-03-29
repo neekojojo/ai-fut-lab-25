@@ -18,7 +18,7 @@ const PeopleDetection = () => {
   const [result, setResult] = useState<DetectionResult | null>(null);
   const [videoSrc, setVideoSrc] = useState<string | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [detectionMethod, setDetectionMethod] = useState<'tensorflow' | 'yolo'>('tensorflow');
+  const [detectionMethod, setDetectionMethod] = useState<'tensorflow' | 'yolo' | 'openpose'>('tensorflow');
   const [yoloModelSize, setYoloModelSize] = useState<'n' | 's' | 'm' | 'l' | 'x'>('m');
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const { toast } = useToast();
@@ -117,7 +117,7 @@ const PeopleDetection = () => {
                 
                 <RadioGroup 
                   value={detectionMethod} 
-                  onValueChange={(value) => setDetectionMethod(value as 'tensorflow' | 'yolo')}
+                  onValueChange={(value) => setDetectionMethod(value as 'tensorflow' | 'yolo' | 'openpose')}
                   className="flex flex-col space-y-2"
                 >
                   <div className="flex items-center space-x-2 space-x-reverse">
@@ -127,6 +127,10 @@ const PeopleDetection = () => {
                   <div className="flex items-center space-x-2 space-x-reverse">
                     <RadioGroupItem value="yolo" id="yolo" />
                     <Label htmlFor="yolo" className="mr-2">YOLOv8 (تحليل متقدم)</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <RadioGroupItem value="openpose" id="openpose" />
+                    <Label htmlFor="openpose" className="mr-2">OpenPose (تحليل هيكل الجسم بدقة)</Label>
                   </div>
                 </RadioGroup>
                 
@@ -151,6 +155,18 @@ const PeopleDetection = () => {
                     <p className="text-sm text-muted-foreground mt-1">
                       النماذج الأكبر تكون أكثر دقة ولكنها تستغرق وقتًا أطول في المعالجة
                     </p>
+                  </div>
+                )}
+                
+                {detectionMethod === 'openpose' && (
+                  <div className="ml-6 mt-2">
+                    <p className="text-sm text-muted-foreground">
+                      OpenPose يقوم بتحليل هيكل الجسم بدقة عالية مع تتبع 25 نقطة مفصلية
+                    </p>
+                    <div className="flex items-center mt-2 p-2 bg-blue-50 dark:bg-blue-950 rounded text-sm text-blue-700 dark:text-blue-300">
+                      <AlertTriangle className="h-4 w-4 mr-2" />
+                      <span>يستغرق هذا النموذج وقتًا أطول لتحليل الفيديو مع نتائج أكثر تفصيلاً</span>
+                    </div>
                   </div>
                 )}
               </div>

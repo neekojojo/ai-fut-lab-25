@@ -12,6 +12,7 @@ import AnalysisOptions from '@/components/analysis/ModelSelection';
 import { analyzeFootballVideo } from '@/utils/analysis';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
 import FeaturesSection from '@/components/features/FeaturesSection';
+import PeopleDetection from '@/components/PeopleDetection';
 import type { PlayerAnalysis } from '@/components/AnalysisReport.d';
 import type { FileWithPreview } from '@/types';
 
@@ -22,6 +23,7 @@ const IndexContent: React.FC = () => {
   const [analysisStage, setAnalysisStage] = useState('بدء تحليل الفيديو');
   const [analysisCompleted, setAnalysisCompleted] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<PlayerAnalysis | null>(null);
+  const [showPeopleDetection, setShowPeopleDetection] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -86,6 +88,7 @@ const IndexContent: React.FC = () => {
     setAnalysisProgress(0);
     setAnalysisCompleted(false);
     setAnalysisResult(null);
+    setShowPeopleDetection(false);
   };
 
   const handleAdvancedAnalysis = () => {
@@ -99,6 +102,41 @@ const IndexContent: React.FC = () => {
       });
     }
   };
+
+  const handleTogglePeopleDetection = () => {
+    setShowPeopleDetection(!showPeopleDetection);
+    
+    if (!showPeopleDetection) {
+      toast({
+        title: "تم فتح أداة اكتشاف اللاعبين",
+        description: "يمكنك الآن تحليل الفيديو باستخدام خوارزميات متعددة",
+      });
+    }
+  };
+
+  if (showPeopleDetection) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="mb-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => setShowPeopleDetection(false)} 
+            className="mb-4"
+          >
+            <ArrowRight className="h-4 w-4 ml-2" />
+            العودة للصفحة الرئيسية
+          </Button>
+          
+          <h1 className="text-3xl font-bold mb-2">أداة اكتشاف اللاعبين</h1>
+          <p className="text-muted-foreground">
+            تحليل الفيديو باستخدام خوارزميات TensorFlow و YOLOv8 و OpenPose
+          </p>
+        </div>
+        
+        <PeopleDetection />
+      </div>
+    );
+  }
 
   if (analysisCompleted && analysisResult) {
     return (
@@ -149,7 +187,16 @@ const IndexContent: React.FC = () => {
       
       {!videoFile ? (
         <>
-          <VideoUpload onUpload={handleFileSelected} />
+          <div className="flex flex-col md:flex-row gap-4 justify-center">
+            <VideoUpload onUpload={handleFileSelected} />
+            
+            <button 
+              onClick={handleTogglePeopleDetection}
+              className="mt-4 px-4 py-2 text-sm font-medium text-primary border border-primary rounded-md hover:bg-primary/10 transition-colors"
+            >
+              تجربة كشف اللاعبين
+            </button>
+          </div>
           
           <div className="mt-12">
             <h2 className="text-2xl font-bold text-center mb-6">مراحل تطوير تطبيق تحليل أداء لاعبي كرة القدم</h2>
