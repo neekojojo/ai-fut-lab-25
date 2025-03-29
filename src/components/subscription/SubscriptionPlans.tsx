@@ -15,6 +15,7 @@ const planFeatures = {
     { name: 'تقارير مختصرة', included: true },
     { name: 'مقارنة بسيطة مع لاعبين آخرين', included: true },
     { name: 'تحديث البيانات شهرياً', included: true },
+    { name: 'تحليل ٣ لاعبين شهرياً', included: true },
     { name: 'توصيات تدريبية محدودة', included: false },
     { name: 'تحليل متقدم للمهارات', included: false },
     { name: 'تحليل بالتكنولوجيا المتقدمة', included: false },
@@ -27,6 +28,7 @@ const planFeatures = {
     { name: 'تقارير مفصلة وشاملة', included: true },
     { name: 'توصيات تدريبية متقدمة', included: true },
     { name: 'تحديث البيانات أسبوعياً', included: true },
+    { name: 'تحليل ١٠ لاعبين شهرياً', included: true },
     { name: 'مقارنة متقدمة مع لاعبين محترفين', included: true },
     { name: 'تحليل بالذكاء الاصطناعي المتقدم', included: false },
     { name: 'تحليل خاص بالموقع واللعب', included: false },
@@ -39,6 +41,7 @@ const planFeatures = {
     { name: 'تكامل مع أنظمة الأندية', included: true },
     { name: 'خطط تطوير مخصصة', included: true },
     { name: 'تحديث البيانات يومياً', included: true },
+    { name: 'عدد غير محدود من تحليلات اللاعبين', included: true },
     { name: 'تقارير للفريق بأكمله', included: true },
     { name: 'تحليل تكتيكي شامل', included: true },
     { name: 'دعم فني على مدار الساعة', included: true },
@@ -129,14 +132,14 @@ const SubscriptionPlans: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
         <PlanCard
           title="الباقة العادية"
-          price="٥٠ ريال"
+          price="٤٩٩ ريال"
           description="للمدربين المبتدئين والهواة"
           features={planFeatures.standard}
         />
         
         <PlanCard
           title="الباقة المتوسطة"
-          price="٢٠٠ ريال"
+          price="٩٩٩ ريال"
           description="للأكاديميات والمدربين المحترفين"
           features={planFeatures.premium}
           highlight={true}
@@ -144,7 +147,7 @@ const SubscriptionPlans: React.FC = () => {
         
         <PlanCard
           title="الباقة الاحترافية"
-          price="٤٠٠ ريال"
+          price="١٤٩٩ ريال"
           description="للأندية والمؤسسات الرياضية المحترفة"
           features={planFeatures.professional}
         />
