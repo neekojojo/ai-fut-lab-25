@@ -40,16 +40,27 @@ const PerformanceMetricsTab: React.FC<PerformanceMetricsTabProps> = ({
     totalDistance: totalDistance,
     averageSpeed: avgSpeed,
     maxSpeed: maxSpeed,
-    topSpeed: maxSpeed, // Adding the missing topSpeed property (using maxSpeed)
+    topSpeed: maxSpeed, // Using maxSpeed for topSpeed
     directionChanges: 12,
     movementEfficiency: Math.floor(65 + Math.random() * 30),
     maxAcceleration: Math.max(...movementData.map(point => point.acceleration || 0)),
     
-    // Adding the missing positionSpecificMetrics property
+    // Setting positionSpecificMetrics according to the expected structure in EnhancedMovementAnalysis
     positionSpecificMetrics: {
-      attackingRuns: Math.floor(60 + Math.random() * 30),
-      defensiveRecovery: Math.floor(50 + Math.random() * 35),
-      positionDiscipline: Math.floor(70 + Math.random() * 20)
+      // For a generic player, we'll set some values for attacker metrics
+      attackerMetrics: {
+        shotsAttempted: Math.floor(Math.random() * 10) + 1,
+        shotsOnTarget: Math.floor(Math.random() * 5) + 1,
+        dribbleAttempts: Math.floor(Math.random() * 15) + 5,
+        dribbleSuccess: Math.floor(Math.random() * 10) + 3
+      },
+      // Can also add midfielderMetrics if needed
+      midfielderMetrics: {
+        passesAttempted: Math.floor(Math.random() * 30) + 20,
+        passAccuracy: Math.floor(Math.random() * 30) + 60,
+        ballControl: Math.floor(Math.random() * 20) + 70,
+        visionScore: Math.floor(Math.random() * 25) + 65
+      }
     },
     
     // Speed zones matching the format in MovementAnalysisResult
