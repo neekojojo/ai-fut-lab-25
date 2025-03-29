@@ -12,6 +12,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 
 const PeopleDetection = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -206,21 +207,22 @@ const PeopleDetection = () => {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4 h-fit">
-                  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-                    <div className="text-sm text-gray-500 dark:text-gray-400">متوسط عدد اللاعبين</div>
-                    <div className="text-2xl font-bold">{result.count}</div>
+                  {/* تحديث: تحسين وضوح الإحصائيات مع خلفية بيضاء ونص أسود */}
+                  <div className="bg-white p-4 rounded-lg border-2 border-primary/30 shadow-md">
+                    <div className="text-sm text-gray-500 font-medium">متوسط عدد اللاعبين</div>
+                    <div className="text-2xl font-bold text-black">{result.count}</div>
                   </div>
-                  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-                    <div className="text-sm text-gray-500 dark:text-gray-400">الثقة</div>
-                    <div className="text-2xl font-bold">{(result.confidence * 100).toFixed(0)}%</div>
+                  <div className="bg-white p-4 rounded-lg border-2 border-primary/30 shadow-md">
+                    <div className="text-sm text-gray-500 font-medium">الثقة</div>
+                    <div className="text-2xl font-bold text-black">{(result.confidence * 100).toFixed(0)}%</div>
                   </div>
-                  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-                    <div className="text-sm text-gray-500 dark:text-gray-400">إجمالي الإطارات</div>
-                    <div className="text-2xl font-bold">{result.frameResults.length}</div>
+                  <div className="bg-white p-4 rounded-lg border-2 border-primary/30 shadow-md">
+                    <div className="text-sm text-gray-500 font-medium">إجمالي الإطارات</div>
+                    <div className="text-2xl font-bold text-black">{result.frameResults.length}</div>
                   </div>
-                  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-                    <div className="text-sm text-gray-500 dark:text-gray-400">المدة (ثانية)</div>
-                    <div className="text-2xl font-bold">
+                  <div className="bg-white p-4 rounded-lg border-2 border-primary/30 shadow-md">
+                    <div className="text-sm text-gray-500 font-medium">المدة (ثانية)</div>
+                    <div className="text-2xl font-bold text-black">
                       {(result.frameResults[result.frameResults.length - 1]?.timestamp / 1000).toFixed(1)}
                     </div>
                   </div>
@@ -238,48 +240,61 @@ const PeopleDetection = () => {
                 </TabsList>
                 
                 <TabsContent value="frameAnalysis" className="mt-4">
-                  <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
-                    <h3 className="text-sm font-medium mb-2">تحليل الإطارات</h3>
+                  <div className="bg-white p-4 rounded-lg border border-primary/20 shadow-md">
+                    <h3 className="text-sm font-medium mb-2 text-black">تحليل الإطارات</h3>
                     <div className="h-48 overflow-y-auto">
-                      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead className="bg-gray-50 dark:bg-gray-800">
-                          <tr>
-                            <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">الإطار</th>
-                            <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">الأشخاص</th>
-                            <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">الوقت (ميلي ثانية)</th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
+                      <Table>
+                        <TableHeader className="bg-gray-100">
+                          <TableRow>
+                            <TableHead className="text-right text-black font-bold">الإطار</TableHead>
+                            <TableHead className="text-right text-black font-bold">الأشخاص</TableHead>
+                            <TableHead className="text-right text-black font-bold">الوقت (ميلي ثانية)</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody className="bg-white">
                           {result.frameResults.map((frame) => (
-                            <tr key={frame.frameNumber}>
-                              <td className="px-3 py-2 whitespace-nowrap text-sm text-right">{frame.frameNumber}</td>
-                              <td className="px-3 py-2 whitespace-nowrap text-sm text-right">{frame.detections}</td>
-                              <td className="px-3 py-2 whitespace-nowrap text-sm text-right">{frame.timestamp}</td>
-                            </tr>
+                            <TableRow key={frame.frameNumber} className="hover:bg-gray-50">
+                              <TableCell className="text-right text-black font-medium">{frame.frameNumber}</TableCell>
+                              <TableCell className="text-right text-black font-medium">{frame.detections}</TableCell>
+                              <TableCell className="text-right text-black font-medium">{frame.timestamp}</TableCell>
+                            </TableRow>
                           ))}
-                        </tbody>
-                      </table>
+                        </TableBody>
+                      </Table>
                     </div>
                   </div>
                 </TabsContent>
                 
                 <TabsContent value="detectionInfo" className="mt-4">
-                  <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
-                    <h3 className="text-sm font-medium mb-2">معلومات الكشف</h3>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-sm text-gray-500 dark:text-gray-400">طريقة الكشف:</span>
-                        <span className="text-sm font-medium">{detectionMethod === 'tensorflow' ? 'TensorFlow' : 'YOLOv8'}</span>
+                  <div className="bg-white p-4 rounded-lg border border-primary/20 shadow-md">
+                    <h3 className="text-sm font-medium mb-4 text-black border-b pb-2">معلومات الكشف</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span className="text-sm text-gray-600 font-medium">طريقة الكشف:</span>
+                        <span className="text-sm font-bold bg-gray-100 px-3 py-1 rounded-full text-black">
+                          {detectionMethod === 'tensorflow' ? 'TensorFlow' : 
+                           detectionMethod === 'yolo' ? 'YOLOv8' : 'OpenPose'}
+                        </span>
                       </div>
                       {detectionMethod === 'yolo' && (
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-500 dark:text-gray-400">حجم نموذج YOLO:</span>
-                          <span className="text-sm font-medium">YOLOv8{yoloModelSize}</span>
+                        <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                          <span className="text-sm text-gray-600 font-medium">حجم نموذج YOLO:</span>
+                          <span className="text-sm font-bold bg-gray-100 px-3 py-1 rounded-full text-black">
+                            YOLOv8{yoloModelSize}
+                          </span>
                         </div>
                       )}
-                      <div className="flex justify-between">
-                        <span className="text-sm text-gray-500 dark:text-gray-400">عدد مواقع اللاعبين:</span>
-                        <span className="text-sm font-medium">{result.playerPositions?.length || 0}</span>
+                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span className="text-sm text-gray-600 font-medium">عدد مواقع اللاعبين:</span>
+                        <span className="text-sm font-bold bg-gray-100 px-3 py-1 rounded-full text-black">
+                          {result.playerPositions?.length || 0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span className="text-sm text-gray-600 font-medium">متوسط ثقة الكشف:</span>
+                        <span className="text-sm font-bold bg-gray-100 px-3 py-1 rounded-full text-black">
+                          {(result.confidence * 100).toFixed(1)}%
+                        </span>
                       </div>
                     </div>
                   </div>

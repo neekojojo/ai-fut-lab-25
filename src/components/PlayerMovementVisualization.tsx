@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { PlayerPosition } from '@/utils/videoDetection/types';
@@ -139,6 +140,7 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
     drawKeypoints(ctx, position.keypoints);
     
     const drawTextWithBackground = (text: string, x: number, y: number, isHighlighted: boolean = false) => {
+      // تحديث: خلفية بيضاء ونص أسود للوضوح
       const bgColor = "#FFFFFF";
       const borderColor = isHighlighted ? "#0891B2" : "#8B5CF6";
       const textColor = "#000000";
@@ -147,13 +149,16 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
       const textWidth = ctx.measureText(text).width;
       const textHeight = 24;
       
+      // رسم الخلفية البيضاء
       ctx.fillStyle = bgColor;
       ctx.fillRect(x - padding, y - textHeight, textWidth + padding * 2, textHeight + padding/2);
       
+      // رسم حدود الصندوق
       ctx.strokeStyle = borderColor;
       ctx.lineWidth = 2;
       ctx.strokeRect(x - padding, y - textHeight, textWidth + padding * 2, textHeight + padding/2);
       
+      // رسم النص باللون الأسود
       ctx.fillStyle = textColor;
       ctx.font = "bold 16px Arial";
       ctx.fillText(text, x, y - 4);
