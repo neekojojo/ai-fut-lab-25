@@ -34,6 +34,35 @@ const PerformanceMetricsTab: React.FC<PerformanceMetricsTabProps> = ({
     return sum + (point.speed * 0.5); // Assuming 0.5 time units between points
   }, 0);
 
+  // Create mock enhanced movement data for the EnhancedMovementChart
+  const mockEnhancedMovement = {
+    maxSpeed: maxSpeed,
+    stamina: Math.floor(75 + Math.random() * 20),
+    consistency: Math.floor(70 + Math.random() * 25),
+    movementEfficiency: Math.floor(65 + Math.random() * 30),
+    maxAcceleration: Math.max(...movementData.map(point => point.acceleration || 0)),
+    tacticaAwareness: Math.floor(60 + Math.random() * 30),
+    recoverySpeed: 7.5 + Math.random() * 2,
+    directionalData: {
+      forward: 0.6,
+      backward: 0.15,
+      sideways: 0.25
+    },
+    accelerationProfile: {
+      explosive: 0.35,
+      sustained: 0.45,
+      deceleration: 0.2
+    },
+    positionalHeatmap: [
+      { x: 30, y: 40, value: 0.8 },
+      { x: 40, y: 30, value: 0.7 },
+      { x: 60, y: 50, value: 0.6 },
+      { x: 70, y: 30, value: 0.5 },
+      { x: 20, y: 60, value: 0.7 },
+      { x: 50, y: 70, value: 0.4 }
+    ]
+  };
+
   return (
     <div className="space-y-8">
       {/* Movement Performance Section */}
@@ -100,8 +129,10 @@ const PerformanceMetricsTab: React.FC<PerformanceMetricsTabProps> = ({
               </CardHeader>
               <CardContent className="h-72">
                 <MovementAnalysisChart 
-                  data={movementData} 
+                  movementData={movementData} 
                   speedZones={speedZonesObject} 
+                  sprintCount={5}
+                  efficiencyScore={85}
                 />
               </CardContent>
             </Card>
@@ -145,7 +176,9 @@ const PerformanceMetricsTab: React.FC<PerformanceMetricsTabProps> = ({
                 </CardDescription>
               </CardHeader>
               <CardContent className="h-72">
-                <EnhancedMovementChart data={movementData} />
+                <EnhancedMovementChart 
+                  enhancedMovement={mockEnhancedMovement}
+                />
               </CardContent>
             </Card>
           </TabsContent>
