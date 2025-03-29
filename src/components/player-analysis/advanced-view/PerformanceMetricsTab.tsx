@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Line, Bar } from 'recharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -39,9 +40,17 @@ const PerformanceMetricsTab: React.FC<PerformanceMetricsTabProps> = ({
     totalDistance: totalDistance,
     averageSpeed: avgSpeed,
     maxSpeed: maxSpeed,
+    topSpeed: maxSpeed, // Adding the missing topSpeed property (using maxSpeed)
     directionChanges: 12,
     movementEfficiency: Math.floor(65 + Math.random() * 30),
     maxAcceleration: Math.max(...movementData.map(point => point.acceleration || 0)),
+    
+    // Adding the missing positionSpecificMetrics property
+    positionSpecificMetrics: {
+      attackingRuns: Math.floor(60 + Math.random() * 30),
+      defensiveRecovery: Math.floor(50 + Math.random() * 35),
+      positionDiscipline: Math.floor(70 + Math.random() * 20)
+    },
     
     // Speed zones matching the format in MovementAnalysisResult
     speedZones: {
