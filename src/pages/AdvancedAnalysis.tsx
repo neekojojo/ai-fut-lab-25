@@ -24,7 +24,7 @@ const AdvancedAnalysis: React.FC = () => {
         setIsLoading(true);
         console.log("Fetching advanced analysis data, id:", id);
         
-        // إذا لم يكن هناك معرف، استخدم التحليل الوهمي
+        // If no ID provided, use mock data
         if (!id) {
           console.log("No ID provided, using mock data");
           const mockData = getMockAnalysis();
@@ -34,14 +34,14 @@ const AdvancedAnalysis: React.FC = () => {
           return;
         }
         
-        // محاولة استرداد التحليل حسب المعرف
+        // Try to fetch analysis by ID
         try {
           const currentAnalysis = await fetchPlayerAnalysisById(id);
           if (currentAnalysis) {
             console.log("Analysis found:", currentAnalysis);
             setAnalysis(currentAnalysis);
             
-            // محاولة استرداد التحليلات السابقة
+            // Try to fetch previous analyses
             try {
               const allAnalyses = await fetchPlayerAnalyses();
               const previousPlayerAnalyses = allAnalyses
@@ -56,7 +56,7 @@ const AdvancedAnalysis: React.FC = () => {
           }
         } catch (e) {
           console.warn("Could not fetch analysis by ID:", e);
-          // استخدام التحليل الوهمي كاحتياطي
+          // Use mock data as fallback
           console.log("Using mock data as fallback");
           const mockData = getMockAnalysis();
           // Use type assertion after making sure the structure is compatible

@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,7 @@ const IndexContent: React.FC = () => {
   const [analysisCompleted, setAnalysisCompleted] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<PlayerAnalysis | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleFileSelected = (file: FileWithPreview) => {
     setVideoFile(file);
@@ -39,7 +40,7 @@ const IndexContent: React.FC = () => {
     }
 
     setAnalysisStarted(true);
-    setAnalysisProgress(5); // Start at 5% instead of 0%
+    setAnalysisProgress(5);
     setAnalysisStage('بدء تحليل الفيديو');
     
     toast({
@@ -48,17 +49,14 @@ const IndexContent: React.FC = () => {
     });
     
     try {
-      // Begin analysis and register progress callback
       const analysisData = await analyzeFootballVideo(videoFile);
       
-      // Register the progress updates callback
       analysisData.progressUpdates((progress, stage) => {
         setAnalysisProgress(progress);
         if (stage) {
           setAnalysisStage(stage);
         }
         
-        // When analysis reaches 100%, set completed state after a short delay
         if (progress >= 100) {
           setTimeout(() => {
             setAnalysisCompleted(true);
@@ -68,7 +66,7 @@ const IndexContent: React.FC = () => {
               title: "اكتمل التحليل",
               description: "تحليل فيديو كرة القدم الخاص بك جاهز",
             });
-          }, 1500); // Give a small delay for better UX
+          }, 1500);
         }
       });
     } catch (error) {
@@ -91,19 +89,17 @@ const IndexContent: React.FC = () => {
   };
 
   const handleAdvancedAnalysis = () => {
-    // Implementing advanced analysis view here with proper console logging
     console.log("Opening advanced analysis view");
     if (analysisResult) {
-      // Make sure this reaches the PlayerAnalysisView component
-      // by passing this function down the component tree
+      navigate(`/advanced-analysis/${analysisResult.id}`);
+      
       toast({
         title: "فتح التحليل المتقدم",
-        description: "جاري فتح التحليل المتقدم للحركة",
+        description: "جاري فتح التحليل المتقدم للاعب",
       });
     }
   };
 
-  // Render analysis results if analysis has completed
   if (analysisCompleted && analysisResult) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -116,7 +112,6 @@ const IndexContent: React.FC = () => {
     );
   }
 
-  // Render analysis processing screen if analysis has started
   if (analysisStarted) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -125,7 +120,6 @@ const IndexContent: React.FC = () => {
           stage={analysisStage} 
           onReset={handleResetAnalysis}
           onAnalysisComplete={() => {
-            // This function is called when the processing component detects analysis completion
             if (analysisResult) {
               setAnalysisCompleted(true);
             }
@@ -137,7 +131,6 @@ const IndexContent: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
-      {/* Simplified hero content that doesn't require props */}
       <div className="space-y-8 md:space-y-12">
         <div className="max-w-3xl mx-auto text-center space-y-3 md:space-y-4 animate-fade-in">
           <div className="inline-block px-3 py-1 text-xs font-medium bg-secondary text-secondary-foreground rounded-full">
@@ -152,7 +145,6 @@ const IndexContent: React.FC = () => {
         </div>
       </div>
       
-      {/* إضافة قسم المميزات الرئيسية هنا */}
       <FeaturesSection />
       
       {!videoFile ? (
