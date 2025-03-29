@@ -12,9 +12,11 @@ import {
 
 const FeaturesSection = () => {
   return (
-    <div className="bg-background py-8">
+    <div className="relative py-16 z-10">
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl font-bold mb-6 text-left">مميزات التطبيق الرئيسية</h2>
+        <h2 className="text-3xl font-bold mb-8 text-left bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-primary/60">
+          مميزات التطبيق الرئيسية
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <FeatureCard 
             icon={<Activity className="h-8 w-8 text-primary" />}
@@ -65,14 +67,14 @@ interface FeatureCardProps {
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) => {
   return (
-    <Card className="border-primary/10 hover:border-primary/30 transition-colors h-full">
+    <Card className="glass-card border-primary/10 transition-all duration-300 card-overlay h-full group hover:-translate-y-2">
       <CardHeader className="pb-2">
         <div className="flex items-start">
-          <div className="bg-primary/10 p-3 rounded-lg">
+          <div className="bg-gradient-primary p-4 rounded-xl shadow-lg group-hover:animate-pulse">
             {icon}
           </div>
         </div>
-        <CardTitle className="mt-2 text-lg">{title}</CardTitle>
+        <CardTitle className="mt-4 text-xl bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80">{title}</CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-muted-foreground text-sm">{description}</p>

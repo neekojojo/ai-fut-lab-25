@@ -116,6 +116,14 @@ export default {
 				'spin-slow': {
 					from: { transform: 'rotate(0deg)' },
 					to: { transform: 'rotate(360deg)' }
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' }
+				},
+				'glow': {
+					'0%, 100%': { boxShadow: '0 0 5px 2px rgba(139, 92, 246, 0.3)' },
+					'50%': { boxShadow: '0 0 20px 5px rgba(139, 92, 246, 0.6)' }
 				}
 			},
 			animation: {
@@ -129,7 +137,9 @@ export default {
 				'slide-down': 'slide-down 0.5s ease-out',
 				pulse: 'pulse 1.5s ease-in-out infinite',
 				shimmer: 'shimmer 2s infinite linear',
-				'spin-slow': 'spin-slow 6s linear infinite'
+				'spin-slow': 'spin-slow 6s linear infinite',
+				'float': 'float 5s ease-in-out infinite',
+				'glow': 'glow 2s ease-in-out infinite'
 			}
 		}
 	},

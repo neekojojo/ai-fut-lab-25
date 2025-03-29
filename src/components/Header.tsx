@@ -18,11 +18,20 @@ const Header = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     if (user) {
       fetchUserAvatar();
     }
+    
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 10;
+      setScrolled(isScrolled);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [user]);
 
   const fetchUserAvatar = async () => {
@@ -46,10 +55,10 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-background border-b">
-      <div className="container mx-auto flex justify-between items-center p-4">
+    <header className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'glass backdrop-blur-md py-2' : 'bg-transparent py-4'}`}>
+      <div className="container mx-auto flex justify-between items-center px-4">
         <div className="flex items-center">
-          <Link to="/" className="font-bold text-xl">
+          <Link to="/" className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
             FUT LAB
           </Link>
         </div>
@@ -57,14 +66,14 @@ const Header = () => {
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
-              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+              <NavigationMenuLink asChild className={navigationMenuTriggerStyle({ className: "bg-transparent hover:bg-primary/10" })}>
                 <Link to="/">الصفحة الرئيسية</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
             
             {user && (
               <NavigationMenuItem>
-                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                <NavigationMenuLink asChild className={navigationMenuTriggerStyle({ className: "bg-transparent hover:bg-primary/10" })}>
                   <Link to="/dashboard">لوحة التحكم</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
@@ -76,26 +85,37 @@ const Header = () => {
           {user ? (
             <div className="flex items-center gap-4">
               <Link to="/dashboard?tab=profile">
-                <Avatar className="cursor-pointer hover:opacity-80 transition-opacity">
+                <Avatar className="cursor-pointer hover:opacity-80 transition-opacity border-2 border-primary">
                   {avatarUrl ? (
                     <AvatarImage src={avatarUrl} alt="Profile" />
                   ) : (
-                    <AvatarFallback>
-                      <UserIcon className="h-5 w-5" />
+                    <AvatarFallback className="bg-primary/20">
+                      <UserIcon className="h-5 w-5 text-primary" />
                     </AvatarFallback>
                   )}
                 </Avatar>
               </Link>
-              <Button variant="outline" onClick={() => signOut().then(() => navigate('/'))}>
+              <Button 
+                variant="outline" 
+                onClick={() => signOut().then(() => navigate('/'))}
+                className="border-primary/50 text-primary hover:bg-primary/10 hover:text-primary-foreground transition-all"
+              >
                 تسجيل الخروج
               </Button>
             </div>
           ) : (
             <div className="space-x-4 rtl:space-x-reverse">
-              <Button variant="outline" onClick={() => navigate('/sign-in')}>
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/sign-in')}
+                className="border-primary/50 text-primary hover:bg-primary/10 hover:text-primary-foreground transition-all"
+              >
                 تسجيل الدخول
               </Button>
-              <Button onClick={() => navigate('/sign-up')}>
+              <Button 
+                onClick={() => navigate('/sign-up')}
+                className="bg-gradient-primary hover:opacity-90 transition-opacity"
+              >
                 إنشاء حساب
               </Button>
             </div>
