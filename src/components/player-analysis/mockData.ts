@@ -86,9 +86,30 @@ export const getMockAnalysis = () => {
         { timestamp: 5, x: 40, y: 57, speed: 19.8, acceleration: -2.3, isActive: true },
       ],
       passes: [
-        { timestamp: 10, fromX: 23, fromY: 45, toX: 45, toY: 50, success: true, type: 'short' },
-        { timestamp: 25, fromX: 35, fromY: 30, toX: 60, toY: 45, success: false, type: 'long' },
-        { timestamp: 40, fromX: 50, fromY: 35, toX: 70, toY: 40, success: true, type: 'through' },
+        { 
+          timestamp: 10, 
+          from: { x: 23, y: 45 }, 
+          to: { x: 45, y: 50 }, 
+          successful: true, 
+          recipient: 'Player 2',
+          type: 'short' 
+        },
+        { 
+          timestamp: 25, 
+          from: { x: 35, y: 30 }, 
+          to: { x: 60, y: 45 }, 
+          successful: false, 
+          recipient: 'Player 3',
+          type: 'long' 
+        },
+        { 
+          timestamp: 40, 
+          from: { x: 50, y: 35 }, 
+          to: { x: 70, y: 40 }, 
+          successful: true, 
+          recipient: 'Player 4',
+          type: 'through' 
+        },
       ],
       heatmap: [
         { x: 25, y: 45, intensity: 0.8 },

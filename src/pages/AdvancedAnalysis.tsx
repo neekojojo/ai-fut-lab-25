@@ -28,7 +28,7 @@ const AdvancedAnalysis: React.FC = () => {
         if (!id) {
           console.log("No ID provided, using mock data");
           const mockData = getMockAnalysis();
-          setAnalysis(mockData.analysis);
+          setAnalysis(mockData.analysis as PlayerAnalysis);
           setPreviousAnalyses([]);
           return;
         }
@@ -58,7 +58,7 @@ const AdvancedAnalysis: React.FC = () => {
           // استخدام التحليل الوهمي كاحتياطي
           console.log("Using mock data as fallback");
           const mockData = getMockAnalysis();
-          setAnalysis(mockData.analysis);
+          setAnalysis(mockData.analysis as PlayerAnalysis);
           setPreviousAnalyses([]);
         }
       } finally {
