@@ -1,10 +1,54 @@
 
 "use client"
 
-import * as React from "react"
-import { ThemeProvider as NextThemesProvider } from "next-themes"
+import { createContext, useContext, useEffect, useState } from "react"
 import { type ThemeProviderProps } from "next-themes/dist/types"
 
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>
+const ThemeProviderContext = createContext({ theme: "dark", setTheme: (theme: string) => {} })
+
+export function ThemeProvider({
+  children,
+  defaultTheme = "dark",
+  storageKey = "vite-ui-theme",
+  ...props
+}: ThemeProviderProps) {
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem(storageKey) || defaultTheme
+  )
+
+  useEffect(() => {
+    const root = window.document.documentElement
+    
+    // Remove old theme class
+    root.classList.remove("light", "dark")
+    
+    // Add new theme class
+    root.classList.add(theme)
+    
+    // Save theme to localStorage
+    localStorage.setItem(storageKey, theme)
+  }, [theme, storageKey])
+
+  const value = {
+    theme,
+    setTheme: (newTheme: string) => {
+      setTheme(newTheme)
+    },
+  }
+
+  return (
+    <ThemeProviderContext.Provider value={value} {...props}>
+      {children}
+    </ThemeProviderContext.Provider>
+  )
+}
+
+export const useTheme = () => {
+  const context = useContext(ThemeProviderContext)
+  
+  if (context === undefined) {
+    throw new Error("useTheme must be used within a ThemeProvider")
+  }
+  
+  return context
 }
