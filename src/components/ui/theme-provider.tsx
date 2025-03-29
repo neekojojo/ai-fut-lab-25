@@ -4,7 +4,12 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import { type ThemeProviderProps } from "next-themes/dist/types"
 
-const ThemeProviderContext = createContext({ theme: "dark", setTheme: (theme: string) => {} })
+type ThemeProviderState = {
+  theme: string
+  setTheme: (theme: string) => void
+}
+
+const ThemeProviderContext = createContext<ThemeProviderState | undefined>(undefined)
 
 export function ThemeProvider({
   children,
@@ -37,7 +42,7 @@ export function ThemeProvider({
   }
 
   return (
-    <ThemeProviderContext.Provider value={value} {...props}>
+    <ThemeProviderContext.Provider value={value}>
       {children}
     </ThemeProviderContext.Provider>
   )
