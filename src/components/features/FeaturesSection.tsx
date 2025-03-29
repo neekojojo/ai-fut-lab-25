@@ -70,7 +70,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) =
     <Card className="glass-card border-primary/10 transition-all duration-300 card-overlay h-full group hover:-translate-y-2">
       <CardHeader className="pb-2">
         <div className="flex items-start">
-          <div className="bg-gradient-primary p-4 rounded-xl shadow-lg group-hover:animate-pulse">
+          <div className="bg-primary/20 p-4 rounded-xl shadow-lg group-hover:animate-pulse">
             {icon}
           </div>
         </div>
