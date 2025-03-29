@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -16,7 +17,6 @@ import FeaturesSection from '@/components/features/FeaturesSection';
 import PeopleDetection from '@/components/PeopleDetection';
 import SubscriptionPlans from '@/components/subscription/SubscriptionPlans';
 import FloatingElements from '@/components/landing/FloatingElements';
-import ImageGallery from '@/components/landing/ImageGallery';
 import type { PlayerAnalysis } from '@/components/AnalysisReport.d';
 import type { FileWithPreview } from '@/types';
 
@@ -25,13 +25,12 @@ interface StageArticle {
   content: React.ReactNode;
 }
 
-const FOOTBALL_IMAGES = [
-  { src: "/player1.jpg", alt: "Football player" },
-  { src: "/player2.jpg", alt: "Football match" },
-  { src: "/player3.jpg", alt: "Football training" },
+// استبدال صور اللاعبين بتأثيرات بصرية
+const VISUAL_EFFECTS = [
+  { id: 1, color: "from-primary/20 to-secondary/20" },
+  { id: 2, color: "from-secondary/20 to-primary/20" },
+  { id: 3, color: "from-accent/20 to-primary/20" },
 ];
-
-const PLAYER_SILHOUETTE = "/player-silhouette.png";
 
 const IndexContent: React.FC = () => {
   const [videoFile, setVideoFile] = useState<FileWithPreview | null>(null);
@@ -458,7 +457,20 @@ const IndexContent: React.FC = () => {
             </div>
             
             <div className="mt-8 md:hidden">
-              <ImageGallery images={FOOTBALL_IMAGES} />
+              {/* استبدال معرض الصور بتأثيرات بصرية */}
+              <div className="relative w-full max-w-md mx-auto overflow-hidden rounded-xl h-48">
+                <div className="absolute inset-0 bg-primary/10 rounded-xl blur-3xl -z-10 animate-pulse opacity-70"></div>
+                {VISUAL_EFFECTS.map((effect) => (
+                  <div 
+                    key={effect.id} 
+                    className={`absolute inset-0 bg-gradient-to-r ${effect.color} opacity-70 animate-float`} 
+                    style={{ animationDelay: `${effect.id * 2}s` }}
+                  />
+                ))}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Trophy className="h-16 w-16 text-primary/70 animate-float" />
+                </div>
+              </div>
             </div>
             
             {!videoFile && (
@@ -476,15 +488,21 @@ const IndexContent: React.FC = () => {
           </div>
           
           <div className="hidden md:block relative">
-            <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-              <ImageGallery 
-                images={FOOTBALL_IMAGES} 
-                className="z-10"
-              />
+            <div className="relative overflow-hidden rounded-2xl shadow-2xl h-64">
+              {/* استبدال معرض الصور بتأثيرات بصرية */}
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 animate-pulse"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="h-24 w-24 bg-primary/20 rounded-lg backdrop-blur-md animate-float"></div>
+                  <div className="h-24 w-24 bg-secondary/20 rounded-lg backdrop-blur-md animate-float" style={{ animationDelay: '1s' }}></div>
+                  <div className="h-24 w-24 bg-accent/20 rounded-lg backdrop-blur-md animate-float" style={{ animationDelay: '2s' }}></div>
+                  <div className="h-24 w-24 bg-primary/20 rounded-lg backdrop-blur-md animate-float" style={{ animationDelay: '3s' }}></div>
+                </div>
+              </div>
             </div>
             
             <div className="absolute top-1/2 -right-8 transform -translate-y-1/2 z-0">
-              <FloatingElements playerSilhouetteSrc={PLAYER_SILHOUETTE} />
+              <FloatingElements playerSilhouetteSrc="" />
             </div>
           </div>
         </div>

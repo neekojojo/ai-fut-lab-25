@@ -24,7 +24,14 @@ const FloatingElements: React.FC<FloatingElementsProps> = ({ playerSilhouetteSrc
         <Target className="w-12 h-12 animate-spin-slow" />
       </div>
       
-      {/* Player silhouette if provided */}
+      {/* Creating custom element instead of player silhouette */}
+      {!playerSilhouetteSrc && (
+        <div className="absolute -top-12 right-10 h-40 w-24 opacity-70 animate-bounce-slow">
+          <div className="h-full w-full bg-gradient-to-b from-primary/20 to-transparent rounded-full blur-md"></div>
+        </div>
+      )}
+      
+      {/* Use player silhouette if provided */}
       {playerSilhouetteSrc && (
         <div className="absolute -top-12 right-10 h-40 w-24 opacity-70 animate-bounce-slow">
           <img 
