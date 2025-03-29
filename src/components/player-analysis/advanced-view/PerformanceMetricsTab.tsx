@@ -34,9 +34,9 @@ const PerformanceMetricsTab: React.FC<PerformanceMetricsTabProps> = ({
     return sum + (point.speed * 0.5); // Assuming 0.5 time units between points
   }, 0);
 
-  // Create mock enhanced movement data for the EnhancedMovementChart
+  // Create deterministic enhanced movement data for the EnhancedMovementChart
   const mockEnhancedMovement = {
-    // Basic movement analysis properties (required by EnhancedMovementAnalysis type)
+    // Basic movement analysis properties
     totalDistance: totalDistance,
     averageSpeed: avgSpeed,
     maxSpeed: maxSpeed,
@@ -103,6 +103,64 @@ const PerformanceMetricsTab: React.FC<PerformanceMetricsTabProps> = ({
     
     // Adding sprintCount property which appears to be needed
     sprintCount: 5
+  };
+
+  // Create a deterministic seed from the provided analysis
+  const createDeterministicValues = (base: number) => {
+    // Simple deterministic random generator
+    const seed = base || 12345;
+    const rand = () => {
+      const x = Math.sin(seed++) * 10000;
+      return x - Math.floor(x);
+    };
+    
+    return {
+      // Replace all random calls with deterministic values
+      shotsAttempted: Math.floor(rand() * 10) + 1,
+      shotsOnTarget: Math.floor(rand() * 5) + 1,
+      dribbleAttempts: Math.floor(rand() * 15) + 5,
+      dribbleSuccess: Math.floor(rand() * 10) + 3,
+      passesAttempted: Math.floor(rand() * 30) + 20,
+      passAccuracy: Math.floor(rand() * 30) + 60,
+      ballControl: Math.floor(rand() * 20) + 70,
+      visionScore: Math.floor(rand() * 25) + 65,
+      movementEfficiency: Math.floor(65 + rand() * 30),
+      stamina: Math.floor(75 + rand() * 20),
+      consistency: Math.floor(70 + rand() * 25),
+      tacticaAwareness: Math.floor(60 + rand() * 30),
+      recoverySpeed: 7.5 + rand() * 2
+    };
+  };
+  
+  // Create a seed from analysis data to ensure consistency
+  const seed = analysis?.id ? 
+    analysis.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0) : 
+    totalDistance * 100 + avgSpeed * 10 + maxSpeed;
+  
+  const deterministicValues = createDeterministicValues(seed);
+  
+  // Update mockEnhancedMovement with deterministic values
+  const deterministicEnhancedMovement = {
+    ...mockEnhancedMovement,
+    movementEfficiency: deterministicValues.movementEfficiency,
+    positionSpecificMetrics: {
+      attackerMetrics: {
+        shotsAttempted: deterministicValues.shotsAttempted,
+        shotsOnTarget: deterministicValues.shotsOnTarget,
+        dribbleAttempts: deterministicValues.dribbleAttempts,
+        dribbleSuccess: deterministicValues.dribbleSuccess
+      },
+      midfielderMetrics: {
+        passesAttempted: deterministicValues.passesAttempted,
+        passAccuracy: deterministicValues.passAccuracy,
+        ballControl: deterministicValues.ballControl,
+        visionScore: deterministicValues.visionScore
+      }
+    },
+    stamina: deterministicValues.stamina,
+    consistency: deterministicValues.consistency,
+    tacticaAwareness: deterministicValues.tacticaAwareness,
+    recoverySpeed: deterministicValues.recoverySpeed
   };
 
   return (
@@ -174,7 +232,7 @@ const PerformanceMetricsTab: React.FC<PerformanceMetricsTabProps> = ({
                   movementData={movementData} 
                   speedZones={speedZonesObject} 
                   sprintCount={5}
-                  efficiencyScore={85}
+                  efficiencyScore={deterministicValues.movementEfficiency}
                 />
               </CardContent>
             </Card>
@@ -219,7 +277,7 @@ const PerformanceMetricsTab: React.FC<PerformanceMetricsTabProps> = ({
               </CardHeader>
               <CardContent className="h-72">
                 <EnhancedMovementChart 
-                  enhancedMovement={mockEnhancedMovement}
+                  enhancedMovement={deterministicEnhancedMovement}
                 />
               </CardContent>
             </Card>

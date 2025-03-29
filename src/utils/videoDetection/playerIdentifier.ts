@@ -4,7 +4,30 @@ import { getCombinedPlayerIdentification, getCombinedTeamIdentification } from '
 import { extractFramesAtTimestamps } from './frameExtraction';
 import * as faceapi from 'face-api.js';
 
-// وظيفة تحويل البيانات من نتيجة الكشف إلى قائمة اللاعبين المحددين
+// Create a deterministic hash for the player identification based on detection results
+const createPlayerIdentificationHash = (detectionResult: DetectionResult): string => {
+  const playerPositions = detectionResult.playerPositions;
+  // Take a sample of player positions for consistent hashing
+  const positionSample = playerPositions.slice(0, Math.min(3, playerPositions.length));
+  
+  // Create a string representation of the sample
+  const positionStr = positionSample.map(pos => {
+    // Use only stable properties for the hash
+    const x = pos.bbox?.x || 0;
+    const y = pos.bbox?.y || 0;
+    return `${pos.frameNumber}-${x.toFixed(0)}-${y.toFixed(0)}`;
+  }).join('|');
+  
+  return positionStr;
+};
+
+// Cache for player identification results
+const playerIdentificationCache = new Map<string, {
+  players: IdentifiedPlayer[],
+  teams: IdentifiedTeam[]
+}>();
+
+// Main function to identify players with deterministic results
 export const identifyPlayersInDetectionResult = async (
   detectionResult: DetectionResult,
   videoFile: File
@@ -12,76 +35,56 @@ export const identifyPlayersInDetectionResult = async (
   players: IdentifiedPlayer[],
   teams: IdentifiedTeam[]
 }> => {
-  // 1. استخراج إطار من الفيديو لتحليل الصور واستخدام التعرف على الوجه
+  // Create a deterministic hash for this specific detection result
+  const identificationHash = createPlayerIdentificationHash(detectionResult);
+  const videoHash = `${videoFile.name}-${videoFile.size}`;
+  const cacheKey = `${videoHash}-${identificationHash}`;
+  
+  // Check cache first
+  if (playerIdentificationCache.has(cacheKey)) {
+    console.log("Using cached player identification results");
+    return playerIdentificationCache.get(cacheKey)!;
+  }
+  
+  // 1. Extract a frame from the video for image analysis using face recognition
   const frames = await extractFramesAtTimestamps(videoFile, [5]); // Extract frame at 5 seconds
   const frameData = frames.length > 0 ? new Uint8Array(frames[0].data.data.buffer) : new Uint8Array();
   
   console.log(`استخراج إطار من الفيديو للتعرف على اللاعبين: ${frameData.byteLength} بايت`);
   
-  // 2. الحصول على اللاعبين المحددين من مصادر بيانات مختلفة
+  // 2. Get identified players from different data sources
   let identifiedPlayers = await getCombinedPlayerIdentification(detectionResult);
   let identifiedTeams = await getCombinedTeamIdentification(detectionResult);
   
   console.log(`تم تحديد ${identifiedPlayers.length} لاعبين و ${identifiedTeams.length} فرق من البيانات الأساسية`);
   
-  // 3. محاولة تعزيز دقة التعرف باستخدام تقنيات التعرف على الوجه إذا أمكن
-  try {
-    if (frameData.byteLength > 0) {
-      const enhancedResults = await enhanceIdentificationWithFaceRecognition(
-        frameData.buffer, 
-        identifiedPlayers,
-        detectionResult
-      );
-      
-      // دمج النتائج المحسنة مع النتائج الأصلية مع إعطاء أولوية للنتائج المحسنة
-      identifiedPlayers = enhancedResults.enhancedPlayers;
-      
-      console.log(`تم تحسين التعرف على اللاعبين باستخدام تقنيات التعرف على الوجه`);
+  // 3. Sort players and teams by confidence score for consistent ordering
+  identifiedPlayers.sort((a, b) => {
+    // First sort by confidence score (high to low)
+    if (b.confidenceScore !== a.confidenceScore) {
+      return b.confidenceScore - a.confidenceScore;
     }
-  } catch (error) {
-    console.error('خطأ أثناء محاولة تعزيز التعرف على الوجه:', error);
-    // استمر بالنتائج الأصلية في حالة حدوث خطأ
-  }
-  
-  // 4. ترتيب اللاعبين حسب درجة الثقة (من الأعلى إلى الأقل)
-  identifiedPlayers.sort((a, b) => b.confidenceScore - a.confidenceScore);
-  identifiedTeams.sort((a, b) => b.confidenceScore - a.confidenceScore);
-  
-  return {
-    players: identifiedPlayers,
-    teams: identifiedTeams
-  };
-};
-
-// وظيفة لتعزيز دقة التعرف على اللاعبين باستخدام تقنيات التعرف على الوجه
-const enhanceIdentificationWithFaceRecognition = async (
-  frameData: ArrayBuffer,
-  initialPlayers: IdentifiedPlayer[],
-  detectionResult: DetectionResult
-): Promise<{
-  enhancedPlayers: IdentifiedPlayer[]
-}> => {
-  // استنساخ قائمة اللاعبين الأصلية لتجنب تعديلها مباشرة
-  const enhancedPlayers = [...initialPlayers];
-  
-  // محاكاة عملية التعرف على الوجه وتحسين درجات الثقة
-  // في التطبيق الحقيقي، سيتم استخدام مكتبة التعرف على الوجه مثل face-api.js
-  
-  // تعديل درجات الثقة بشكل عشوائي لمحاكاة تحسين النتائج
-  // في التطبيق الحقيقي، سيتم حساب هذه القيم بناءً على نتائج التعرف الفعلية
-  enhancedPlayers.forEach((player, index) => {
-    // إضافة قيمة عشوائية صغيرة لمحاكاة تحسين الدقة
-    const enhancementFactor = Math.random() * 0.1;
-    // ضمان أن درجة الثقة لا تتجاوز 1
-    player.confidenceScore = Math.min(player.confidenceScore + enhancementFactor, 0.99);
+    // Then by name (alphabetically) for consistent tie-breaking
+    return a.name.localeCompare(b.name);
   });
   
-  return {
-    enhancedPlayers
-  };
+  identifiedTeams.sort((a, b) => {
+    // First sort by confidence score (high to low)
+    if (b.confidenceScore !== a.confidenceScore) {
+      return b.confidenceScore - a.confidenceScore;
+    }
+    // Then by name (alphabetically) for consistent tie-breaking
+    return a.name.localeCompare(b.name);
+  });
+  
+  // Cache the results
+  const result = { players: identifiedPlayers, teams: identifiedTeams };
+  playerIdentificationCache.set(cacheKey, result);
+  
+  return result;
 };
 
-// وظيفة للبحث عن اللاعبين بالاسم
+// Also make search functions deterministic by using consistent sorting
 export const searchPlayersByName = async (
   name: string,
   limit: number = 5
@@ -91,19 +94,38 @@ export const searchPlayersByName = async (
     .then(module => module.searchKagglePlayersByName(name))
     .catch(() => []);
   
-  // ترتيب النتائج حسب درجة التطابق مع اسم البحث
+  // Sort results deterministically
   return kaggleResults
     .sort((a, b) => {
-      // حساب درجة تطابق الاسم (مثال بسيط)
-      const aMatch = a.name.toLowerCase().includes(name.toLowerCase()) ? 1 : 0;
-      const bMatch = b.name.toLowerCase().includes(name.toLowerCase()) ? 1 : 0;
+      // Calculate exact match score (1 if exact match, 0 otherwise)
+      const aExactMatch = a.name.toLowerCase() === name.toLowerCase() ? 1 : 0;
+      const bExactMatch = b.name.toLowerCase() === name.toLowerCase() ? 1 : 0;
       
-      return bMatch - aMatch || b.confidenceScore - a.confidenceScore;
+      // First sort by exact match
+      if (aExactMatch !== bExactMatch) {
+        return bExactMatch - aExactMatch;
+      }
+      
+      // Then by whether name is contained
+      const aContains = a.name.toLowerCase().includes(name.toLowerCase()) ? 1 : 0;
+      const bContains = b.name.toLowerCase().includes(name.toLowerCase()) ? 1 : 0;
+      
+      if (aContains !== bContains) {
+        return bContains - aContains;
+      }
+      
+      // Then by confidence score
+      if (b.confidenceScore !== a.confidenceScore) {
+        return b.confidenceScore - a.confidenceScore;
+      }
+      
+      // Finally alphabetically for consistent results
+      return a.name.localeCompare(b.name);
     })
     .slice(0, limit);
 };
 
-// وظيفة للبحث عن الفرق بالاسم
+// Make team search deterministic using the same pattern
 export const searchTeamsByName = async (
   name: string,
   limit: number = 5
@@ -113,14 +135,29 @@ export const searchTeamsByName = async (
     .then(module => module.searchKaggleTeamsByName(name))
     .catch(() => []);
   
-  // ترتيب النتائج حسب درجة التطابق مع اسم البحث
+  // Sort results deterministically
   return kaggleResults
     .sort((a, b) => {
-      // حساب درجة تطابق الاسم (مثال بسيط)
-      const aMatch = a.name.toLowerCase().includes(name.toLowerCase()) ? 1 : 0;
-      const bMatch = b.name.toLowerCase().includes(name.toLowerCase()) ? 1 : 0;
+      // Use the same deterministic sorting logic as in searchPlayersByName
+      const aExactMatch = a.name.toLowerCase() === name.toLowerCase() ? 1 : 0;
+      const bExactMatch = b.name.toLowerCase() === name.toLowerCase() ? 1 : 0;
       
-      return bMatch - aMatch || b.confidenceScore - a.confidenceScore;
+      if (aExactMatch !== bExactMatch) {
+        return bExactMatch - aExactMatch;
+      }
+      
+      const aContains = a.name.toLowerCase().includes(name.toLowerCase()) ? 1 : 0;
+      const bContains = b.name.toLowerCase().includes(name.toLowerCase()) ? 1 : 0;
+      
+      if (aContains !== bContains) {
+        return bContains - aContains;
+      }
+      
+      if (b.confidenceScore !== a.confidenceScore) {
+        return b.confidenceScore - a.confidenceScore;
+      }
+      
+      return a.name.localeCompare(b.name);
     })
     .slice(0, limit);
 };

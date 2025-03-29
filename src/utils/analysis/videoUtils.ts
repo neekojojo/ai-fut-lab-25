@@ -1,4 +1,3 @@
-
 import type { DetectionResult } from '@/utils/videoDetection/types';
 
 // Helper function to extract basic video properties
@@ -56,25 +55,27 @@ export const getVideoProperties = async (file: File): Promise<{
   });
 };
 
-// Generate a deterministic hash for video files
+// More sophisticated hash function to create consistent video fingerprints
 export const generateVideoHash = async (file: File): Promise<string> => {
-  // Create a hash based on file name, size, and the first few bytes of content
-  const firstChunk = await readFirstChunkOfFile(file, 1024);
+  // Calculate hash based on more robust file properties
+  const firstChunk = await readFirstChunkOfFile(file, 2048); // Increased sample size
   const contentHash = await simpleHash(firstChunk);
-  return `${file.name}-${file.size}-${contentHash}`;
+  const fileProps = `${file.name}-${file.size}-${file.type}-${file.lastModified}`;
+  return `${fileProps}-${contentHash}`;
 };
 
-// Create a deterministic seed based on video file properties
+// Create an even more deterministic seed based on video file properties
 export const createDeterministicSeed = async (file: File): Promise<number> => {
-  const firstChunk = await readFirstChunkOfFile(file, 512);
+  const firstChunk = await readFirstChunkOfFile(file, 1024); // More data for better seeding
   const arr = new Uint8Array(firstChunk);
-  // Create a more varied seed by sampling bytes from the file
-  let seed = file.size;
-  for (let i = 0; i < arr.length; i += 32) {
-    if (i < arr.length) {
-      seed = (seed * 33) + arr[i];
-    }
+  
+  // Create a more robust seed by using CRC-like algorithm
+  let seed = 0;
+  for (let i = 0; i < arr.length; i++) {
+    seed = ((seed << 5) - seed + arr[i]) | 0;
   }
+  
+  // Make sure we return a positive number
   return Math.abs(seed);
 };
 
@@ -106,25 +107,28 @@ export const simpleHash = async (buffer: ArrayBuffer): Promise<string> => {
   return hash.toString(36);
 };
 
-// Generate realistic player positions based on video properties
+// Generate deterministic player positions based on video properties and seed
 export const generateRealisticPlayerPositions = (file: File) => {
-  const positionCount = 10 + Math.floor(Math.random() * 10); // 10-20 positions
+  const positionCount = 15; // Fixed count instead of random
   const positions = [];
   
+  // Use deterministic values based on filename/size
+  const seedOffset = file.size % 100;
+  
   for (let i = 0; i < positionCount; i++) {
-    // Create more realistic position data with smoother progression
-    const timestamp = i * (1 + Math.random() * 0.5);
-    const x = 150 + Math.sin(i / 3) * 100 + Math.cos(i / 5) * 50;
-    const y = 200 + Math.cos(i / 4) * 80 + Math.sin(i / 7) * 30;
-    const speed = 5 + Math.sin(i / 2) * 3; // Speed varies between 2-8
+    // Create completely deterministic position data
+    const timestamp = i * 1.2; // Fixed interval
+    const x = 150 + Math.sin((i + seedOffset) / 3) * 100 + Math.cos((i + seedOffset) / 5) * 50;
+    const y = 200 + Math.cos((i + seedOffset) / 4) * 80 + Math.sin((i + seedOffset) / 7) * 30;
+    const speed = 5 + Math.sin((i + seedOffset) / 2) * 3;
     
     positions.push({
       timestamp,
       bbox: { 
         x, 
         y, 
-        width: 40 + Math.random() * 20, 
-        height: 80 + Math.random() * 40 
+        width: 40 + Math.sin(i) * 10, // Deterministic width
+        height: 80 + Math.cos(i) * 20  // Deterministic height
       },
       speed
     });

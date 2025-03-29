@@ -15,28 +15,34 @@ export interface FootballVideoAnalysisResult {
   progressUpdates: (callback: ProgressCallback) => void;
 }
 
-// Cache to store analysis results by video hash
+// Enhanced cache to store analysis results by video hash
 const analysisCache = new Map<string, PlayerAnalysis>();
 
-// Analyze the football video with a combination of real detection and synthetic data
+// Log cache size for debugging
+const logCacheStatus = () => {
+  console.log(`Analysis cache contains ${analysisCache.size} entries`);
+};
+
+// Analyze the football video with consistent deterministic results
 export const analyzeFootballVideo = async (videoFile: File): Promise<FootballVideoAnalysisResult> => {
   // Setup progress tracking 
   const progressTracker = new ProgressTracker(DETAILED_STAGES[0]);
   let isAnalysisRunning = false;
   
-  // Generate a deterministic hash for the video file with enhanced properties
+  // Generate a deterministic hash for the video file
   const videoHash = await generateVideoHash(videoFile);
   
   // Add console logs for debugging
   console.log("Starting video analysis for:", videoFile.name);
-  console.log("Video hash:", videoHash);
+  console.log("Deterministic video hash:", videoHash);
+  logCacheStatus();
   
   // Check cache for this video hash
   if (analysisCache.has(videoHash)) {
-    console.log("Using cached analysis result for video:", videoFile.name);
+    console.log("CACHE HIT: Using cached analysis result for video:", videoFile.name);
     const cachedAnalysis = analysisCache.get(videoHash)!;
     
-    // Immediately resolve with cached analysis but simulate progress with more detailed stages
+    // Immediately resolve with cached analysis but simulate progress
     return {
       analysis: cachedAnalysis,
       progressUpdates: (callback) => {
@@ -49,11 +55,13 @@ export const analyzeFootballVideo = async (videoFile: File): Promise<FootballVid
     };
   }
   
-  // Start with baseline random analysis with enhanced determinism based on video properties
+  console.log("CACHE MISS: Generating new analysis for:", videoFile.name);
+  
+  // Start with deterministic baseline analysis based on video properties
   const hashNum = await createDeterministicSeed(videoFile);
   const baselineAnalysis = generateEnhancedAnalysis(hashNum);
   
-  console.log("Generated baseline analysis with seed:", hashNum);
+  console.log("Generated baseline analysis with deterministic seed:", hashNum);
   
   // Return result object immediately with function to register progress callbacks
   const resultObj = {
@@ -65,7 +73,7 @@ export const analyzeFootballVideo = async (videoFile: File): Promise<FootballVid
       // If analysis hasn't started yet, start it now
       if (!isAnalysisRunning) {
         isAnalysisRunning = true;
-        console.log("Starting full analysis process");
+        console.log("Starting full deterministic analysis process");
         performAnalysis(
           videoFile, 
           baselineAnalysis, 
@@ -73,12 +81,13 @@ export const analyzeFootballVideo = async (videoFile: File): Promise<FootballVid
           (hash, analysis) => {
             console.log("Caching analysis result for hash:", hash);
             analysisCache.set(hash, analysis);
+            logCacheStatus();
           },
           videoHash
         ).then(analysis => {
           // Update the analysis in the result object when complete
           resultObj.analysis = analysis;
-          console.log("Analysis completed successfully");
+          console.log("Analysis completed successfully with deterministic results");
         });
       }
     }

@@ -25,10 +25,11 @@ const getSeededRandom = (seed: number): () => number => {
   };
 };
 
-// Cache for storing previous detection results
+// Global cache for storing previous detection results
+// This ensures the exact same results for the same video
 const detectionCache = new Map<string, DetectionResult>();
 
-// Optimized version for faster performance
+// Optimized version for faster performance and consistent results
 export const detectPeopleInVideo = async (
   videoFile: File
 ): Promise<DetectionResult> => {
@@ -45,15 +46,15 @@ export const detectPeopleInVideo = async (
   const hashSum = videoHash.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
   const seededRandom = getSeededRandom(hashSum);
   
-  // Generate simplified frame results - fewer frames for better performance
-  const frameCount = Math.floor(seededRandom() * 5) + 10; // Between 10-15 frames
+  // Generate deterministic frame results
+  const frameCount = 12; // Fixed frame count for consistency
   const frameResults = [];
   const playerPositions = [];
   
   let totalDetections = 0;
   for (let i = 0; i < frameCount; i++) {
     // Create deterministic number of detections for each frame
-    const frameDetections = Math.floor(seededRandom() * 7) + 1; // 1-7 people per frame
+    const frameDetections = Math.floor(seededRandom() * 5) + 3; // 3-7 people per frame
     totalDetections += frameDetections;
     
     frameResults.push({
@@ -62,17 +63,17 @@ export const detectPeopleInVideo = async (
       timestamp: i * (1000 / 30) // Assuming 30fps
     });
     
-    // Generate simplified player positions - only for key frames
+    // Generate deterministic player positions - only for key frames
     if (i % 3 === 0) { // Only every 3rd frame
       const timestamp = i * (1000 / 30);
       
       // Create a deterministic but varying position for the player over time
-      const seedOffset1 = seededRandom() * 10;
-      const seedOffset2 = seededRandom() * 10;
+      const seedOffset1 = hashSum % 10;
+      const seedOffset2 = (hashSum / 10) % 10;
       const centerX = 300 + Math.sin((i + seedOffset1) / 5) * 50;
       const centerY = 200 + Math.cos((i + seedOffset2) / 3) * 30;
       
-      // Generate fewer keypoints for better performance
+      // Generate deterministic keypoints
       const keypoints = [
         // Face
         { x: centerX, y: centerY - 50, part: "nose", confidence: 0.9 },
@@ -107,10 +108,10 @@ export const detectPeopleInVideo = async (
     }
   }
   
-  // Calculate average count and confidence (deterministically)
+  // Calculate fully deterministic count and confidence
   const avgCount = Math.round(totalDetections / frameCount);
-  // Ensure confidence is deterministic but realistic (between 0.7 and 0.95)
-  const confidence = 0.7 + ((hashSum % 25) / 100);
+  // Ensure confidence is completely deterministic
+  const confidence = 0.7 + ((hashSum % 20) / 100);
   
   const result: DetectionResult = {
     count: avgCount,
