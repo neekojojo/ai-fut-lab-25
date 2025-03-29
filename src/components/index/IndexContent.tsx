@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import VideoUpload from '../VideoUpload';
 import { ANALYSIS_STAGES } from '@/utils/analysis/constants';
 import { Separator } from '@/components/ui/separator';
-import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, Globe, ChevronRight } from 'lucide-react';
+import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, Globe, ChevronRight, Trophy, SoccerBall } from 'lucide-react';
 import AnalysisProcessing from './analysis-processing/AnalysisProcessing';
 import AnalysisOptions from '@/components/analysis/ModelSelection';
 import { analyzeFootballVideo } from '@/utils/analysis';
@@ -112,7 +112,7 @@ const IndexContent: React.FC = () => {
             <li>تقرير شامل عن أداء اللاعب الفني والبدني</li>
             <li>تحديد نقاط القوة ومجالات التحسين</li>
             <li>مؤشرات اللياقة البدنية والتعب</li>
-            <li>أنماط اللعب المفضلة للاعب</li>
+            <li>أن��اط اللعب المفضلة للاعب</li>
           </ul>
         </div>
       )
@@ -167,7 +167,7 @@ const IndexContent: React.FC = () => {
           <h3 className="text-lg font-semibold mt-4">قاعدة بيانات المقارنة</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
             <li>بيانات أداء من أكثر من 10,000 لاعب محترف</li>
-            <li>تغطية للبطولات والدوريات العالمية ا��كبرى</li>
+            <li>تغطية لل��طولات والدوريات العالمية ا��كبرى</li>
             <li>مجموعات بيانات مقسمة حسب الفئة العمرية والمستوى</li>
             <li>تحديث البيانات بشكل دوري</li>
           </ul>
@@ -433,16 +433,28 @@ const IndexContent: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="space-y-8 md:space-y-12">
-        <div className="max-w-3xl mx-auto text-center space-y-3 md:space-y-4 animate-fade-in">
-          <div className="inline-block px-3 py-1 text-xs font-medium bg-secondary text-secondary-foreground rounded-full">
-            تحليل بالذكاء الاصطناعي
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+          <div className="md:col-span-2">
+            <div className="max-w-3xl mx-auto text-center space-y-3 md:space-y-4 animate-fade-in">
+              <div className="inline-block px-3 py-1 text-xs font-medium bg-secondary text-secondary-foreground rounded-full">
+                تحليل بالذكاء الاصطناعي
+              </div>
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+                FUT LAB Analyzer
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                <span className="text-primary font-semibold">تحليل</span> أداء لاعبي كرة القدم وتقييم المواهب بالذكاء الاصطناعي
+              </p>
+            </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-            FUT LAB Analyzer
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            <span className="text-primary font-semibold">تحليل</span> أداء لاعبي كرة القدم وتقييم المواهب بالذكاء الاصطناعي
-          </p>
+          <div className="hidden md:flex justify-center items-center relative">
+            <div className="absolute w-48 h-48 bg-primary/20 rounded-full blur-3xl -z-10"></div>
+            <div className="relative">
+              <SoccerBall className="absolute -top-10 -left-10 text-primary w-16 h-16 animate-bounce-slow" />
+              <Trophy className="text-yellow-500 w-32 h-32 drop-shadow-xl animate-float" />
+              <SoccerBall className="absolute -bottom-8 -right-8 text-primary w-12 h-12 animate-spin-slow" />
+            </div>
+          </div>
         </div>
       </div>
       
