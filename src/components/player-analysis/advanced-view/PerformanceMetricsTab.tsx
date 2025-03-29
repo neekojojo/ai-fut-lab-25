@@ -1,292 +1,196 @@
 
 import React from 'react';
-import { Line, Bar } from 'recharts';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import MovementAnalysisChart from "@/components/player-movement/MovementAnalysisChart";
-import EnhancedMovementChart from "@/components/player-movement/EnhancedMovementChart";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis
+} from 'recharts';
 
 interface PerformanceMetricsTabProps {
-  movementData: { timestamp: number; speed: number; acceleration: number; }[];
-  speedZones: { name: string; percentage: number; color: string; }[];
+  movementData: { timestamp: number; speed: number; acceleration: number }[];
+  speedZones: { name: string; percentage: number; color: string }[];
   analysis: any;
 }
 
 const PerformanceMetricsTab: React.FC<PerformanceMetricsTabProps> = ({ 
-  movementData,
+  movementData, 
   speedZones,
-  analysis 
+  analysis
 }) => {
-  // Convert speedZones array to the format expected by MovementAnalysisChart
-  const speedZonesObject = {
-    walking: speedZones.find(zone => zone.name === 'مشي')?.percentage || 0,
-    jogging: speedZones.find(zone => zone.name === 'جري خفيف')?.percentage || 0,
-    running: speedZones.find(zone => zone.name === 'جري')?.percentage || 0,
-    sprinting: speedZones.find(zone => zone.name === 'سرعة قصوى')?.percentage || 0
-  };
-
-  // Calculate avg, max speed and total distance from movementData
-  const avgSpeed = movementData.reduce((sum, point) => sum + point.speed, 0) / movementData.length;
-  const maxSpeed = Math.max(...movementData.map(point => point.speed));
-  const totalDistance = movementData.reduce((sum, point, index, array) => {
-    if (index === 0) return sum;
-    // Simple distance calculation for demo purposes
-    return sum + (point.speed * 0.5); // Assuming 0.5 time units between points
-  }, 0);
-
-  // Create deterministic enhanced movement data for the EnhancedMovementChart
-  const mockEnhancedMovement = {
-    // Basic movement analysis properties
-    totalDistance: totalDistance,
-    averageSpeed: avgSpeed,
-    maxSpeed: maxSpeed,
-    topSpeed: maxSpeed, // Using maxSpeed for topSpeed
-    directionChanges: 12,
-    movementEfficiency: Math.floor(65 + Math.random() * 30),
-    maxAcceleration: Math.max(...movementData.map(point => point.acceleration || 0)),
-    
-    // Setting positionSpecificMetrics according to the expected structure in EnhancedMovementAnalysis
-    positionSpecificMetrics: {
-      // For a generic player, we'll set some values for attacker metrics
-      attackerMetrics: {
-        shotsAttempted: Math.floor(Math.random() * 10) + 1,
-        shotsOnTarget: Math.floor(Math.random() * 5) + 1,
-        dribbleAttempts: Math.floor(Math.random() * 15) + 5,
-        dribbleSuccess: Math.floor(Math.random() * 10) + 3
-      },
-      // Can also add midfielderMetrics if needed
-      midfielderMetrics: {
-        passesAttempted: Math.floor(Math.random() * 30) + 20,
-        passAccuracy: Math.floor(Math.random() * 30) + 60,
-        ballControl: Math.floor(Math.random() * 20) + 70,
-        visionScore: Math.floor(Math.random() * 25) + 65
-      }
-    },
-    
-    // Speed zones matching the format in MovementAnalysisResult
-    speedZones: {
-      walking: speedZonesObject.walking / 100,
-      jogging: speedZonesObject.jogging / 100,
-      running: speedZonesObject.running / 100,
-      sprinting: speedZonesObject.sprinting / 100
-    },
-    
-    // Enhanced properties
-    stamina: Math.floor(75 + Math.random() * 20),
-    consistency: Math.floor(70 + Math.random() * 25),
-    tacticaAwareness: Math.floor(60 + Math.random() * 30),
-    recoverySpeed: 7.5 + Math.random() * 2,
-    
-    // Directional data
-    directionalData: {
-      forward: 0.6,
-      backward: 0.15,
-      sideways: 0.25
-    },
-    
-    // Acceleration profile
-    accelerationProfile: {
-      explosive: 0.35,
-      sustained: 0.45,
-      deceleration: 0.2
-    },
-    
-    // Positional heatmap
-    positionalHeatmap: [
-      { x: 30, y: 40, value: 0.8 },
-      { x: 40, y: 30, value: 0.7 },
-      { x: 60, y: 50, value: 0.6 },
-      { x: 70, y: 30, value: 0.5 },
-      { x: 20, y: 60, value: 0.7 },
-      { x: 50, y: 70, value: 0.4 }
-    ],
-    
-    // Adding sprintCount property which appears to be needed
-    sprintCount: 5
-  };
-
-  // Create a deterministic seed from the provided analysis
-  const createDeterministicValues = (baseSeed: number) => {
-    // Simple deterministic random generator
-    let generatorSeed = baseSeed || 12345;
-    const rand = () => {
-      const x = Math.sin(generatorSeed++) * 10000;
-      return x - Math.floor(x);
-    };
-    
-    return {
-      // Replace all random calls with deterministic values
-      shotsAttempted: Math.floor(rand() * 10) + 1,
-      shotsOnTarget: Math.floor(rand() * 5) + 1,
-      dribbleAttempts: Math.floor(rand() * 15) + 5,
-      dribbleSuccess: Math.floor(rand() * 10) + 3,
-      passesAttempted: Math.floor(rand() * 30) + 20,
-      passAccuracy: Math.floor(rand() * 30) + 60,
-      ballControl: Math.floor(rand() * 20) + 70,
-      visionScore: Math.floor(rand() * 25) + 65,
-      movementEfficiency: Math.floor(65 + rand() * 30),
-      stamina: Math.floor(75 + rand() * 20),
-      consistency: Math.floor(70 + rand() * 25),
-      tacticaAwareness: Math.floor(60 + rand() * 30),
-      recoverySpeed: 7.5 + rand() * 2
-    };
-  };
+  // Create data for radar chart
+  const skillRadarData = [
+    { subject: 'تمرير', A: 85, B: 75, fullMark: 100 },
+    { subject: 'تسديد', A: 65, B: 55, fullMark: 100 },
+    { subject: 'مراوغة', A: 75, B: 65, fullMark: 100 },
+    { subject: 'تمركز', A: 80, B: 70, fullMark: 100 },
+    { subject: 'تكتيك', A: 70, B: 60, fullMark: 100 },
+    { subject: 'سرعة', A: 75, B: 68, fullMark: 100 },
+  ];
   
-  // Create a seed from analysis data to ensure consistency
-  const generateSeed = () => {
-    if (analysis?.id) {
-      return analysis.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
-    }
-    return totalDistance * 100 + avgSpeed * 10 + maxSpeed;
-  };
+  // Calculate total for pie chart
+  const totalPercentage = speedZones.reduce((sum, zone) => sum + zone.percentage, 0);
   
-  const deterministicValues = createDeterministicValues(generateSeed());
-  
-  // Update mockEnhancedMovement with deterministic values
-  const deterministicEnhancedMovement = {
-    ...mockEnhancedMovement,
-    movementEfficiency: deterministicValues.movementEfficiency,
-    positionSpecificMetrics: {
-      attackerMetrics: {
-        shotsAttempted: deterministicValues.shotsAttempted,
-        shotsOnTarget: deterministicValues.shotsOnTarget,
-        dribbleAttempts: deterministicValues.dribbleAttempts,
-        dribbleSuccess: deterministicValues.dribbleSuccess
-      },
-      midfielderMetrics: {
-        passesAttempted: deterministicValues.passesAttempted,
-        passAccuracy: deterministicValues.passAccuracy,
-        ballControl: deterministicValues.ballControl,
-        visionScore: deterministicValues.visionScore
-      }
-    },
-    stamina: deterministicValues.stamina,
-    consistency: deterministicValues.consistency,
-    tacticaAwareness: deterministicValues.tacticaAwareness,
-    recoverySpeed: deterministicValues.recoverySpeed
-  };
-
   return (
-    <div className="space-y-8">
-      {/* Movement Performance Section */}
-      <section>
-        <h3 className="text-xl font-semibold mb-4">مؤشرات الأداء الحركي</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">متوسط السرعة</CardTitle>
-              <CardDescription>كيلومتر/ساعة</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{avgSpeed.toFixed(1)}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {avgSpeed > 12 ? 'أعلى من المتوسط' : 'ضمن المتوسط'}
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">السرعة القصوى</CardTitle>
-              <CardDescription>كيلومتر/ساعة</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{maxSpeed.toFixed(1)}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {maxSpeed > 25 ? 'ممتاز' : 'جيد'}
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">المسافة المقطوعة</CardTitle>
-              <CardDescription>كيلومتر</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{totalDistance.toFixed(1)}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                خلال فترة التحليل
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-      
-      {/* Advanced Movement Charts */}
-      <section>
-        <Tabs defaultValue="speed">
-          <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="speed">السرعة والتسارع</TabsTrigger>
-            <TabsTrigger value="zones">مناطق السرعة</TabsTrigger>
-            <TabsTrigger value="enhanced">التحليل المتقدم</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="speed" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>تغير السرعة والتسارع مع الوقت</CardTitle>
-                <CardDescription>
-                  يوضح تغير سرعة وتسارع اللاعب خلال فترة التحليل
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="h-72">
-                <MovementAnalysisChart 
-                  movementData={movementData} 
-                  speedZones={speedZonesObject} 
-                  sprintCount={5}
-                  efficiencyScore={deterministicValues.movementEfficiency}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="zones" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>توزيع مناطق السرعة</CardTitle>
-                <CardDescription>
-                  النسبة المئوية للوقت المقضي في كل منطقة سرعة
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="h-72 flex items-center justify-center">
-                <div className="w-full max-w-md">
-                  {speedZones.map((zone, index) => (
-                    <div key={index} className="mb-4">
-                      <div className="flex justify-between mb-1">
-                        <span>{zone.name}</span>
-                        <span>{zone.percentage}%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2.5">
-                        <div 
-                          className="h-2.5 rounded-full" 
-                          style={{ width: `${zone.percentage}%`, backgroundColor: zone.color }}
-                        ></div>
-                      </div>
-                    </div>
-                  ))}
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Speed and Acceleration Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>السرعة والتسارع</CardTitle>
+            <CardDescription>تحليل أنماط السرعة والتسارع خلال المباراة</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={movementData}
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="timestamp" label={{ value: 'الوقت (ثانية)', position: 'insideBottomRight', offset: -5 }} />
+                  <YAxis yAxisId="left" label={{ value: 'السرعة (كم/س)', angle: -90, position: 'insideLeft' }} />
+                  <YAxis yAxisId="right" orientation="right" label={{ value: 'التسارع (م/ث²)', angle: 90, position: 'insideRight' }} />
+                  <Tooltip />
+                  <Legend />
+                  <Line yAxisId="left" type="monotone" dataKey="speed" name="السرعة" stroke="#8884d8" activeDot={{ r: 8 }} />
+                  <Line yAxisId="right" type="monotone" dataKey="acceleration" name="التسارع" stroke="#82ca9d" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Speed Zones Pie Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>توزيع مناطق السرعة</CardTitle>
+            <CardDescription>نسبة الوقت المقضي في كل منطقة سرعة</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={speedZones}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={true}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="percentage"
+                    nameKey="name"
+                    label={({ name, percentage }) => `${name}: ${percentage}%`}
+                  >
+                    {speedZones.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => [`${value}%`, 'النسبة']} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Skill Performance Radar */}
+        <Card>
+          <CardHeader>
+            <CardTitle>مهارات الأداء</CardTitle>
+            <CardDescription>مقارنة متعددة الأبعاد للمهارات</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={skillRadarData}>
+                  <PolarGrid />
+                  <PolarAngleAxis dataKey="subject" />
+                  <PolarRadiusAxis angle={30} domain={[0, 100]} />
+                  <Radar name="الحالي" dataKey="A" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.6} />
+                  <Radar name="السابق" dataKey="B" stroke="#9CA3AF" fill="#9CA3AF" fillOpacity={0.3} />
+                  <Legend />
+                  <Tooltip />
+                </RadarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Advanced Movement Metrics */}
+        <Card>
+          <CardHeader>
+            <CardTitle>مقاييس الحركة المتقدمة</CardTitle>
+            <CardDescription>تحليل تفصيلي لمؤشرات الحركة المتقدمة</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-primary/5 p-3 rounded-lg">
+                  <div className="text-sm text-muted-foreground mb-1">الكفاءة الحركية</div>
+                  <div className="text-2xl font-bold">{analysis.stats?.movementEfficiency || 79}%</div>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="enhanced" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>التحليل المتقدم للحركة</CardTitle>
-                <CardDescription>
-                  مؤشرات متقدمة للأداء الحركي والتكتيكي
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="h-72">
-                <EnhancedMovementChart 
-                  enhancedMovement={deterministicEnhancedMovement}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </section>
+                <div className="bg-primary/5 p-3 rounded-lg">
+                  <div className="text-sm text-muted-foreground mb-1">ثبات الأداء</div>
+                  <div className="text-2xl font-bold">{analysis.stats?.consistencyScore || 76}%</div>
+                </div>
+                <div className="bg-primary/5 p-3 rounded-lg">
+                  <div className="text-sm text-muted-foreground mb-1">التحمل</div>
+                  <div className="text-2xl font-bold">{analysis.stats?.stamina || 82}%</div>
+                </div>
+                <div className="bg-primary/5 p-3 rounded-lg">
+                  <div className="text-sm text-muted-foreground mb-1">الوعي التكتيكي</div>
+                  <div className="text-2xl font-bold">{analysis.stats?.tacticalAwareness || 74}%</div>
+                </div>
+              </div>
+              
+              <div className="border-t pt-4 mt-2">
+                <h4 className="font-medium mb-2">ملف التسارع</h4>
+                <div className="flex justify-between text-sm">
+                  <div>
+                    <span className="text-muted-foreground">تسارع مفاجئ:</span>
+                    <span className="font-medium mr-1">{analysis.stats?.explosiveAccelerations || 28}%</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">تسارع مستدام:</span>
+                    <span className="font-medium mr-1">{analysis.stats?.sustainedAccelerations || 45}%</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">تباطؤ:</span>
+                    <span className="font-medium mr-1">{analysis.stats?.decelerations || 27}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>تحليل مناطق الحركة</CardTitle>
+          <CardDescription>توزيع حركة اللاعب في مختلف مناطق الملعب</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-muted/20 p-4 rounded-lg border text-center">
+            <p className="text-muted-foreground mb-2">يتم إنشاء خريطة حرارية تفصيلية لتغطية اللاعب للملعب.</p>
+            <p className="text-sm">تظهر البيانات أن اللاعب يفضل الجانب {analysis.preferredSide || 'الأيمن'} من الملعب، مع تغطية جيدة للمنطقة الوسطى. هناك فرصة لتحسين التغطية في المناطق الدفاعية العميقة.</p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

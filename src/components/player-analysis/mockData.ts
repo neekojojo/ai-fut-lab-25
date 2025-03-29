@@ -1,218 +1,355 @@
 
-import { PlayerStats } from '@/utils/dataProcessing/playerAnalysisTypes';
-import { PlayerComparison, TrainingRecommendation, ProfessionalPlayer, SimilarityMetric } from '@/utils/ml/playerMLService';
-import { PlayerAnalysis, PlayerMovement, PassAttempt, PositionHeatmap } from '@/components/AnalysisReport.d';
+import { faker } from '@faker-js/faker';
 
-export const getPlayerStats = (): PlayerStats => ({
-  avgSpeed: 15.2,
-  maxSpeed: 28.5,
-  avgAcceleration: 3.8,
-  distanceCovered: 1250,
-  balanceScore: 78,
-  technicalScore: 82,
-  physicalScore: 75,
-  movementEfficiency: 80,
-});
-
-// Define a new interface for the mock analysis data
-export interface MockAnalysis {
-  playerMovements: PlayerMovement[];
-  passes: PassAttempt[];
-  heatmap: PositionHeatmap[];
-  analysis: PlayerAnalysis;
-}
-
-export const getMockAnalysis = (): MockAnalysis => {
-  const analysis: PlayerAnalysis = {
-    id: "analysis-1",
-    playerName: "Alex Johnson",
-    position: "Midfielder",
-    timestamp: new Date().toISOString(),
-    duration: 120,
-    confidence: 0.85,
-    stats: {
-      pace: 82,
-      shooting: 75,
-      passing: 85,
-      dribbling: 78,
-      defending: 65,
-      physical: 75,
-      stamina: 80,
-      acceleration: 83,
-      agility: 76,
-      balance: 72,
-      ballControl: 79,
-      decision: 74,
-      anticipation: 71,
-      positioning: 76,
-      vision: 83,
-      composure: 79
-    },
-    movements: [],
-    passes: [],
-    heatmap: [],
-    strengths: [
-      "Exceptional vision for through balls",
-      "Consistent passing accuracy over long distances",
-      "Effective at switching play to the opposite flank"
-    ],
-    weaknesses: [
-      "Occasionally loses concentration during defensive transitions",
-      "Could improve decision-making in the final third"
-    ],
-    summary: "A technically gifted midfielder with excellent passing range and vision.",
-    advancedInsights: ["Shows great potential in central midfield role", "Excellent at creating chances"],
-    recommendations: [
-      "Practice scanning before receiving passes with 'shoulder checks'",
-      "Work on quick transition from defense to attack",
-    ],
-    performanceScore: 82,
-    // Added fields to match updated interface
-    marketValue: "$2.5M",
-    talentScore: 85,
-    compatibilityScore: 80,
-    performance: {
-      technical: 82,
-      physical: 75,
-      tactical: 79,
-      mental: 81,
-    },
-    detailedSkills: {
-      passing: 85,
-      shooting: 72,
-      dribbling: 78,
-      tackling: 65,
-      positioning: 76
-    }
-  };
-  
+// Mock player stats data
+export const getPlayerStats = () => {
   return {
-    playerMovements: [],
-    passes: [],
-    heatmap: [],
-    analysis
+    pace: faker.number.int({ min: 65, max: 90 }),
+    shooting: faker.number.int({ min: 65, max: 85 }),
+    passing: faker.number.int({ min: 70, max: 88 }),
+    dribbling: faker.number.int({ min: 70, max: 89 }),
+    defending: faker.number.int({ min: 60, max: 80 }),
+    physical: faker.number.int({ min: 70, max: 85 }),
+    
+    // More detailed player stats for the player analysis
+    speed: faker.number.int({ min: 70, max: 90 }),
+    acceleration: faker.number.int({ min: 65, max: 87 }),
+    agility: faker.number.int({ min: 70, max: 88 }),
+    balance: faker.number.int({ min: 65, max: 82 }),
+    strength: faker.number.int({ min: 65, max: 80 }),
+    stamina: faker.number.int({ min: 70, max: 85 }),
+    positioning: faker.number.int({ min: 70, max: 85 }),
+    finishing: faker.number.int({ min: 65, max: 80 }),
+    shortPassing: faker.number.int({ min: 75, max: 90 }),
+    longPassing: faker.number.int({ min: 70, max: 85 }),
+    ballControl: faker.number.int({ min: 70, max: 88 }),
+    dribbling_skill: faker.number.int({ min: 70, max: 85 }),
+    crossing: faker.number.int({ min: 65, max: 80 }),
+    freeKick: faker.number.int({ min: 60, max: 75 }),
+    interceptions: faker.number.int({ min: 65, max: 80 }),
+    defensiveAwareness: faker.number.int({ min: 65, max: 80 }),
+    slidingTackle: faker.number.int({ min: 60, max: 75 }),
+    standingTackle: faker.number.int({ min: 65, max: 80 }),
+    vision: faker.number.int({ min: 70, max: 85 }),
+    composure: faker.number.int({ min: 70, max: 85 }),
+    aggression: faker.number.int({ min: 65, max: 80 }),
+    reactions: faker.number.int({ min: 70, max: 85 }),
+    firstTouch: faker.number.int({ min: 70, max: 85 }),
+    
+    // Physical metrics
+    avgSpeed: faker.number.float({ min: 10, max: 15, precision: 0.1 }),
+    maxSpeed: faker.number.float({ min: 20, max: 32, precision: 0.1 }),
+    avgAcceleration: faker.number.float({ min: 2, max: 4, precision: 0.1 }),
+    distanceCovered: faker.number.int({ min: 1000, max: 1500 }),
+    balanceScore: faker.number.int({ min: 60, max: 80 }),
+    technicalScore: faker.number.int({ min: 65, max: 85 }),
+    physicalScore: faker.number.int({ min: 70, max: 85 }),
+    movementEfficiency: faker.number.int({ min: 65, max: 85 }),
+    
+    // Enhanced movement analytics
+    consistencyScore: faker.number.int({ min: 65, max: 85 }),
+    decision: faker.number.int({ min: 65, max: 85 }),
+    anticipation: faker.number.int({ min: 65, max: 85 }),
+    tacticalAwareness: faker.number.int({ min: 65, max: 80 }),
+    explosiveAccelerations: faker.number.int({ min: 20, max: 35 }),
+    sustainedAccelerations: faker.number.int({ min: 40, max: 50 }),
+    decelerations: faker.number.int({ min: 20, max: 35 }),
   };
 };
 
-export const getPlayerComparison = (): PlayerComparison => {
-  const similarPlayers: ProfessionalPlayer[] = [
-    {
-      name: "Kevin De Bruyne",
-      team: "Manchester City",
-      position: "midfielder",
-      similarity: 78,
-      strengths: ["Vision", "Passing Range", "Set Pieces"]
-    },
-    {
-      name: "Toni Kroos",
-      team: "Real Madrid",
-      position: "midfielder",
-      similarity: 72,
-      strengths: ["Ball Control", "Positional Awareness", "Long Passing"]
-    },
-    {
-      name: "Mason Mount",
-      team: "Manchester United",
-      position: "midfielder",
-      similarity: 68,
-      strengths: ["Work Rate", "Technical Ability", "Versatility"]
-    }
-  ];
-  
-  const similarityMetrics: SimilarityMetric[] = [
-    { category: "Passing", score: 78, description: "Excellent range of passing with good accuracy." },
-    { category: "Vision", score: 82, description: "Great awareness of teammates' positioning." },
-    { category: "Technique", score: 75, description: "Good ball control and first touch." },
-    { category: "Positioning", score: 70, description: "Solid understanding of spatial awareness." },
-    { category: "Decision Making", score: 65, description: "Sometimes hesitates in the final third." }
-  ];
+// Mock player analysis data
+export const getMockAnalysis = () => {
+  const playerStats = getPlayerStats();
   
   return {
-    similarProfessionals: similarPlayers,
-    similarityMetrics
+    analysis: {
+      id: faker.string.uuid(),
+      playerId: faker.string.uuid(),
+      playerName: 'عبدالله محمد',
+      position: 'وسط',
+      timestamp: new Date().toISOString(),
+      duration: faker.number.int({ min: 60, max: 90 }),
+      confidence: faker.number.float({ min: 0.75, max: 0.95, precision: 0.01 }),
+      videoUrl: '',
+      thumbnailUrl: '',
+      stats: {
+        ...playerStats,
+        // Additional stats
+        overall: faker.number.int({ min: 65, max: 82 }),
+        potential: faker.number.int({ min: 70, max: 90 }),
+      },
+      movements: [
+        { timestamp: 1, x: 23, y: 45, speed: 12.3, acceleration: 2.1, isActive: true },
+        { timestamp: 2, x: 26, y: 48, speed: 14.7, acceleration: 2.4, isActive: true },
+        { timestamp: 3, x: 30, y: 52, speed: 18.5, acceleration: 3.8, isActive: true },
+        { timestamp: 4, x: 35, y: 55, speed: 22.1, acceleration: 3.6, isActive: true },
+        { timestamp: 5, x: 40, y: 57, speed: 19.8, acceleration: -2.3, isActive: true },
+      ],
+      passes: [
+        { timestamp: 10, fromX: 23, fromY: 45, toX: 45, toY: 50, success: true, type: 'short' },
+        { timestamp: 25, fromX: 35, fromY: 30, toX: 60, toY: 45, success: false, type: 'long' },
+        { timestamp: 40, fromX: 50, fromY: 35, toX: 70, toY: 40, success: true, type: 'through' },
+      ],
+      heatmap: [
+        { x: 25, y: 45, intensity: 0.8 },
+        { x: 35, y: 50, intensity: 0.9 },
+        { x: 45, y: 40, intensity: 0.7 },
+        { x: 30, y: 60, intensity: 0.5 },
+        { x: 55, y: 35, intensity: 0.4 },
+      ],
+      strengths: [
+        'قوة التمرير',
+        'الرؤية الكروية',
+        'التمركز الجيد',
+        'التحكم في الكرة',
+      ],
+      weaknesses: [
+        'السرعة القصوى',
+        'القوة البدنية',
+        'الاستحواذ تحت الضغط',
+      ],
+      summary: 'لاعب وسط ذكي مع مهارات تمرير ممتازة ورؤية جيدة للملعب. يحتاج إلى تحسين في الجوانب البدنية.',
+      advancedInsights: [
+        'يظهر قدرات مميزة في التمريرات المفتاحية في الثلث الأخير',
+        'يقوم بالتغطية الدفاعية بشكل جيد للمساحات خلف الظهير',
+        'يحتاج إلى تحسين مستوى الجري عالي الشدة',
+        'يمكنه العمل على تحسين قدرته على الاحتفاظ بالكرة تحت الضغط'
+      ],
+      recommendations: [
+        'برنامج تدريبي لتحسين السرعة القصوى والقدرة على التحمل',
+        'تمارين مكثفة للاحتفاظ بالكرة تحت الضغط',
+        'تحسين المهارات الدفاعية والمراقبة'
+      ],
+      performanceScore: faker.number.int({ min: 65, max: 85 }),
+      talentScore: faker.number.int({ min: 70, max: 88 }),
+      marketValue: `$${faker.number.int({ min: 500, max: 2000 })}K`,
+      compatibilityScore: faker.number.float({ min: 6.5, max: 8.5, precision: 0.1 }),
+      
+      // Additional fields with more detailed metrics
+      performance: {
+        technical: faker.number.int({ min: 70, max: 85 }),
+        tactical: faker.number.int({ min: 65, max: 80 }),
+        physical: faker.number.int({ min: 65, max: 80 }),
+        mental: faker.number.int({ min: 70, max: 85 }),
+      },
+      
+      detailedSkills: {
+        passing: faker.number.int({ min: 75, max: 88 }),
+        shooting: faker.number.int({ min: 65, max: 78 }),
+        dribbling: faker.number.int({ min: 70, max: 82 }),
+        tackling: faker.number.int({ min: 60, max: 75 }),
+        positioning: faker.number.int({ min: 70, max: 82 }),
+        movement: faker.number.int({ min: 70, max: 80 }),
+        awareness: faker.number.int({ min: 70, max: 85 }),
+      },
+      
+      proComparison: {
+        name: 'Kevin De Bruyne',
+        similarity: faker.number.int({ min: 70, max: 85 }),
+        skills: {
+          passing: faker.number.int({ min: 85, max: 95 }),
+          vision: faker.number.int({ min: 85, max: 95 }),
+          shooting: faker.number.int({ min: 80, max: 90 }),
+          movement: faker.number.int({ min: 80, max: 90 }),
+          positioning: faker.number.int({ min: 80, max: 90 }),
+        }
+      },
+      
+      progress: {
+        technical: {
+          current: faker.number.int({ min: 70, max: 85 }),
+          previous: faker.number.int({ min: 65, max: 75 }),
+          change: faker.number.int({ min: 5, max: 15 }),
+        },
+        tactical: {
+          current: faker.number.int({ min: 65, max: 80 }),
+          previous: faker.number.int({ min: 60, max: 70 }),
+          change: faker.number.int({ min: 5, max: 15 }),
+        },
+        physical: {
+          current: faker.number.int({ min: 65, max: 80 }),
+          previous: faker.number.int({ min: 60, max: 70 }),
+          change: faker.number.int({ min: 5, max: 15 }),
+        },
+        mental: {
+          current: faker.number.int({ min: 70, max: 85 }),
+          previous: faker.number.int({ min: 65, max: 75 }),
+          change: faker.number.int({ min: 5, max: 15 }),
+        }
+      },
+      
+      injuryRisk: {
+        overall: faker.number.float({ min: 0.1, max: 0.3, precision: 0.01 }),
+        areas: {
+          knee: faker.number.float({ min: 0.05, max: 0.2, precision: 0.01 }),
+          ankle: faker.number.float({ min: 0.05, max: 0.2, precision: 0.01 }),
+          hamstring: faker.number.float({ min: 0.1, max: 0.25, precision: 0.01 }),
+          groin: faker.number.float({ min: 0.05, max: 0.15, precision: 0.01 }),
+        }
+      },
+      
+      badges: [
+        { title: 'صانع اللعب', description: 'قدرة استثنائية على صناعة الفرص', type: 'technical' },
+        { title: 'رؤية مميزة', description: 'قدرة عالية على رؤية التمريرات المفتاحية', type: 'technical' },
+        { title: 'ذكاء كروي', description: 'قدرة فائقة على قراءة اللعب', type: 'tactical' },
+      ],
+      
+      // Player profile data
+      age: faker.number.int({ min: 18, max: 25 }),
+      country: 'المملكة العربية السعودية',
+      city: 'الرياض',
+      height: `${faker.number.int({ min: 170, max: 190 })} سم`,
+      weight: `${faker.number.int({ min: 65, max: 85 })} كجم`,
+      preferredFoot: 'Right',
+      
+      // Preferred style
+      preferredSide: 'الأيمن',
+      
+      // Coach notes
+      coachNotes: 'يظهر اللاعب تطوراً جيداً في مستوى التمرير وصناعة اللعب. يحتاج إلى عمل إضافي على الجوانب البدنية خاصة السرعة والقوة، مع التركيز على تحسين قدرته على المراوغة تحت الضغط وتطوير مهارات المراقبة الدفاعية.',
+      
+      // Physical metrics for detailed movement analysis
+      physicalMetrics: {
+        maxSpeed: faker.number.float({ min: 26, max: 32, precision: 0.1 }),
+        avgSpeed: faker.number.float({ min: 10, max: 15, precision: 0.1 }),
+        distance: faker.number.float({ min: 6.5, max: 8.5, precision: 0.1 }),
+        strength: faker.number.int({ min: 65, max: 80 }),
+        endurance: faker.number.int({ min: 70, max: 85 }),
+      },
+      
+      // Movement specific data
+      movementNotes: 'يظهر اللاعب قدرات حركية جيدة مع إمكانية تحسين في الرشاقة والتوازن. يوصى بتمارين مخصصة لتحسين القدرة على تغيير الاتجاه بسرعة أكبر والحفاظ على التوازن أثناء المناورات السريعة.'
+    }
   };
 };
 
-export const getTrainingRecommendations = (): TrainingRecommendation[] => ([
-  {
-    id: "tr-001",
-    title: "Passing Precision Program",
-    description: "Comprehensive program to improve all aspects of passing",
-    category: "Technical",
-    difficulty: 3,
-    estimatedTimeInMinutes: 45,
-    targetAreas: ["Passing", "Vision"],
-    expectedImprovement: 15,
-    // Additional properties needed by components
-    area: "Passing Accuracy",
-    intensity: "high",
-    frequency: 3,
-    duration: 45,
-    exercises: [
+// Mock player comparison data
+export const getPlayerComparison = () => {
+  return {
+    player: {
+      name: 'عبدالله محمد',
+      age: 22,
+      position: 'وسط',
+      scores: {
+        technical: 75,
+        tactical: 72,
+        physical: 68,
+        mental: 76
+      }
+    },
+    similarProfessionals: [
       {
-        name: "One-touch passing circuit",
-        description: "Quick one-touch passing in triangles with movement",
-        difficulty: "intermediate"
+        name: 'Kevin De Bruyne',
+        team: 'Manchester City',
+        position: 'midfielder',
+        similarity: 78,
+        strengths: ['Vision', 'Passing Range', 'Set Pieces']
       },
       {
-        name: "Long-range passing drill",
-        description: "Practice 30-40 yard passes to moving targets",
-        difficulty: "advanced"
-      }
-    ]
-  },
-  {
-    id: "tr-002",
-    title: "Defensive Awareness Training",
-    description: "Sessions to improve defensive positioning and awareness",
-    category: "Tactical",
-    difficulty: 4,
-    estimatedTimeInMinutes: 60,
-    targetAreas: ["Defending", "Positioning"],
-    expectedImprovement: 20,
-    // Additional properties needed by components
-    area: "Defensive Awareness",
-    intensity: "medium",
-    frequency: 2,
-    duration: 30,
-    exercises: [
-      {
-        name: "Defensive positioning drill",
-        description: "Shadow defending scenarios with quick transitions",
-        difficulty: "intermediate"
+        name: 'Luka Modric',
+        team: 'Real Madrid',
+        position: 'midfielder',
+        similarity: 71,
+        strengths: ['Game Control', 'First Touch', 'Positioning']
       },
       {
-        name: "Zonal marking practice",
-        description: "Group exercise focusing on maintaining defensive shape",
-        difficulty: "intermediate"
+        name: 'Bruno Fernandes',
+        team: 'Manchester United',
+        position: 'midfielder',
+        similarity: 65,
+        strengths: ['Creativity', 'Shot Power', 'Work Rate']
       }
+    ],
+    similarityScore: 76,
+    similarityBreakdown: [
+      { category: 'Playing Style', similarity: 82 },
+      { category: 'Technical Skills', similarity: 73 },
+      { category: 'Physical Attributes', similarity: 68 },
+      { category: 'Decision Making', similarity: 77 },
     ]
-  },
-  {
-    id: "tr-003",
-    title: "Decision Making Under Pressure",
-    description: "Training to improve quick decision making in game situations",
-    category: "Mental",
-    difficulty: 3,
-    estimatedTimeInMinutes: 40,
-    targetAreas: ["Decision Making", "Composure"],
-    expectedImprovement: 25,
-    // Additional properties needed by components
-    area: "Decision Making",
-    intensity: "high",
-    frequency: 3,
-    duration: 40,
-    exercises: [
-      {
-        name: "Small-sided games with constraints",
-        description: "3v3 games with restrictions on touches and time",
-        difficulty: "advanced"
-      },
-      {
-        name: "Video analysis sessions",
-        description: "Review of game decisions with coach feedback",
-        difficulty: "beginner"
-      }
-    ]
-  }
-]);
+  };
+};
+
+// Mock training recommendations
+export const getTrainingRecommendations = () => {
+  return [
+    {
+      id: "tr-001",
+      title: "تدريب دقة التمرير",
+      description: "برنامج شامل لتحسين جميع جوانب التمرير",
+      category: "تقني",
+      difficulty: 3,
+      estimatedTimeInMinutes: 45,
+      targetAreas: ["التمرير", "الرؤية"],
+      expectedImprovement: 15,
+      area: "دقة التمرير",
+      intensity: "عالية",
+      frequency: 3,
+      duration: 45,
+      exercises: [
+        {
+          name: "تدريب التمرير بلمسة واحدة",
+          description: "تمرير سريع بلمسة واحدة في مثلثات مع الحركة",
+          difficulty: "intermediate"
+        },
+        {
+          name: "تدريب التمرير طويل المدى",
+          description: "ممارسة تمريرات بمسافة 30-40 ياردة إلى أهداف متحركة",
+          difficulty: "advanced"
+        }
+      ]
+    },
+    {
+      id: "tr-002",
+      title: "تدريب الوعي الدفاعي",
+      description: "جلسات لتحسين التمركز الدفاعي والوعي",
+      category: "تكتيكي",
+      difficulty: 4,
+      estimatedTimeInMinutes: 60,
+      targetAreas: ["الدفاع", "التمركز"],
+      expectedImprovement: 20,
+      area: "الوعي الدفاعي",
+      intensity: "متوسطة",
+      frequency: 2,
+      duration: 30,
+      exercises: [
+        {
+          name: "تدريب التمركز الدفاعي",
+          description: "سيناريوهات الدفاع الظلي مع انتقالات سريعة",
+          difficulty: "intermediate"
+        },
+        {
+          name: "تمرين المراقبة المنطقية",
+          description: "تمرين جماعي يركز على الحفاظ على التشكيل الدفاعي",
+          difficulty: "intermediate"
+        }
+      ]
+    },
+    {
+      id: "tr-003",
+      title: "اتخاذ القرار تحت الضغط",
+      description: "تدريب لتحسين اتخاذ القرار السريع في مواقف اللعب",
+      category: "ذهني",
+      difficulty: 3,
+      estimatedTimeInMinutes: 40,
+      targetAreas: ["اتخاذ القرار", "الثبات"],
+      expectedImprovement: 25,
+      area: "اتخاذ القرار",
+      intensity: "عالية",
+      frequency: 3,
+      duration: 40,
+      exercises: [
+        {
+          name: "ألعاب مصغرة مع قيود",
+          description: "مباريات 3 ضد 3 مع قيود على اللمسات والوقت",
+          difficulty: "advanced"
+        },
+        {
+          name: "جلسات تحليل الفيديو",
+          description: "مراجعة قرارات اللعب مع تعليقات المدرب",
+          difficulty: "beginner"
+        }
+      ]
+    }
+  ];
+};

@@ -1,67 +1,143 @@
 
-import React from "react";
-import { getMovementIcon, calculateImprovement, ensureData } from "./utils";
-import LineChartComponent from "./LineChart";
-import BarChartComponent from "./BarChart";
-import AreaChartComponent from "./AreaChart";
-import ChartInfo, { ChartDescription, ChartImprovementBadge } from "./ChartInfo";
-import { NumberMovementProps, ChartConfigType } from "./types";
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ResponsiveContainer, LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import type { DataPoint } from "../DataTypes";
 
-const NumberMovementChart: React.FC<NumberMovementProps> = ({
+interface NumberMovementChartProps {
+  title: string;
+  data: DataPoint[];
+  type: 'line' | 'bar' | 'area';
+  colors?: {
+    current: string;
+    previous: string;
+    alternative: string;
+  };
+  description?: string;
+}
+
+const DEFAULT_COLORS = {
+  current: "#8B5CF6", // Purple
+  previous: "#9CA3AF", // Gray
+  alternative: "#F97316", // Orange
+};
+
+const NumberMovementChart: React.FC<NumberMovementChartProps> = ({
   title,
   data,
-  type = "line",
-  colors = {
-    current: "#8B5CF6",
-    previous: "#D1D5DB",
-    alternative: "#F97316",
-  },
-  description,
+  type = 'line',
+  colors = DEFAULT_COLORS,
+  description
 }) => {
-  // Process data for charts if empty
-  const chartData = ensureData(data);
-
-  // Create a config object that includes our chart configuration
-  const config: ChartConfigType = {
-    current: { color: colors.current, label: "Current" },
-    previous: { color: colors.previous || "#D1D5DB", label: "Previous" },
-    alternative: { color: colors.alternative || "#F97316", label: "Alternative" },
-    // Adding default property for the index signature requirement
-    default: { color: "#D1D5DB", label: "Default" }
-  };
-
-  // Calculate the average improvement between current and previous
-  const improvement = calculateImprovement(chartData);
-
-  // Render the appropriate chart component based on the type
+  
   const renderChart = () => {
     switch (type) {
-      case "bar":
-        return <BarChartComponent data={chartData} config={config} />;
-      case "area":
-        return <AreaChartComponent data={chartData} config={config} />;
-      case "line":
+      case 'line':
+        return (
+          <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis dataKey="name" />
+            <YAxis domain={[0, 100]} />
+            <Tooltip />
+            <Legend />
+            <Line 
+              type="monotone" 
+              dataKey="current" 
+              name="الحالي" 
+              stroke={colors.current} 
+              strokeWidth={2} 
+              dot={{ r: 4 }} 
+              activeDot={{ r: 6 }} 
+            />
+            <Line 
+              type="monotone" 
+              dataKey="previous" 
+              name="السابق" 
+              stroke={colors.previous} 
+              strokeWidth={2} 
+              strokeDasharray="5 5" 
+              dot={{ r: 3 }} 
+            />
+            <Line 
+              type="monotone" 
+              dataKey="alternative" 
+              name="المستهدف" 
+              stroke={colors.alternative} 
+              strokeWidth={2} 
+              dot={{ r: 3 }} 
+            />
+          </LineChart>
+        );
+        
+      case 'bar':
+        return (
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis dataKey="name" />
+            <YAxis domain={[0, 100]} />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="current" name="الحالي" fill={colors.current} radius={[4, 4, 0, 0]} />
+            <Bar dataKey="previous" name="السابق" fill={colors.previous} radius={[4, 4, 0, 0]} />
+            <Bar dataKey="alternative" name="المستهدف" fill={colors.alternative} radius={[4, 4, 0, 0]} />
+          </BarChart>
+        );
+        
+      case 'area':
+        return (
+          <AreaChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis dataKey="name" />
+            <YAxis domain={[0, 100]} />
+            <Tooltip />
+            <Legend />
+            <Area 
+              type="monotone" 
+              dataKey="current" 
+              name="الحالي" 
+              stroke={colors.current} 
+              fill={`${colors.current}20`} 
+              strokeWidth={2} 
+            />
+            <Area 
+              type="monotone" 
+              dataKey="previous" 
+              name="السابق" 
+              stroke={colors.previous} 
+              fill={`${colors.previous}20`} 
+              strokeWidth={2} 
+              strokeDasharray="5 5" 
+            />
+            <Area 
+              type="monotone" 
+              dataKey="alternative" 
+              name="المستهدف" 
+              stroke={colors.alternative} 
+              fill={`${colors.alternative}20`} 
+              strokeWidth={2} 
+            />
+          </AreaChart>
+        );
+        
       default:
-        return <LineChartComponent data={chartData} config={config} />;
+        return null;
     }
   };
-
+  
   return (
-    <div className="w-full p-4 bg-white rounded-lg shadow-md">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center">
-          <h3 className="text-xl font-semibold">{title}</h3>
-          {chartData.length > 0 && getMovementIcon(chartData[chartData.length - 1].current, chartData[0].current)}
+    <Card>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        {description && <CardDescription>{description}</CardDescription>}
+      </CardHeader>
+      <CardContent>
+        <div className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            {renderChart()}
+          </ResponsiveContainer>
         </div>
-        <ChartImprovementBadge improvement={improvement} />
-      </div>
-
-      <ChartDescription description={description} />
-
-      <div className="h-64 w-full">
-        {renderChart()}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

@@ -6,13 +6,7 @@ import AnalysisHeader from './AnalysisHeader';
 import AnalysisTabs from './AnalysisTabs';
 import MovementPatternsTab from './MovementPatternsTab';
 import PerformanceMetricsTab from './PerformanceMetricsTab';
-import { PerformanceProfile } from '@/components/charts/PerformanceProfile';
-import { PerformanceDistribution } from '@/components/charts/PerformanceDistribution';
-import { OverallStats } from '@/components/charts/OverallStats';
-import { ProgressCharts } from '@/components/charts/ProgressCharts';
-import { ProComparison } from '@/components/charts/ProComparison';
-
-// Import the mock data directly to ensure we have data
+import SimilarPlayersTab from './SimilarPlayersTab';
 import { getMockAnalysis } from '../mockData';
 
 interface AdvancedAnalysisViewProps {
@@ -29,38 +23,6 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
   
   // Combine passed analysis with mock data as fallback
   const combinedAnalysis = analysis || mockData;
-  
-  // Create derived data for charts
-  const speedData = [
-    { name: '0-2 دقيقة', value: 16 },
-    { name: '2-5 دقيقة', value: 18 },
-    { name: '5-10 دقيقة', value: 15 },
-    { name: '10-15 دقيقة', value: 12 },
-    { name: '15+ دقيقة', value: 10 }
-  ];
-  
-  const accelerationData = [
-    { name: 'تسارع قوي', value: 8 },
-    { name: 'تسارع متوسط', value: 15 },
-    { name: 'ثبات', value: 20 },
-    { name: 'تباطؤ متوسط', value: 10 },
-    { name: 'تباطؤ قوي', value: 5 }
-  ];
-  
-  const movementPatternData = [
-    { name: 'الجري السريع', value: 30 },
-    { name: 'الجري المتوسط', value: 45 },
-    { name: 'المشي', value: 15 },
-    { name: 'الوقوف', value: 10 }
-  ];
-  
-  const energyEfficiencyData = [
-    { name: '0-10 دقيقة', value: 90 },
-    { name: '10-20 دقيقة', value: 85 },
-    { name: '20-30 دقيقة', value: 75 },
-    { name: '30-40 دقيقة', value: 70 },
-    { name: '40+ دقيقة', value: 65 }
-  ];
   
   // Convert the movement data to an array format as expected by PerformanceMetricsTab
   const movementDataArray = [
@@ -81,17 +43,30 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
     { name: 'سرعة قصوى', percentage: 10, color: '#EC4899' }
   ];
   
-  // Create a mock player stats object for the charts
-  const playerStats = {
-    avgSpeed: 12.5,
-    maxSpeed: 22.3,
-    avgAcceleration: 3.2,
-    distanceCovered: 1250,
-    balanceScore: 68,
-    technicalScore: 75,
-    physicalScore: 82,
-    movementEfficiency: 79
-  };
+  // Create a list of professional players similar to the current player
+  const professionalPlayers = [
+    {
+      name: "Kevin De Bruyne",
+      team: "Manchester City",
+      position: "Midfielder",
+      match: 78,
+      strengths: ["Vision", "Passing Range", "Set Pieces"]
+    },
+    {
+      name: "Toni Kroos",
+      team: "Real Madrid",
+      position: "Midfielder",
+      match: 72,
+      strengths: ["Ball Control", "Positional Awareness", "Long Passing"]
+    },
+    {
+      name: "Marco Verratti",
+      team: "PSG",
+      position: "Midfielder",
+      match: 68,
+      strengths: ["Dribbling", "Close Control", "Pressing Resistance"]
+    }
+  ];
   
   useEffect(() => {
     // Display toast when the component mounts to confirm loading
@@ -101,8 +76,7 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
     });
     
     console.log("Advanced analysis view mounted with data:", combinedAnalysis);
-    console.log("Movement data array:", movementDataArray);
-  }, [toast, combinedAnalysis, movementDataArray]);
+  }, [toast, combinedAnalysis]);
   
   return (
     <div className="space-y-6 animate-fade-in">
@@ -111,18 +85,7 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
       <AnalysisTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <TabsContent value="patterns" className="mt-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <PerformanceProfile playerStats={playerStats} playerName={combinedAnalysis?.playerName || "اللاعب"} />
-          <PerformanceDistribution playerStats={playerStats} />
-          <OverallStats playerStats={playerStats} />
-          <ProComparison playerStats={playerStats} playerPosition={combinedAnalysis?.position} />
-        </div>
-        <div className="mt-6">
-          <h2 className="text-2xl font-bold mb-4">تطور الأداء</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <ProgressCharts />
-          </div>
-        </div>
+        <MovementPatternsTab analysis={combinedAnalysis} />
       </TabsContent>
 
       <TabsContent value="metrics" className="mt-4">
@@ -130,6 +93,14 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
           movementData={movementDataArray}
           speedZones={speedZones}
           analysis={combinedAnalysis}
+        />
+      </TabsContent>
+      
+      <TabsContent value="comparisons" className="mt-4">
+        <SimilarPlayersTab
+          playerName={combinedAnalysis.playerName}
+          professionalPlayers={professionalPlayers}
+          playerPosition={combinedAnalysis.position}
         />
       </TabsContent>
     </div>
