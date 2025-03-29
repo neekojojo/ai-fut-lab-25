@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { fetchPlayerAnalysisById, fetchPlayerAnalyses } from '@/services/playerAnalysisService';
 import { getMockAnalysis } from '@/components/player-analysis/mockData';
+import { InjuryRiskArea } from '@/types/injuries';
 
 const AdvancedAnalysis: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -38,14 +39,19 @@ const AdvancedAnalysis: React.FC = () => {
           const currentAnalysis = await fetchPlayerAnalysisById(id);
           if (currentAnalysis) {
             console.log("Analysis found:", currentAnalysis);
-            setAnalysis(currentAnalysis as PlayerAnalysis);
+            
+            // Transform injuryRisk.areas if it's not an array
+            const transformedAnalysis = transformAnalysisData(currentAnalysis);
+            
+            setAnalysis(transformedAnalysis as PlayerAnalysis);
             
             // Try to fetch previous analyses
             try {
               const allAnalyses = await fetchPlayerAnalyses();
               const previousPlayerAnalyses = allAnalyses
                 .filter((a: any) => a.id !== id && a.playerId === currentAnalysis.playerId)
-                .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+                .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                .map(transformAnalysisData);
               
               setPreviousAnalyses(previousPlayerAnalyses as PlayerAnalysis[]);
             } catch (e) {
@@ -68,6 +74,29 @@ const AdvancedAnalysis: React.FC = () => {
     
     fetchData();
   }, [id, toast]);
+  
+  // Transform the analysis data to ensure injuryRisk.areas is an array
+  const transformAnalysisData = (data: any): PlayerAnalysis => {
+    // Make a deep copy to avoid mutating the original
+    const transformed = { ...data };
+    
+    // If injuryRisk exists but areas is not an array, transform it
+    if (transformed.injuryRisk && transformed.injuryRisk.areas && !Array.isArray(transformed.injuryRisk.areas)) {
+      const areasObj = transformed.injuryRisk.areas;
+      const areasArray: InjuryRiskArea[] = Object.entries(areasObj).map(([name, risk]) => ({
+        name,
+        risk: risk as number,
+        recommendation: `Focus on ${name} strengthening and recovery exercises`
+      }));
+      
+      transformed.injuryRisk = {
+        ...transformed.injuryRisk,
+        areas: areasArray
+      };
+    }
+    
+    return transformed as PlayerAnalysis;
+  };
   
   const handleBack = () => {
     console.log("Navigating back");

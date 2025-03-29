@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { PlayerAnalysis } from '@/types/playerAnalysis';
 import { Progress } from '@/components/ui/progress';
-import { Euro, Trophy, Users } from 'lucide-react';
+import { Euro, Trophy, Users, Check } from 'lucide-react';
 
 interface AdvancedPlayerReportPanelProps {
   analysis: PlayerAnalysis;
@@ -60,7 +59,6 @@ const AdvancedPlayerReportPanel: React.FC<AdvancedPlayerReportPanelProps> = ({ a
     { name: 'Teamwork', value: 60 }
   ];
 
-  // المقارنة مع لاعب محترف
   const proComparison = {
     name: 'Alisson Becker',
     similarity: 41,
@@ -78,7 +76,6 @@ const AdvancedPlayerReportPanel: React.FC<AdvancedPlayerReportPanelProps> = ({ a
     ]
   };
 
-  // خطة التدريب المخصصة
   const trainingPlan = {
     technical: {
       title: 'Day 1-2: Technical',
