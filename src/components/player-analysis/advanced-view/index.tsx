@@ -69,16 +69,6 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
     { timestamp: 8, speed: 16.3, acceleration: -2.6 }
   ];
   
-  // Add the movement metrics as separate properties for reference
-  const movementMetrics = {
-    avgSpeed: 15.2,
-    maxSpeed: 28.4,
-    totalDistance: 7.6,
-    sprintCount: 12,
-    directionChanges: 48,
-    accelerationCount: 24
-  };
-  
   const speedZones = [
     { name: 'مشي', percentage: 20, color: '#10B981' },
     { name: 'جري خفيف', percentage: 45, color: '#6366F1' },

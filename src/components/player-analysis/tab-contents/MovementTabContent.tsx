@@ -6,13 +6,13 @@ import { ExternalLink } from "lucide-react";
 
 interface MovementTabContentProps {
   analysis: any;
-  onViewAdvanced: () => void;
+  onViewAdvanced?: () => void;
 }
 
 const MovementTabContent: React.FC<MovementTabContentProps> = ({ analysis, onViewAdvanced }) => {
-  // Handle button click for advanced movement analysis
+  // معالج نقر زر التحليل المتقدم للحركة
   const handleAdvancedView = () => {
-    console.log("Advanced movement analysis button clicked");
+    console.log("تم النقر على زر التحليل المتقدم للحركة");
     if (onViewAdvanced) {
       onViewAdvanced();
     }
@@ -21,17 +21,20 @@ const MovementTabContent: React.FC<MovementTabContentProps> = ({ analysis, onVie
   return (
     <div className="space-y-6">
       <MovementPanel analysis={analysis} />
-      <div className="text-center mt-6">
-        <Button 
-          onClick={handleAdvancedView} 
-          variant="outline" 
-          className="gap-2 px-6 py-2"
-          size="lg"
-        >
-          <ExternalLink className="h-4 w-4 mr-1 rtl:ml-1 rtl:mr-0" />
-          عرض تحليل الحركة المتقدم
-        </Button>
-      </div>
+      
+      {onViewAdvanced && (
+        <div className="text-center mt-6">
+          <Button 
+            onClick={handleAdvancedView} 
+            variant="outline" 
+            className="gap-2 px-6 py-2"
+            size="lg"
+          >
+            <ExternalLink className="h-4 w-4 mr-1 rtl:ml-1 rtl:mr-0" />
+            عرض تحليل الحركة المتقدم
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
