@@ -3,8 +3,8 @@ import React from 'react';
 import { Line, Bar } from 'recharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MovementAnalysisChart } from "@/components/player-movement/MovementAnalysisChart";
-import { EnhancedMovementChart } from "@/components/player-movement/EnhancedMovementChart";
+import MovementAnalysisChart from "@/components/player-movement/MovementAnalysisChart";
+import EnhancedMovementChart from "@/components/player-movement/EnhancedMovementChart";
 
 interface PerformanceMetricsTabProps {
   movementData: { timestamp: number; speed: number; acceleration: number; }[];
