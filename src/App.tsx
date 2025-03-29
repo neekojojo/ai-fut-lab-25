@@ -13,21 +13,23 @@ import '@/App.css';
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="fut-lab-theme">
-      <AuthProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/advanced-analysis/:id" element={<AdvancedAnalysis />} />
-            <Route path="/sign-in" element={<SignIn />} />
-            <Route path="/sign-up" element={<SignUp />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Router>
-        <Toaster />
-      </AuthProvider>
-    </ThemeProvider>
+    <React.StrictMode>
+      <ThemeProvider defaultTheme="dark" storageKey="fut-lab-theme">
+        <AuthProvider>
+          <Router>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/advanced-analysis/:id" element={<AdvancedAnalysis />} />
+              <Route path="/sign-in" element={<SignIn />} />
+              <Route path="/sign-up" element={<SignUp />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Router>
+          <Toaster />
+        </AuthProvider>
+      </ThemeProvider>
+    </React.StrictMode>
   );
 }
 
