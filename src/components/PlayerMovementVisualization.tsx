@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { PlayerPosition } from '@/utils/videoDetection/types';
+import { CHART_COLORS } from '@/components/charts/constants';
 
 interface PlayerMovementVisualizationProps {
   playerPositions: PlayerPosition[];
@@ -157,23 +158,31 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
     
     // Function to draw text with enhanced visibility
     const drawTextWithBackground = (text: string, x: number, y: number, isHighlighted: boolean = false) => {
-      // الخلفية السوداء مع حدود متوهجة
-      ctx.fillStyle = isHighlighted ? "rgba(34, 211, 238, 0.3)" : "rgba(0, 0, 0, 0.9)";
-      const padding = 8;
-      const textWidth = ctx.measureText(text).width;
-      ctx.shadowColor = isHighlighted ? 'rgba(34, 211, 238, 0.7)' : 'rgba(255, 255, 255, 0.5)';
-      ctx.shadowBlur = 10;
-      ctx.fillRect(x - padding, y - 20, textWidth + padding * 2, 28);
-      ctx.strokeStyle = isHighlighted ? "#22D3EE" : "#FFFFFF";
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(x - padding, y - 20, textWidth + padding * 2, 28);
+      // تحسين مظهر خلفية النص - استخدام خلفية سوداء داكنة مع حدود متوهجة ملونة
+      const bgColor = isHighlighted ? "rgba(34, 211, 238, 0.85)" : "rgba(0, 0, 0, 0.85)";
+      const borderColor = isHighlighted ? "#22D3EE" : CHART_COLORS.highlight;
+      const textColor = "#FFFFFF"; // دائمًا نص أبيض للتباين العالي
       
-      // النص الأبيض
-      ctx.shadowColor = 'transparent';
+      const padding = 10;
+      const textWidth = ctx.measureText(text).width;
+      const textHeight = 24;
+      
+      // رسم الخلفية مع التوهج
+      ctx.shadowColor = isHighlighted ? 'rgba(34, 211, 238, 0.8)' : 'rgba(244, 113, 181, 0.7)';
+      ctx.shadowBlur = 15;
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(x - padding, y - textHeight, textWidth + padding * 2, textHeight + padding/2);
+      
+      // رسم الحدود الخارجية
       ctx.shadowBlur = 0;
-      ctx.fillStyle = isHighlighted ? "#FFFFFF" : "#FFFFFF";
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x - padding, y - textHeight, textWidth + padding * 2, textHeight + padding/2);
+      
+      // رسم النص بلون أبيض ساطع
+      ctx.fillStyle = textColor;
       ctx.font = "bold 16px Arial";
-      ctx.fillText(text, x, y);
+      ctx.fillText(text, x, y - 4);
     };
     
     // Draw frame number and timestamp with enhanced visibility
@@ -233,22 +242,26 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
             </button>
           </div>
           
-          <div className="bg-gray-900/70 p-3 rounded-lg">
+          <div className="bg-gray-900/90 p-4 rounded-lg border border-primary/30">
             <input
               type="range"
               min="0"
               max={playerPositions.length - 1}
               value={currentFrame}
               onChange={handleSliderChange}
-              className="w-full accent-primary h-2.5"
+              className="w-full accent-primary h-3"
             />
             
-            <div className="text-center text-sm text-white mt-3 bg-black/50 py-2 rounded-md border border-primary/20">
+            <div className="text-center text-white mt-4 bg-black/80 py-3 rounded-md border border-primary/30 shadow-[0_0_10px_rgba(139,92,246,0.2)]">
               {playerPositions.length > 0 && (
-                <>
-                  <span className="font-bold text-primary">الإطار الحالي:</span>{' '}
-                  <span className="inline-block min-w-10 bg-primary/10 px-2 py-0.5 rounded-md">{currentFrame + 1}</span> / {playerPositions.length}
-                </>
+                <div className="flex items-center justify-center">
+                  <span className="font-bold text-primary ml-2">الإطار الحالي:</span>
+                  <span className="inline-block min-w-10 bg-primary/20 px-3 py-1 rounded-md text-white font-bold">
+                    {currentFrame + 1}
+                  </span>
+                  <span className="mx-2 text-gray-400">/</span>
+                  <span className="text-white">{playerPositions.length}</span>
+                </div>
               )}
             </div>
           </div>
