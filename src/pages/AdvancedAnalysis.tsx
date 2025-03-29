@@ -29,7 +29,9 @@ const AdvancedAnalysis: React.FC = () => {
         if (!id) {
           console.log("No ID provided, using mock data");
           const mockData = getMockAnalysis();
-          setAnalysis(mockData.analysis as PlayerAnalysis);
+          // Transform mock data to ensure proper structure
+          const transformedMockAnalysis = transformAnalysisData(mockData.analysis);
+          setAnalysis(transformedMockAnalysis);
           setPreviousAnalyses([]);
           return;
         }
@@ -43,7 +45,7 @@ const AdvancedAnalysis: React.FC = () => {
             // Transform injuryRisk.areas if it's not an array
             const transformedAnalysis = transformAnalysisData(currentAnalysis);
             
-            setAnalysis(transformedAnalysis as PlayerAnalysis);
+            setAnalysis(transformedAnalysis);
             
             // Try to fetch previous analyses
             try {
@@ -53,7 +55,7 @@ const AdvancedAnalysis: React.FC = () => {
                 .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
                 .map(transformAnalysisData);
               
-              setPreviousAnalyses(previousPlayerAnalyses as PlayerAnalysis[]);
+              setPreviousAnalyses(previousPlayerAnalyses);
             } catch (e) {
               console.warn("Could not fetch previous analyses:", e);
               setPreviousAnalyses([]);
@@ -64,7 +66,9 @@ const AdvancedAnalysis: React.FC = () => {
           // Use mock data as fallback
           console.log("Using mock data as fallback");
           const mockData = getMockAnalysis();
-          setAnalysis(mockData.analysis as PlayerAnalysis);
+          // Transform mock data to ensure proper structure
+          const transformedMockAnalysis = transformAnalysisData(mockData.analysis);
+          setAnalysis(transformedMockAnalysis);
           setPreviousAnalyses([]);
         }
       } finally {
