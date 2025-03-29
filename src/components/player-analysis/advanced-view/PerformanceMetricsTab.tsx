@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Line, Bar } from 'recharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -36,23 +35,43 @@ const PerformanceMetricsTab: React.FC<PerformanceMetricsTabProps> = ({
 
   // Create mock enhanced movement data for the EnhancedMovementChart
   const mockEnhancedMovement = {
+    // Basic movement analysis properties (required by EnhancedMovementAnalysis type)
+    totalDistance: totalDistance,
+    averageSpeed: avgSpeed,
     maxSpeed: maxSpeed,
-    stamina: Math.floor(75 + Math.random() * 20),
-    consistency: Math.floor(70 + Math.random() * 25),
+    directionChanges: 12,
     movementEfficiency: Math.floor(65 + Math.random() * 30),
     maxAcceleration: Math.max(...movementData.map(point => point.acceleration || 0)),
+    
+    // Speed zones matching the format in MovementAnalysisResult
+    speedZones: {
+      walking: speedZonesObject.walking / 100,
+      jogging: speedZonesObject.jogging / 100,
+      running: speedZonesObject.running / 100,
+      sprinting: speedZonesObject.sprinting / 100
+    },
+    
+    // Enhanced properties
+    stamina: Math.floor(75 + Math.random() * 20),
+    consistency: Math.floor(70 + Math.random() * 25),
     tacticaAwareness: Math.floor(60 + Math.random() * 30),
     recoverySpeed: 7.5 + Math.random() * 2,
+    
+    // Directional data
     directionalData: {
       forward: 0.6,
       backward: 0.15,
       sideways: 0.25
     },
+    
+    // Acceleration profile
     accelerationProfile: {
       explosive: 0.35,
       sustained: 0.45,
       deceleration: 0.2
     },
+    
+    // Positional heatmap
     positionalHeatmap: [
       { x: 30, y: 40, value: 0.8 },
       { x: 40, y: 30, value: 0.7 },
@@ -60,7 +79,10 @@ const PerformanceMetricsTab: React.FC<PerformanceMetricsTabProps> = ({
       { x: 70, y: 30, value: 0.5 },
       { x: 20, y: 60, value: 0.7 },
       { x: 50, y: 70, value: 0.4 }
-    ]
+    ],
+    
+    // Adding sprintCount property which appears to be needed
+    sprintCount: 5
   };
 
   return (
