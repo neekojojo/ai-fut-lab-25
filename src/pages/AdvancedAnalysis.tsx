@@ -44,8 +44,8 @@ const AdvancedAnalysis: React.FC = () => {
             try {
               const allAnalyses = await fetchPlayerAnalyses();
               const previousPlayerAnalyses = allAnalyses
-                .filter(a => a.id !== id && a.playerId === currentAnalysis.playerId)
-                .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+                .filter((a: any) => a.id !== id && a.playerId === currentAnalysis.playerId)
+                .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
               
               setPreviousAnalyses(previousPlayerAnalyses);
             } catch (e) {

@@ -6,6 +6,11 @@ import AnalysisHeader from './AnalysisHeader';
 import AnalysisTabs from './AnalysisTabs';
 import MovementPatternsTab from './MovementPatternsTab';
 import PerformanceMetricsTab from './PerformanceMetricsTab';
+import { PerformanceProfile } from '@/components/charts/PerformanceProfile';
+import { PerformanceDistribution } from '@/components/charts/PerformanceDistribution';
+import { OverallStats } from '@/components/charts/OverallStats';
+import { ProgressCharts } from '@/components/charts/ProgressCharts';
+import { ProComparison } from '@/components/charts/ProComparison';
 
 // Import the mock data directly to ensure we have data
 import { getMockAnalysis } from '../mockData';
@@ -76,6 +81,18 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
     { name: 'سرعة قصوى', percentage: 10, color: '#EC4899' }
   ];
   
+  // Create a mock player stats object for the charts
+  const playerStats = {
+    avgSpeed: 12.5,
+    maxSpeed: 22.3,
+    avgAcceleration: 3.2,
+    distanceCovered: 1250,
+    balanceScore: 68,
+    technicalScore: 75,
+    physicalScore: 82,
+    movementEfficiency: 79
+  };
+  
   useEffect(() => {
     // Display toast when the component mounts to confirm loading
     toast({
@@ -94,12 +111,18 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
       <AnalysisTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <TabsContent value="patterns" className="mt-4">
-        <MovementPatternsTab 
-          speedData={speedData}
-          accelerationData={accelerationData}
-          movementPatternData={movementPatternData}
-          energyEfficiencyData={energyEfficiencyData}
-        />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <PerformanceProfile playerStats={playerStats} playerName={combinedAnalysis?.playerName || "اللاعب"} />
+          <PerformanceDistribution playerStats={playerStats} />
+          <OverallStats playerStats={playerStats} />
+          <ProComparison playerStats={playerStats} playerPosition={combinedAnalysis?.position} />
+        </div>
+        <div className="mt-6">
+          <h2 className="text-2xl font-bold mb-4">تطور الأداء</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ProgressCharts />
+          </div>
+        </div>
       </TabsContent>
 
       <TabsContent value="metrics" className="mt-4">
