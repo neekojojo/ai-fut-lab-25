@@ -36,16 +36,16 @@ const EyeTrackingVisualization: React.FC<EyeTrackingVisualizationProps> = ({ eye
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          <div className="relative w-full h-64 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden mb-4">
+          <div className="relative w-full h-64 bg-black dark:bg-black rounded-lg overflow-hidden mb-4">
             {/* Field representation */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-5/6 h-4/5 border-2 border-gray-300 dark:border-gray-600 rounded-lg"></div>
-              <div className="absolute w-1/2 h-4/5 border-r-2 border-gray-300 dark:border-gray-600"></div>
+              <div className="w-5/6 h-4/5 border-2 border-gray-300 dark:border-gray-300 rounded-lg"></div>
+              <div className="absolute w-1/2 h-4/5 border-r-2 border-gray-300 dark:border-gray-300"></div>
               <div className="absolute left-[8.3%] w-[16.7%] h-4/5 flex items-center">
-                <div className="w-full h-1/2 border-2 border-gray-300 dark:border-gray-600 rounded-lg"></div>
+                <div className="w-full h-1/2 border-2 border-gray-300 dark:border-gray-300 rounded-lg"></div>
               </div>
               <div className="absolute right-[8.3%] w-[16.7%] h-4/5 flex items-center">
-                <div className="w-full h-1/2 border-2 border-gray-300 dark:border-gray-600 rounded-lg"></div>
+                <div className="w-full h-1/2 border-2 border-gray-300 dark:border-gray-300 rounded-lg"></div>
               </div>
             </div>
             
@@ -85,7 +85,7 @@ const EyeTrackingVisualization: React.FC<EyeTrackingVisualizationProps> = ({ eye
               </g>
             </svg>
             
-            <div className="absolute bottom-2 right-2 bg-white dark:bg-gray-950 p-1 rounded text-xs opacity-70">
+            <div className="absolute bottom-2 right-2 bg-black text-white p-1 rounded text-xs opacity-70">
               خريطة حركة العين
             </div>
           </div>

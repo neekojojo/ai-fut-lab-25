@@ -7,10 +7,10 @@ export const CHART_COLORS = {
   quaternary: '#10B981',  // Vibrant Green
   negative: '#EF4444',    // Bright Red
   positive: '#22C55E',    // Bright Green
-  neutral: '#9CA3AF',     // Medium Gray
+  neutral: '#FFFFFF',     // White for better visibility
   highlight: '#D946EF',   // Magenta Pink
-  background: '#F1F0FB',  // Light purple/gray
-  text: '#1A1F2C',        // Dark blue/black
+  background: '#000000',  // Black background
+  text: '#FFFFFF',        // White text
   
   // إضافة الألوان المفقودة
   blue: '#0EA5E9',        // نفس لون tertiary

@@ -125,8 +125,9 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Clear canvas with black background
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     // Get current position data
     const position = playerPositions[currentFrame];
@@ -136,15 +137,14 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
     drawSkeleton(ctx, position.keypoints);
     drawKeypoints(ctx, position.keypoints);
     
-    // Draw frame info with improved visibility
-    // Add background for text to improve readability
+    // Improved text visibility with dark background and white text
     const drawTextWithBackground = (text: string, x: number, y: number) => {
-      // Draw background rectangle
-      ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+      // Draw black background rectangle with higher opacity
+      ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
       const textWidth = ctx.measureText(text).width;
       ctx.fillRect(x - 4, y - 20, textWidth + 8, 26);
       
-      // Draw text with high contrast
+      // Draw white text with larger font
       ctx.fillStyle = "#FFFFFF";
       ctx.font = "bold 16px Arial";
       ctx.fillText(text, x, y);
@@ -187,7 +187,7 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
         <CardTitle>تحليل حركة اللاعب</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-center">
-        <div className="relative border rounded-md w-full max-w-[600px] aspect-[3/2] bg-gray-900">
+        <div className="relative border rounded-md w-full max-w-[600px] aspect-[3/2] bg-black">
           <canvas 
             ref={canvasRef} 
             className="w-full h-full"
@@ -227,4 +227,3 @@ const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = 
 };
 
 export default PlayerMovementVisualization;
-
