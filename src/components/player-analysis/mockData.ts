@@ -1,4 +1,3 @@
-
 import { faker } from '@faker-js/faker';
 import { ProgressData } from '@/types/progress';
 
@@ -109,7 +108,7 @@ export const getMockAnalysis = () => {
       "التمرير تحت الضغط"
     ],
     tacticalAnalysis: "يتميز اللاعب بقدرته على إنهاء الهجمات بكفاءة عالية، مع معدل تهديفي مميز من الفرص المتاحة. يُظهر ذكاءً في التمركز واستغلال المساحات داخل منطقة الجزاء. يحتاج إلى تحسين مستوى الضغط على الخصم عند فقدان الكرة والمساهمة في بناء الهجمات من العمق.",
-    movementAnalysis: "يتميز اللاعب بحركة سلسة وانفجارية في الثلث الأخير، مع قدرة جيدة على التسارع في المسافات القصيرة. يُظهر مهارة في تغيير الاتجاه بسرعة للتخلص من الرقابة. يميل إلى التمركز المتقدم وعدم المشاركة كثيراً في بناء الهجمات من الخلف.",
+    movementAnalysis: "يتميز اللاعب بحركة سلسة وانفجارية في الثلث الأخير، مع قدرة جيدة على التسارع في الم��افات القصيرة. يُظهر مهارة في تغيير الاتجاه بسرعة للتخلص من الرقابة. يميل إلى التمركز المتقدم وعدم المشاركة كثيراً في بناء الهجمات من الخلف.",
     futurePotential: "يمتلك اللاعب إمكانيات عالية للتطور كمهاجم متكامل إذا عمل على تحسين المساهمة الدفاعية والحركة بدون كرة. بقدراته التهديفية الحالية وذكائه التكتيكي، يمكنه أن يصبح من أفضل المهاجمين محلياً وربما الانتقال للعب في دوريات أقوى مستقبلاً."
   };
 
@@ -134,9 +133,11 @@ export const getMockAnalysis = () => {
     futurePotential: "بقدراته التقنية العالية ورؤيته الكروية المميزة، يمتلك اللاعب إمكانات كبيرة للتطور كصانع ألعاب أو لاعب وسط متكامل. إذا طور جوانبه الدفاعية وقدرته على الاحتفاظ بالكرة تحت الضغط، يمكن أن يصل إلى مستويات عالية ويلعب دوراً محورياً في الفريق."
   };
   
-  // Choose insights based on position
+  // Choose insights based on position - Fix the position comparison by casting to string
   let positionInsights;
-  if (position.includes('هجوم') || position === 'مهاجم' || position === 'جناح') {
+  // Fix: Cast position string to be compatible for comparison
+  const positionStr = String(position).toLowerCase();
+  if (positionStr.includes('هجوم') || positionStr === 'مهاجم' || positionStr === 'جناح') {
     positionInsights = forwardInsights;
   } else {
     positionInsights = midfielderInsights; // Default to midfielder insights
