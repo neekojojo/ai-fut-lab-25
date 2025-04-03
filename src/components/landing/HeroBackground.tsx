@@ -15,7 +15,7 @@ const HeroBackground: React.FC<HeroBackgroundProps> = ({ imageSrc, className = "
           <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/50 to-background z-20"></div>
           <img 
             src={imageSrc} 
-            alt="Football stadium"
+            alt=""
             className="absolute inset-0 h-[120%] w-[120%] object-cover opacity-60 animate-parallax-slow transform-gpu"
             style={{ transformOrigin: 'center center' }}
           />
