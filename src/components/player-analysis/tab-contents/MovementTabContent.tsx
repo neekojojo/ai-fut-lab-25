@@ -1,10 +1,11 @@
 
 import React from 'react';
-import PositionSpecificAnalysis from '@/components/player-movement/PositionSpecificAnalysis';
+import { Card } from '@/components/ui/card';
+import { PlayerMovementVisualization } from '@/components/PlayerMovementVisualization';
 import EnhancedMovementChart from '@/components/player-movement/EnhancedMovementChart';
-import { Button } from '@/components/ui/button';
-import { Grid2X2 } from 'lucide-react';
-import PlayerHeatMapPanel from '../PlayerHeatMapPanel';
+import PositionSpecificAnalysis from '@/components/player-movement/PositionSpecificAnalysis';
+import AchievementBadges from '@/components/player-analysis/AchievementBadges';
+import { determineEarnedBadges } from '@/utils/analysis/badgeService';
 
 interface MovementTabContentProps {
   analysis: any;
@@ -12,74 +13,35 @@ interface MovementTabContentProps {
 }
 
 const MovementTabContent: React.FC<MovementTabContentProps> = ({ analysis, onViewAdvanced }) => {
-  // Mock data for testing (with totalDistance and other missing fields added)
-  const mockEnhancedMovement = {
-    maxSpeed: 82,
-    avgSpeed: 65,
-    maxAcceleration: 76,
-    avgAcceleration: 62,
-    stamina: 78,
-    consistency: 72,
-    movementEfficiency: 75,
-    tacticaAwareness: 82, 
-    recoverySpeed: 70,
-    accelerationProfile: {
-      explosive: 0.45,
-      sustained: 0.35,
-      deceleration: 0.2
-    },
-    directionalData: {
-      forward: 0.6,
-      backward: 0.1,
-      sideways: 0.3
-    },
-    positionalHeatmap: [
-      {x: 20, y: 30, value: 0.8},
-      {x: 30, y: 40, value: 0.7},
-      {x: 40, y: 50, value: 0.9},
-      {x: 60, y: 20, value: 0.5},
-      {x: 70, y: 60, value: 0.3},
-      {x: 80, y: 40, value: 0.6},
-    ],
-    // Adding missing properties required by EnhancedMovementAnalysis type
-    totalDistance: 8500,
-    averageSpeed: 12.3,
-    directionChanges: 52,
-    speedZones: {
-      walking: 0.25,
-      jogging: 0.40,
-      running: 0.25,
-      sprinting: 0.10
-    },
-    zoneTransitions: {
-      defensiveToOffensive: 15,
-      offensiveToDefensive: 12,
-      effectiveness: 75
-    },
-    technicalConsistency: 78
+  // المتغيرات الخاصة بالحركة المحسنة
+  const enhancedMovement = {
+    maxSpeed: analysis.physicalMetrics?.maxSpeed || 78,
+    avgSpeed: analysis.physicalMetrics?.avgSpeed || 72,
+    maxAcceleration: analysis.physicalMetrics?.maxAcceleration || 81,
+    avgAcceleration: analysis.physicalMetrics?.avgAcceleration || 75,
+    stamina: analysis.physicalMetrics?.stamina || 80,
+    consistency: analysis.physicalMetrics?.consistency || 76,
+    movementEfficiency: analysis.physicalMetrics?.efficiency || 82,
+    tacticaAwareness: analysis.physicalMetrics?.awareness || 73,
+    recoverySpeed: analysis.physicalMetrics?.recovery || 79
   };
-
+  
+  // تحديد الشارات بناءً على التحليل
+  const earnedBadges = determineEarnedBadges(analysis);
+  
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <PositionSpecificAnalysis position={analysis.position || 'Forward'} />
-        <PlayerHeatMapPanel 
-          heatmapData={analysis.heatmap?.map(point => ({ 
-            x: point.x, 
-            y: point.y, 
-            intensity: point.value || point.intensity || 0.5 
-          }))}
-        />
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <PlayerMovementVisualization data={analysis} />
       
-      <EnhancedMovementChart enhancedMovement={mockEnhancedMovement} />
+      <EnhancedMovementChart enhancedMovement={enhancedMovement} />
       
-      <div className="flex justify-center mt-4">
-        <Button onClick={onViewAdvanced} className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
-          <Grid2X2 className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
-          عرض التحليل المتقدم للحركة
-        </Button>
-      </div>
+      <PositionSpecificAnalysis position={analysis.position || 'وسط'} />
+      
+      {/* إضافة مكون الشارات والإنجازات */}
+      <AchievementBadges 
+        playerName={analysis.playerName} 
+        badges={earnedBadges} 
+      />
     </div>
   );
 };

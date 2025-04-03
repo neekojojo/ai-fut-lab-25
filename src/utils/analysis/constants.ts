@@ -1,181 +1,76 @@
-// If this file exists, only append to it. If not, create it.
 
-export const ANALYSIS_STAGES = [
-  "استخراج إطارات الفيديو",
-  "تحليل حركة اللاعب",
-  "تقييم المهارات الفنية",
-  "حساب المؤشرات التكتيكية",
-  "مقارنة مع بيانات اللاعبين المحترفين",
-  "تكامل مع أنظمة FIFA وTransfermarkt"
-];
+import type { PlayerAnalysis } from "@/components/AnalysisReport.d";
+import { Badge } from "@/types/badges";
 
-export const EXTERNAL_SYSTEMS = {
-  FIFA: {
-    name: "FIFA API",
-    description: "واجهة برمجة التطبيقات الرسمية لـ FIFA للوصول إلى إحصائيات اللاعبين والأندية والبطولات",
-    endpoint: "https://api.fifa.com/api/v3",
-    dataTypes: ["player_stats", "team_rankings", "tournament_data"]
-  },
-  TRANSFER_MARKET: {
-    name: "Transfermarkt API",
-    description: "واجهة برمجة التطبيقات لتحليل سوق انتقالات اللاعبين والقيم السوقية",
-    endpoint: "https://api.transfermarkt.com/v1",
-    dataTypes: ["market_value", "transfer_history", "contract_details"]
-  },
-  OPTA: {
-    name: "Opta Sports API",
-    description: "منصة تحليلية متخصصة في إحصائيات كرة القدم",
-    endpoint: "https://api.optasports.com/v1",
-    dataTypes: ["detailed_match_stats", "player_performance", "tactical_analysis"]
-  },
-  PERFORMANCE_OPTIONS: {
-    WEBGL: "استخدام WebGL لتسريع المعالجة البصرية",
-    CACHING: "تخزين البيانات مؤقتًا لتحسين الأداء",
-    BATCH_PROCESSING: "معالجة الفيديو على دفعات لتحسين الكفاءة",
-    PARALLEL_COMPUTING: "الحساب المتوازي لتحليل الفيديو"
-  }
-};
+interface BadgeDefinition {
+  name: string;
+  description: string;
+  level: "bronze" | "silver" | "gold";
+  unlockCondition: (analysis: PlayerAnalysis) => boolean;
+}
 
-export const CACHE_DURATION = {
-  SHORT: 15, // 15 minutes
-  MEDIUM: 60, // 1 hour
-  LONG: 1440, // 24 hours
-  VERY_LONG: 10080 // 1 week
-};
-
-// Detailed stages array for progress tracking
-export const DETAILED_STAGES = [
-  "بدء تحليل الفيديو",
-  "استخراج إطارات الفيديو",
-  "اكتشاف وتتبع اللاعبين",
-  "تحليل حركة اللاعب",
-  "تقييم المهارات الفنية",
-  "حساب مؤشرات اللياقة البدنية",
-  "تحليل القدرات التكتيكية",
-  "مقارنة مع بيانات اللاعبين المحترفين",
-  "تحليل نقاط القوة والضعف",
-  "التكامل مع بيانات FIFA",
-  "تحليل القيمة السوقية",
-  "تكامل مع منصات التحليل الخارجية",
-  "إنشاء التقرير النهائي"
-];
-
-// Adding the missing PROFESSIONAL_PLAYERS constant
-export const PROFESSIONAL_PLAYERS = [
+export const AVAILABLE_BADGES: BadgeDefinition[] = [
   {
-    name: "Cristiano Ronaldo",
-    position: "Forward",
-    skills: ["Finishing", "Aerial ability", "Long shots", "Speed", "Power"],
-    style: "Direct, athletic forward with exceptional finishing ability"
+    name: "التحليل الأول",
+    description: "أكمل أول تحليل للاعب بنجاح",
+    level: "bronze",
+    unlockCondition: () => true, // دائمًا متاح للتحليل الأول
   },
   {
-    name: "Lionel Messi",
-    position: "Forward",
-    skills: ["Dribbling", "Vision", "Finishing", "Free kicks", "Ball control"],
-    style: "Technical, creative playmaker with incredible close control"
+    name: "تقنية متميزة",
+    description: "حصل على تقييم عالٍ في المهارات التقنية",
+    level: "silver",
+    unlockCondition: (analysis) => (analysis.performance?.technical || 0) >= 85,
   },
   {
-    name: "Kevin De Bruyne",
-    position: "Midfielder",
-    skills: ["Passing", "Vision", "Long shots", "Set pieces", "Work rate"],
-    style: "Complete midfielder with exceptional passing range and creativity"
+    name: "سرعة فائقة",
+    description: "سجل قيم سرعة استثنائية في التحليل",
+    level: "bronze",
+    unlockCondition: (analysis) => (analysis.stats?.pace || 0) >= 80,
   },
   {
-    name: "Virgil van Dijk",
-    position: "Defender",
-    skills: ["Aerial ability", "Tackling", "Positioning", "Leadership", "Composure"],
-    style: "Dominant, composed defender with excellent leadership qualities"
+    name: "لياقة عالية",
+    description: "أظهر مستويات لياقة بدنية ممتازة",
+    level: "silver",
+    unlockCondition: (analysis) => (analysis.stats?.stamina || 0) >= 85,
   },
   {
-    name: "Manuel Neuer",
-    position: "Goalkeeper",
-    skills: ["Shot stopping", "Sweeping", "Distribution", "Command of area", "One-on-ones"],
-    style: "Modern sweeper-keeper with excellent ball-playing ability"
+    name: "رؤية استراتيجية",
+    description: "أظهر وعيًا تكتيكيًا متميزًا",
+    level: "gold",
+    unlockCondition: (analysis) => (analysis.performance?.tactical || 0) >= 90,
   },
   {
-    name: "N'Golo Kanté",
-    position: "Midfielder",
-    skills: ["Tackling", "Interceptions", "Stamina", "Positioning", "Work rate"],
-    style: "Tireless ball-winner with exceptional defensive awareness"
+    name: "توازن مثالي",
+    description: "أظهر توازنًا استثنائيًا في الحركة",
+    level: "silver",
+    unlockCondition: (analysis) => (analysis.stats?.balance || 0) >= 85,
   },
   {
-    name: "Karim Benzema",
-    position: "Forward",
-    skills: ["Finishing", "Link-up play", "Movement", "Technical ability", "Intelligence"],
-    style: "Complete forward with exceptional technical ability and game intelligence"
+    name: "رشاقة متميزة",
+    description: "سجل مستويات رشاقة عالية",
+    level: "bronze",
+    unlockCondition: (analysis) => (analysis.stats?.agility || 0) >= 80,
   },
   {
-    name: "Sergio Ramos",
-    position: "Defender",
-    skills: ["Tackling", "Leadership", "Aerial ability", "Set pieces", "Aggression"],
-    style: "Aggressive leader with exceptional set-piece ability"
+    name: "تحكم كروي ممتاز",
+    description: "أظهر قدرة استثنائية في السيطرة على الكرة",
+    level: "gold",
+    unlockCondition: (analysis) => (analysis.stats?.ballControl || 0) >= 90,
   },
   {
-    name: "Trent Alexander-Arnold",
-    position: "Defender",
-    skills: ["Crossing", "Passing", "Set pieces", "Vision", "Technique"],
-    style: "Creative right-back with exceptional passing range"
-  }
-];
-
-// Adding the missing AVAILABLE_BADGES constant with proper typing
-export const AVAILABLE_BADGES = [
-  {
-    name: "صانع اللعب",
-    description: "لاعب متميز في تمرير الكرة وصناعة الفرص",
-    level: "gold" as "gold",
-    unlockCondition: (analysis) => analysis.stats.passing >= 85 && analysis.stats.vision >= 80
+    name: "كفاءة حركة",
+    description: "حقق كفاءة عالية في أنماط الحركة",
+    level: "silver",
+    unlockCondition: (analysis) => {
+      const enhancedMovement = analysis.movements?.some(m => m.isActive) || false;
+      return enhancedMovement && (analysis.stats?.agility || 0) >= 75;
+    },
   },
   {
-    name: "القناص",
-    description: "مهارة استثنائية في إنهاء الهجمات وتسجيل الأهداف",
-    level: "gold" as "gold",
-    unlockCondition: (analysis) => analysis.stats.shooting >= 85 && analysis.position === "Forward"
-  },
-  {
-    name: "المدافع الصلب",
-    description: "قدرات دفاعية متميزة وصلابة في المواجهات",
-    level: "gold" as "gold",
-    unlockCondition: (analysis) => analysis.position === "Defender" && analysis.stats.defending >= 85
-  },
-  {
-    name: "الجناح السريع",
-    description: "سرعة فائقة وقدرة على اختراق الدفاعات",
-    level: "silver" as "silver",
-    unlockCondition: (analysis) => analysis.stats.pace >= 85 && analysis.stats.dribbling >= 80
-  },
-  {
-    name: "لاعب الوسط الشامل",
-    description: "متوازن في المهارات الهجومية والدفاعية",
-    level: "silver" as "silver",
-    unlockCondition: (analysis) => (
-      analysis.position === "Midfielder" && 
-      analysis.stats.passing >= 75 && 
-      analysis.stats.defending >= 70
-    )
-  },
-  {
-    name: "القائد",
-    description: "مهارات قيادية وتأثير إيجابي على الفريق",
-    level: "silver" as "silver",
-    unlockCondition: (analysis) => analysis.stats.vision >= 80 && analysis.stats.decision >= 80
-  },
-  {
-    name: "المراوغ الماهر",
-    description: "قدرة استثنائية على المراوغة والتحكم بالكرة",
-    level: "bronze" as "bronze",
-    unlockCondition: (analysis) => analysis.stats.dribbling >= 80 && analysis.stats.ballControl >= 80
-  },
-  {
-    name: "لاعب تكتيكي",
-    description: "فهم ممتاز للجوانب التكتيكية وتنفيذ التعليمات",
-    level: "bronze" as "bronze",
-    unlockCondition: (analysis) => analysis.performance.tactical >= 80
-  },
-  {
-    name: "اللاعب الواعد",
-    description: "إمكانات واعدة ومستقبل مشرق في كرة القدم",
-    level: "bronze" as "bronze",
-    unlockCondition: (analysis) => analysis.talentScore >= 75 && analysis.talentScore < 85
+    name: "نجم المستقبل",
+    description: "يظهر إمكانات واعدة للتطور المستقبلي",
+    level: "gold",
+    unlockCondition: (analysis) => (analysis.talentScore || 0) >= 85,
   }
 ];

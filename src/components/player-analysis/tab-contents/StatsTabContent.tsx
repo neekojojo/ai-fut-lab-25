@@ -5,6 +5,8 @@ import PerformanceMetricsCard from '../PerformanceMetricsCard';
 import { PerformanceProfile } from '@/components/charts/PerformanceProfile';
 import { PerformanceDistribution } from '@/components/charts/PerformanceDistribution';
 import { OverallStats } from '@/components/charts/OverallStats';
+import AchievementBadges from '../AchievementBadges';
+import { determineEarnedBadges } from '@/utils/analysis/badgeService';
 
 interface StatsTabContentProps {
   playerStats: any;
@@ -12,6 +14,9 @@ interface StatsTabContentProps {
 }
 
 const StatsTabContent: React.FC<StatsTabContentProps> = ({ playerStats, analysis }) => {
+  // تحديد الشارات المكتسبة
+  const earnedBadges = determineEarnedBadges(analysis);
+  
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -77,6 +82,9 @@ const StatsTabContent: React.FC<StatsTabContentProps> = ({ playerStats, analysis
           playerName={analysis.playerName || "اللاعب"}
         />
       </div>
+      
+      {/* إضافة مكون الشارات والإنجازات */}
+      <AchievementBadges playerName={analysis.playerName} badges={earnedBadges} />
     </div>
   );
 };
