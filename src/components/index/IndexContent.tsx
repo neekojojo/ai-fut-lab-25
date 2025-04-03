@@ -115,7 +115,7 @@ const IndexContent: React.FC = () => {
           
           <h3 className="text-lg font-semibold mt-4">مخرجات التحليل</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
-            <li>تقرير شامل عن أداء اللاعب الفني والبدني</li>
+            <li>تقرير شامل عن أداء ال��اعب الفني والبدني</li>
             <li>تحديد نقاط القوة ومجالات التحسين</li>
             <li>مؤشرات اللياقة البدنية والتعب</li>
             <li>أنماط اللعب المفضلة للاعب</li>
@@ -397,68 +397,46 @@ const IndexContent: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="space-y-8 md:space-y-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-          <div className="z-10">
-            <div className="max-w-3xl mx-auto text-center md:text-left space-y-3 md:space-y-4 animate-fade-in">
-              <div className="inline-block px-3 py-1 text-xs font-medium bg-secondary text-secondary-foreground rounded-full">
-                تحليل بالذكاء الاصطناعي
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-primary/80">
-                FUT LAB Analyzer
-              </h1>
-              <p className="text-lg text-muted-foreground max-w-2xl">
-                <span className="text-primary font-semibold">تحليل</span> أداء لاعبي كرة القدم وتقييم المواهب بالذكاء الاصطناعي
-              </p>
-            </div>
-            
-            <div className="mt-8 md:hidden">
-              <div className="relative w-full max-w-md mx-auto overflow-hidden rounded-xl h-48">
-                <div className="absolute inset-0 bg-primary/10 rounded-xl blur-3xl -z-10 animate-pulse opacity-70"></div>
-                {VISUAL_EFFECTS.map((effect) => (
-                  <div 
-                    key={effect.id} 
-                    className={`absolute inset-0 bg-gradient-to-r ${effect.color} opacity-70 animate-float`} 
-                    style={{ animationDelay: `${effect.id * 2}s` }}
-                  />
-                ))}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Trophy className="h-16 w-16 text-primary/70 animate-float" />
-                </div>
-              </div>
-            </div>
-            
-            {!videoFile && (
-              <div className="mt-8 flex flex-col md:flex-row gap-4 justify-center md:justify-start">
-                <VideoUpload onUpload={handleFileSelected} />
-                
-                <button 
-                  onClick={handleTogglePeopleDetection}
-                  className="mt-4 px-4 py-2 text-sm font-medium text-primary border border-primary rounded-md hover:bg-primary/10 transition-colors backdrop-blur-sm"
-                >
-                  تجربة كشف اللاعبين
-                </button>
-              </div>
-            )}
+        <div className="text-center space-y-3 md:space-y-4 animate-fade-in">
+          <div className="inline-block px-3 py-1 text-xs font-medium bg-secondary text-secondary-foreground rounded-full">
+            تحليل بالذكاء الاصطناعي
           </div>
-          
-          <div className="hidden md:block relative">
-            <div className="relative overflow-hidden rounded-2xl shadow-2xl h-64">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 animate-pulse"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="h-24 w-24 bg-primary/20 rounded-lg backdrop-blur-md animate-float"></div>
-                  <div className="h-24 w-24 bg-secondary/20 rounded-lg backdrop-blur-md animate-float" style={{ animationDelay: '1s' }}></div>
-                  <div className="h-24 w-24 bg-accent/20 rounded-lg backdrop-blur-md animate-float" style={{ animationDelay: '2s' }}></div>
-                  <div className="h-24 w-24 bg-primary/20 rounded-lg backdrop-blur-md animate-float" style={{ animationDelay: '3s' }}></div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="absolute top-1/2 -right-8 transform -translate-y-1/2 z-0">
-              <FloatingElements playerSilhouetteSrc="" />
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-primary/80">
+            FUT LAB Analyzer
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <span className="text-primary font-semibold">تحليل</span> أداء لاعبي كرة القدم وتقييم المواهب بالذكاء الاصطناعي
+          </p>
+        </div>
+        
+        <div className="flex justify-center">
+          <div className="relative w-32 h-32">
+            <div className="absolute inset-0 bg-primary/10 rounded-xl blur-3xl -z-10 animate-pulse opacity-70"></div>
+            {VISUAL_EFFECTS.map((effect) => (
+              <div 
+                key={effect.id} 
+                className={`absolute inset-0 bg-gradient-to-r ${effect.color} opacity-70 animate-float`} 
+                style={{ animationDelay: `${effect.id * 2}s` }}
+              />
+            ))}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Trophy className="h-20 w-20 text-yellow-500 animate-float" />
             </div>
           </div>
         </div>
+        
+        {!videoFile && (
+          <div className="flex flex-col items-center gap-4 max-w-3xl mx-auto">
+            <VideoUpload onUpload={handleFileSelected} />
+            
+            <button 
+              onClick={handleTogglePeopleDetection}
+              className="mt-2 px-8 py-3 font-medium text-primary border border-primary rounded-md hover:bg-primary/10 transition-colors backdrop-blur-sm"
+            >
+              تجربة كشف اللاعبين
+            </button>
+          </div>
+        )}
       </div>
       
       {!videoFile ? (
