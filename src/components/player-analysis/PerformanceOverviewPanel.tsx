@@ -22,7 +22,7 @@ interface PerformanceOverviewPanelProps {
 
 const PerformanceOverviewPanel: React.FC<PerformanceOverviewPanelProps> = ({
   compatibilityScore = 89,
-  position = "Goalkeeper",
+  position = "forward",
   primaryMetrics = {
     technical: 67,
     physical: 71,
@@ -30,13 +30,16 @@ const PerformanceOverviewPanel: React.FC<PerformanceOverviewPanelProps> = ({
     mental: 67
   },
   positionSkills = [
-    { name: "Reflexes", value: 68 },
-    { name: "Handling", value: 73 },
-    { name: "Positioning", value: 80 },
-    { name: "Communication", value: 72 },
-    { name: "Distribution", value: 67 }
+    { name: "المراوغة", value: 68 },
+    { name: "التسديد", value: 73 },
+    { name: "التمريرات", value: 80 },
+    { name: "التمركز", value: 72 },
+    { name: "السرعة", value: 67 }
   ]
 }) => {
+  // تحديد النص المناسب للمركز (هجوم أو وسط)
+  const positionText = position === "midfielder" ? "لاعب وسط" : "لاعب هجوم";
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -47,7 +50,7 @@ const PerformanceOverviewPanel: React.FC<PerformanceOverviewPanelProps> = ({
           <div className="mb-6">
             <h3 className="text-xl font-semibold mb-2">مدى ملاءمة اللاعب</h3>
             <div className="text-5xl font-bold mb-2">{compatibilityScore}%</div>
-            <p className="text-muted-foreground">توافق مع متطلبات مركز {position}</p>
+            <p className="text-muted-foreground">توافق مع متطلبات مركز {positionText}</p>
           </div>
 
           <div className="space-y-6">
