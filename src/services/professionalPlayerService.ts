@@ -1,6 +1,7 @@
 
 import { apiProxyService } from './apiProxyService';
 import type { PlayerComparison } from '@/utils/ml/playerMLService';
+import { professionalPlayers } from '@/types/training';
 
 /**
  * خدمة للحصول على بيانات اللاعبين المحترفين ومقارنتهم
@@ -35,7 +36,7 @@ export const professionalPlayerService = {
    */
   getSimilarPlayers: async (attributes: Record<string, number>, position?: string): Promise<PlayerComparison> => {
     // في وضع API حقيقي، سنستدعي Edge Function هنا
-    // في هذه الحالة المبسطة، سنجمع بعض البيانات الثابتة وسنعيد نتيجة
+    // في هذه الحالة المبسطة، سنستخدم البيانات المحلية
     
     try {
       // محاولة استدعاء API للبحث عن لاعبين في الوضع الحقيقي
@@ -50,107 +51,19 @@ export const professionalPlayerService = {
       }
     } catch (error) {
       console.error('Error fetching similar players from API:', error);
-      // سنستمر وسنعود إلى البيانات الثابتة
+      // سنستمر وسنعود إلى البيانات المحلية
     }
     
-    // هذه البيانات الثابتة فقط للعرض التوضيحي
-    const positionMappings = {
-      'forward': [
-        {
-          name: "Lionel Messi",
-          team: "Inter Miami",
-          position: "forward",
-          similarity: 83,
-          strengths: ["Dribbling", "Vision", "Finishing"]
-        },
-        {
-          name: "Mohamed Salah",
-          team: "Liverpool",
-          position: "forward",
-          similarity: 78,
-          strengths: ["Speed", "Finishing", "Technique"]
-        },
-        {
-          name: "Kylian Mbappé",
-          team: "Real Madrid",
-          position: "forward",
-          similarity: 75,
-          strengths: ["Acceleration", "Finishing", "Pace"]
-        }
-      ],
-      'midfielder': [
-        {
-          name: "Kevin De Bruyne",
-          team: "Manchester City",
-          position: "midfielder",
-          similarity: 81,
-          strengths: ["Vision", "Passing Range", "Set Pieces"]
-        },
-        {
-          name: "Luka Modric",
-          team: "Real Madrid",
-          position: "midfielder",
-          similarity: 79,
-          strengths: ["Game Control", "First Touch", "Positioning"]
-        },
-        {
-          name: "Bruno Fernandes",
-          team: "Manchester United",
-          position: "midfielder",
-          similarity: 76,
-          strengths: ["Creativity", "Shot Power", "Work Rate"]
-        }
-      ],
-      'defender': [
-        {
-          name: "Virgil van Dijk",
-          team: "Liverpool",
-          position: "defender",
-          similarity: 82,
-          strengths: ["Aerial Ability", "Tackling", "Leadership"]
-        },
-        {
-          name: "Rúben Dias",
-          team: "Manchester City",
-          position: "defender",
-          similarity: 77,
-          strengths: ["Positioning", "Tackling", "Physicality"]
-        },
-        {
-          name: "Marquinhos",
-          team: "Paris Saint-Germain",
-          position: "defender",
-          similarity: 75,
-          strengths: ["Speed", "Positioning", "Tackles"]
-        }
-      ],
-      'goalkeeper': [
-        {
-          name: "Alisson Becker",
-          team: "Liverpool",
-          position: "goalkeeper",
-          similarity: 80,
-          strengths: ["Reflexes", "One-on-one", "Distribution"]
-        },
-        {
-          name: "Éderson",
-          team: "Manchester City",
-          position: "goalkeeper",
-          similarity: 78,
-          strengths: ["Distribution", "Sweeping", "Shot-stopping"]
-        },
-        {
-          name: "Jan Oblak",
-          team: "Atlético Madrid",
-          position: "goalkeeper",
-          similarity: 76,
-          strengths: ["Positioning", "Reflexes", "Consistency"]
-        }
-      ]
-    };
-
-    // استخدام وضع اللاعب إذا تم تحديده، وإلا استخدام وضع افتراضي
-    const players = positionMappings[position as keyof typeof positionMappings] || positionMappings.midfielder;
+    // استخدام البيانات المحلية
+    // فلترة اللاعبين حسب المركز
+    const filteredPlayers = position 
+      ? professionalPlayers.filter(player => player.position === position)
+      : professionalPlayers;
+    
+    // اختيار عدد من اللاعبين عشوائيًا أو الأكثر تشابهًا
+    const selectedPlayers = filteredPlayers
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, 5);
     
     // حساب مقاييس التشابه بناءً على السمات
     const technicalScore = attributes.technical || 70;
@@ -158,7 +71,7 @@ export const professionalPlayerService = {
     const enduranceScore = attributes.endurance || 60;
     
     return {
-      similarProfessionals: players,
+      similarProfessionals: selectedPlayers,
       similarityMetrics: [
         { category: "Technical Ability", score: technicalScore, description: "Ball control and first touch capabilities." },
         { category: "Speed", score: speedScore, description: "Pace and acceleration on the field." },

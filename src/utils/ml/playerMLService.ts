@@ -1,5 +1,6 @@
 
 import { professionalPlayerService } from "@/services/professionalPlayerService";
+import { professionalPlayers } from "@/types/training";
 
 /**
  * واجهة للاعب المحترف المشابه 
@@ -10,6 +11,10 @@ export interface ProfessionalPlayer {
   position: string;
   similarity: number;
   strengths: string[];
+  nationality?: string;
+  age?: number;
+  rating?: number;
+  playingStyle?: string;
 }
 
 /**
@@ -68,7 +73,39 @@ export const playerMLService = {
     attributes: Record<string, number>,
     position?: string
   ): Promise<PlayerComparison> => {
-    return professionalPlayerService.getSimilarPlayers(attributes, position);
+    try {
+      // محاولة الحصول على اللاعبين المشابهين عن طريق API
+      const apiResult = await professionalPlayerService.getSimilarPlayers(attributes, position)
+        .catch(() => null);
+      
+      if (apiResult) {
+        return apiResult;
+      }
+    } catch (error) {
+      console.error("خطأ في الحصول على اللاعبين المشابهين من API:", error);
+    }
+    
+    // استخدام البيانات المحلية إذا فشل الاتصال بـ API
+    // تصفية اللاعبين حسب المركز
+    const filteredPlayers = position
+      ? professionalPlayers.filter(player => player.position === position).slice(0, 5)
+      : professionalPlayers.slice(0, 5);
+    
+    // إنشاء مقاييس التشابه بناءً على السمات
+    const technicalScore = attributes.technical || 70;
+    const speedScore = attributes.speed || 65;
+    const enduranceScore = attributes.endurance || 60;
+    
+    return {
+      similarProfessionals: filteredPlayers,
+      similarityMetrics: [
+        { category: "Technical Ability", score: technicalScore, description: "Ball control and first touch capabilities." },
+        { category: "Speed", score: speedScore, description: "Pace and acceleration on the field." },
+        { category: "Endurance", score: enduranceScore, description: "Stamina and ability to maintain performance." },
+        { category: "Positioning", score: attributes.balance || 68, description: "Understanding of spatial awareness on the pitch." },
+        { category: "Decision Making", score: (attributes.efficiency || 60) + 5, description: "Speed and quality of decisions during play." }
+      ]
+    };
   },
 
   /**

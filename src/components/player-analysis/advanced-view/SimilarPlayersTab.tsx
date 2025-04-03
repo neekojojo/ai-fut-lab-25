@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
@@ -13,6 +13,9 @@ import {
   Legend, 
   ResponsiveContainer 
 } from 'recharts';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { professionalPlayers } from '@/types/training';
 
 interface ProfessionalPlayer {
   name: string;
@@ -30,9 +33,31 @@ interface SimilarPlayersTabProps {
 
 const SimilarPlayersTab: React.FC<SimilarPlayersTabProps> = ({ 
   playerName = "اللاعب",
-  professionalPlayers,
+  professionalPlayers: propPlayers,
   playerPosition
 }) => {
+  const [positionFilter, setPositionFilter] = useState<string>(playerPosition || 'all');
+  
+  // استخدام بيانات اللاعبين المحترفين من props أو من البيانات المحلية
+  const allPlayers = propPlayers && propPlayers.length > 0 ? 
+    propPlayers : 
+    professionalPlayers.map(p => ({ 
+      name: p.name, 
+      team: p.team, 
+      position: p.position, 
+      match: p.similarity, 
+      strengths: p.strengths 
+    }));
+  
+  // تطبيق الفلتر حسب المركز
+  const filteredPlayers = allPlayers.filter(player => {
+    if (positionFilter === 'all') return true;
+    return player.position === positionFilter;
+  });
+  
+  // اختيار اللاعبين الأكثر تشابهاً
+  const topPlayers = filteredPlayers.slice(0, 5);
+  
   // Create comparison data for bar chart
   const comparisonData = [
     { 
@@ -69,6 +94,25 @@ const SimilarPlayersTab: React.FC<SimilarPlayersTabProps> = ({
   
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold">مقارنة مع لاعبين محترفين</h2>
+        <div className="flex items-center space-x-4 rtl:space-x-reverse">
+          <div className="grid w-full max-w-sm items-center gap-1.5">
+            <Label htmlFor="position-filter">تصفية حسب المركز</Label>
+            <Select value={positionFilter} onValueChange={setPositionFilter}>
+              <SelectTrigger id="position-filter" className="w-[180px]">
+                <SelectValue placeholder="جميع المراكز" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">جميع المراكز</SelectItem>
+                <SelectItem value="forward">الهجوم</SelectItem>
+                <SelectItem value="midfielder">الوسط</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+      
       <Card className="border-2 border-primary/10 shadow-md">
         <CardHeader>
           <CardTitle>مقارنة مع لاعبين محترفين</CardTitle>
@@ -76,7 +120,7 @@ const SimilarPlayersTab: React.FC<SimilarPlayersTabProps> = ({
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {professionalPlayers.map((player, index) => (
+            {topPlayers.map((player, index) => (
               <div key={index} className="flex flex-col sm:flex-row items-center gap-4 p-4 border rounded-lg bg-card transition-all hover:bg-muted/50">
                 <div className="flex flex-col items-center mb-4 sm:mb-0">
                   <Avatar className="h-16 w-16 mb-2">
@@ -84,10 +128,10 @@ const SimilarPlayersTab: React.FC<SimilarPlayersTabProps> = ({
                   </Avatar>
                   <h3 className="font-bold text-lg">{player.name}</h3>
                   <p className="text-sm text-muted-foreground">{player.team}</p>
-                  <p className="text-sm text-muted-foreground">{player.position}</p>
+                  <p className="text-sm text-muted-foreground">{player.position === 'forward' ? 'مهاجم' : 'وسط'}</p>
                   <div className="mt-2 text-2xl font-bold flex items-baseline">
                     <span>{player.match}%</span>
-                    <span className="text-sm text-muted-foreground ml-1">تطابق</span>
+                    <span className="text-sm text-muted-foreground mr-1">تطابق</span>
                   </div>
                 </div>
                 
@@ -101,6 +145,12 @@ const SimilarPlayersTab: React.FC<SimilarPlayersTabProps> = ({
                 </div>
               </div>
             ))}
+            
+            {topPlayers.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">لا يوجد لاعبين مطابقين للفلتر المحدد</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -108,7 +158,7 @@ const SimilarPlayersTab: React.FC<SimilarPlayersTabProps> = ({
       <Card>
         <CardHeader>
           <CardTitle>مقارنة المهارات</CardTitle>
-          <CardDescription>مقارنة بين مهاراتك ومهارات {professionalPlayers[0]?.name || "المحترفين"}</CardDescription>
+          <CardDescription>مقارنة بين مهاراتك ومهارات {topPlayers[0]?.name || "المحترفين"}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="h-80">
@@ -123,7 +173,7 @@ const SimilarPlayersTab: React.FC<SimilarPlayersTabProps> = ({
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="player" name={playerName} fill="#8B5CF6" />
-                <Bar dataKey="professional" name={professionalPlayers[0]?.name || "المحترف"} fill="#3B82F6" />
+                <Bar dataKey="professional" name={topPlayers[0]?.name || "المحترف"} fill="#3B82F6" />
                 <Bar dataKey="average" name="متوسط اللاعبين" fill="#9CA3AF" />
               </BarChart>
             </ResponsiveContainer>
@@ -131,7 +181,7 @@ const SimilarPlayersTab: React.FC<SimilarPlayersTabProps> = ({
           
           <div className="mt-4 text-sm text-muted-foreground">
             <p>
-              بناءً على تحليل أسلوب لعبك ومهاراتك، أنت تشبه {professionalPlayers[0]?.name || "لاعبين محترفين"} في المركز.
+              بناءً على تحليل أسلوب لعبك ومهاراتك، أنت تشبه {topPlayers[0]?.name || "لاعبين محترفين"} في المركز.
               أكبر فرص التطوير لديك هي في مجالات التمركز والتكتيك، حيث يوجد أكبر فرق بينك وبين النموذج المحترف.
             </p>
           </div>
