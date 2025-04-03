@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import VideoUpload from '../VideoUpload';
 import { ANALYSIS_STAGES } from '@/utils/analysis/constants';
 import { Separator } from '@/components/ui/separator';
-import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, ChevronRight, Target } from 'lucide-react';
+import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, ChevronRight, Target, Trophy } from 'lucide-react';
 import AnalysisProcessing from './analysis-processing/AnalysisProcessing';
 import AnalysisOptions from '@/components/analysis/ModelSelection';
 import { analyzeFootballVideo } from '@/utils/analysis';
@@ -220,7 +220,7 @@ const IndexContent: React.FC = () => {
           <h3 className="text-lg font-semibold mt-4">المؤشرات المتابعة</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
             <li>التطور في المهارات الفنية المستهدفة</li>
-            <li>تحسن الأداء البدني و��لفسيولوجي</li>
+            <li>تحسن الأداء البدني و���لفسيولوجي</li>
             <li>التقدم في الجوانب التكتيكية والذهنية</li>
             <li>مؤشرات الأداء خلال المباريات الرسمية</li>
           </ul>
@@ -420,21 +420,7 @@ const IndexContent: React.FC = () => {
               />
             ))}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="relative h-20 w-20 rounded-full bg-white animate-float shadow-lg">
-                <div className="absolute inset-0 rounded-full overflow-hidden">
-                  <div className="absolute top-[25%] left-[25%] w-[50%] h-[50%] bg-black rotate-45"></div>
-                  <div className="absolute top-[10%] left-[42%] w-[16%] h-[16%] bg-black rounded-full"></div>
-                  <div className="absolute top-[70%] left-[42%] w-[16%] h-[16%] bg-black rounded-full"></div>
-                  <div className="absolute top-[42%] left-[10%] w-[16%] h-[16%] bg-black rounded-full"></div>
-                  <div className="absolute top-[42%] left-[70%] w-[16%] h-[16%] bg-black rounded-full"></div>
-                  <div className="absolute top-[15%] left-[15%] w-[16%] h-[16%] bg-black rounded-full"></div>
-                  <div className="absolute top-[15%] left-[70%] w-[16%] h-[16%] bg-black rounded-full"></div>
-                  <div className="absolute top-[70%] left-[15%] w-[16%] h-[16%] bg-black rounded-full"></div>
-                  <div className="absolute top-[70%] left-[70%] w-[16%] h-[16%] bg-black rounded-full"></div>
-                  
-                  <div className="absolute inset-0 border-[3px] border-black rounded-full"></div>
-                </div>
-              </div>
+              <Trophy className="h-20 w-20 text-yellow-500 animate-float" />
             </div>
           </div>
           <p className="text-lg font-semibold text-primary">Play football like a pro</p>
