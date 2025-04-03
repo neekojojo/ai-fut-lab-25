@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import EnhancedMovementChart from './EnhancedMovementChart';
 import MovementAnalysisChart from './MovementAnalysisChart';
@@ -318,42 +317,7 @@ const AdvancedAnalysisPanel: React.FC<AdvancedAnalysisPanelProps> = ({
               </div>
               
               <PositionSpecificAnalysis 
-                data={{
-                  ...enhancedMovement,
-                  positionSpecificMetrics: {
-                    defenderMetrics: {
-                      tacklesAttempted: Math.round(enhancedMovement.directionChanges * 0.3),
-                      interceptionsAttempted: Math.round(enhancedMovement.directionChanges * 0.5),
-                      clearancesAttempted: Math.round(enhancedMovement.directionChanges * 0.2),
-                      defensePositioning: Math.round(enhancedMovement.movementEfficiency)
-                    },
-                    midfielderMetrics: {
-                      passesAttempted: Math.round(enhancedMovement.directionChanges * 0.7),
-                      passAccuracy: Math.round(enhancedMovement.movementEfficiency * 0.8),
-                      ballControl: Math.round((1 - (enhancedMovement.speedZones.sprinting + enhancedMovement.speedZones.running) / 2) * 100),
-                      visionScore: Math.round(enhancedMovement.movementEfficiency * 0.9)
-                    },
-                    attackerMetrics: {
-                      shotsAttempted: Math.round(enhancedMovement.speedZones.sprinting * 10),
-                      shotsOnTarget: Math.round(enhancedMovement.speedZones.sprinting * 10 * (enhancedMovement.movementEfficiency / 100)),
-                      dribbleAttempts: Math.round(enhancedMovement.directionChanges * 0.8),
-                      dribbleSuccess: Math.round(enhancedMovement.directionChanges * 0.8 * (enhancedMovement.movementEfficiency / 100))
-                    },
-                    goalkeeperMetrics: {
-                      savesAttempted: Math.round(enhancedMovement.directionChanges * 0.4),
-                      saveSuccess: Math.round(enhancedMovement.directionChanges * 0.4 * (enhancedMovement.movementEfficiency / 100)),
-                      distribution: Math.round(enhancedMovement.movementEfficiency * 0.7),
-                      commandOfArea: Math.round((enhancedMovement.speedZones.walking + enhancedMovement.speedZones.jogging) * 100)
-                    }
-                  },
-                  topSpeed: enhancedMovement.maxSpeed * 1.2,
-                  accelerationProfile: {
-                    explosive: 0.8,
-                    sustained: 0.65,
-                    deceleration: 0.7
-                  }
-                }} 
-                playerPosition={selectedPosition}
+                position={selectedPosition}
               />
             </CardContent>
           </Card>

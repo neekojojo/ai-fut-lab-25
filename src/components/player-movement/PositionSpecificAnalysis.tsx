@@ -39,7 +39,9 @@ const PositionSpecificAnalysis: React.FC<PositionSpecificAnalysisProps> = ({ pos
   };
 
   const data = mockData;
-  const playerPosition = position.toLowerCase() as 'defender' | 'midfielder' | 'attacker' | 'goalkeeper';
+  // Ensure we handle 'forward' as 'attacker'
+  const normalizedPosition = position.toLowerCase();
+  const playerPosition = normalizedPosition === 'forward' ? 'attacker' : normalizedPosition as 'defender' | 'midfielder' | 'attacker' | 'goalkeeper';
 
   // Get the appropriate metrics based on player position
   const getMetrics = () => {
@@ -49,7 +51,7 @@ const PositionSpecificAnalysis: React.FC<PositionSpecificAnalysisProps> = ({ pos
       return positionSpecificMetrics.defenderMetrics;
     } else if (playerPosition === 'midfielder' && positionSpecificMetrics.midfielderMetrics) {
       return positionSpecificMetrics.midfielderMetrics;
-    } else if ((playerPosition === 'attacker' || playerPosition === 'forward') && positionSpecificMetrics.attackerMetrics) {
+    } else if (playerPosition === 'attacker' && positionSpecificMetrics.attackerMetrics) {
       return positionSpecificMetrics.attackerMetrics;
     } else if (playerPosition === 'goalkeeper' && positionSpecificMetrics.goalkeeperMetrics) {
       return positionSpecificMetrics.goalkeeperMetrics;
@@ -131,7 +133,7 @@ const PositionSpecificAnalysis: React.FC<PositionSpecificAnalysisProps> = ({ pos
         </div>
       );
     }
-    else if (playerPosition === 'attacker' || playerPosition === 'forward') {
+    else if (playerPosition === 'attacker') {
       const attackerMetrics = metrics as any;
       return (
         <div className="space-y-4">
@@ -207,8 +209,7 @@ const PositionSpecificAnalysis: React.FC<PositionSpecificAnalysisProps> = ({ pos
     switch (playerPosition) {
       case 'defender': return 'المدافع';
       case 'midfielder': return 'لاعب الوسط';
-      case 'attacker': 
-      case 'forward': return 'المهاجم';
+      case 'attacker': return 'المهاجم';
       case 'goalkeeper': return 'حارس المرمى';
       default: return 'اللاعب';
     }

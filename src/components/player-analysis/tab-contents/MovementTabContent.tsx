@@ -12,7 +12,7 @@ interface MovementTabContentProps {
 }
 
 const MovementTabContent: React.FC<MovementTabContentProps> = ({ analysis, onViewAdvanced }) => {
-  // Mock data for testing
+  // Mock data for testing (with totalDistance and other missing fields added)
   const mockEnhancedMovement = {
     maxSpeed: 82,
     avgSpeed: 65,
@@ -40,7 +40,23 @@ const MovementTabContent: React.FC<MovementTabContentProps> = ({ analysis, onVie
       {x: 60, y: 20, value: 0.5},
       {x: 70, y: 60, value: 0.3},
       {x: 80, y: 40, value: 0.6},
-    ]
+    ],
+    // Adding missing properties required by EnhancedMovementAnalysis type
+    totalDistance: 8500,
+    averageSpeed: 12.3,
+    directionChanges: 52,
+    speedZones: {
+      walking: 0.25,
+      jogging: 0.40,
+      running: 0.25,
+      sprinting: 0.10
+    },
+    zoneTransitions: {
+      defensiveToOffensive: 15,
+      offensiveToDefensive: 12,
+      effectiveness: 75
+    },
+    technicalConsistency: 78
   };
 
   return (
