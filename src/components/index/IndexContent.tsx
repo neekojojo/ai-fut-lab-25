@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -7,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import VideoUpload from '../VideoUpload';
 import { ANALYSIS_STAGES } from '@/utils/analysis/constants';
 import { Separator } from '@/components/ui/separator';
-import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, ChevronRight, Trophy, Target } from 'lucide-react';
+import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, ChevronRight, Target, Football } from 'lucide-react';
 import AnalysisProcessing from './analysis-processing/AnalysisProcessing';
 import AnalysisOptions from '@/components/analysis/ModelSelection';
 import { analyzeFootballVideo } from '@/utils/analysis';
@@ -409,8 +410,9 @@ const IndexContent: React.FC = () => {
           </p>
         </div>
         
-        <div className="flex justify-center">
-          <div className="relative w-32 h-32">
+        {/* Football icon centered */}
+        <div className="flex flex-col items-center justify-center space-y-6">
+          <div className="relative w-32 h-32 flex justify-center items-center">
             <div className="absolute inset-0 bg-primary/10 rounded-xl blur-3xl -z-10 animate-pulse opacity-70"></div>
             {VISUAL_EFFECTS.map((effect) => (
               <div 
@@ -420,23 +422,24 @@ const IndexContent: React.FC = () => {
               />
             ))}
             <div className="absolute inset-0 flex items-center justify-center">
-              <Trophy className="h-20 w-20 text-yellow-500 animate-float" />
+              <Football className="h-20 w-20 text-white animate-float" />
             </div>
           </div>
+          <p className="text-lg font-semibold text-primary">Play football like a pro</p>
+          
+          {!videoFile && (
+            <div className="flex flex-col items-center gap-4">
+              <VideoUpload onUpload={handleFileSelected} />
+              
+              <button 
+                onClick={handleTogglePeopleDetection}
+                className="mt-2 px-8 py-3 font-medium text-primary border border-primary rounded-md hover:bg-primary/10 transition-colors backdrop-blur-sm"
+              >
+                تجربة كشف اللاعبين
+              </button>
+            </div>
+          )}
         </div>
-        
-        {!videoFile && (
-          <div className="flex flex-col items-center gap-4 max-w-3xl mx-auto">
-            <VideoUpload onUpload={handleFileSelected} />
-            
-            <button 
-              onClick={handleTogglePeopleDetection}
-              className="mt-2 px-8 py-3 font-medium text-primary border border-primary rounded-md hover:bg-primary/10 transition-colors backdrop-blur-sm"
-            >
-              تجربة كشف اللاعبين
-            </button>
-          </div>
-        )}
       </div>
       
       {!videoFile ? (
