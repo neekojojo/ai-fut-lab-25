@@ -46,8 +46,6 @@ const ComprehensiveSkillsPanel: React.FC = () => {
 
   // التفاصيل الأداء
   const performanceSnapshot = {
-    playerName: 'John Doe',
-    position: 'Goalkeeper',
     talentScore: 71
   };
 
@@ -124,8 +122,6 @@ const ComprehensiveSkillsPanel: React.FC = () => {
             <div className="relative rounded-xl overflow-hidden aspect-video bg-gradient-to-br from-gray-900 to-gray-800">
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center p-6 text-white">
-                  <h4 className="text-3xl font-bold mb-1">{performanceSnapshot.playerName}</h4>
-                  <p className="text-xl mb-3">{performanceSnapshot.position}</p>
                   <div className="text-lg">
                     مؤشر الموهبة: <span className="font-bold">{performanceSnapshot.talentScore}/100</span>
                   </div>
