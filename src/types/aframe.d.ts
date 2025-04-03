@@ -21,6 +21,7 @@ declare global {
       'a-torus': any;
       'a-ring': any;
       'a-circle': any;
+      'a-cone': any; // Added cone element
     }
   }
 
