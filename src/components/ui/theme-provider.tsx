@@ -7,6 +7,7 @@ import { type ThemeProviderProps } from "next-themes/dist/types"
 type ThemeProviderState = {
   theme: string
   setTheme: (theme: string) => void
+  clearThemePreference: () => void
 }
 
 const ThemeProviderContext = createContext<ThemeProviderState | undefined>(undefined)
@@ -34,11 +35,17 @@ export function ThemeProvider({
     localStorage.setItem(storageKey, theme)
   }, [theme, storageKey])
 
+  const clearThemePreference = () => {
+    localStorage.removeItem(storageKey)
+    setTheme(defaultTheme)
+  }
+
   const value = {
     theme,
     setTheme: (newTheme: string) => {
       setTheme(newTheme)
     },
+    clearThemePreference
   }
 
   return (
