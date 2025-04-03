@@ -4,7 +4,6 @@ import { Card } from '@/components/ui/card';
 import PlayerMovementVisualization from '@/components/PlayerMovementVisualization';
 import EnhancedMovementChart from '@/components/player-movement/EnhancedMovementChart';
 import PositionSpecificAnalysis from '@/components/player-movement/PositionSpecificAnalysis';
-import AchievementBadges from '@/components/player-analysis/AchievementBadges';
 import { determineEarnedBadges } from '@/utils/analysis/badgeService';
 
 interface MovementTabContentProps {
@@ -26,24 +25,14 @@ const MovementTabContent: React.FC<MovementTabContentProps> = ({ analysis, onVie
     recoverySpeed: analysis.physicalMetrics?.recovery || 79
   };
   
-  // تحديد الشارات بناءً على التحليل
-  const earnedBadges = determineEarnedBadges(analysis);
-  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <PlayerMovementVisualization data={analysis} />
-      
       <EnhancedMovementChart enhancedMovement={enhancedMovement} />
-      
       <PositionSpecificAnalysis position={analysis.position || 'وسط'} />
-      
-      {/* إضافة مكون الشارات والإنجازات */}
-      <AchievementBadges 
-        playerName={analysis.playerName} 
-        badges={earnedBadges} 
-      />
     </div>
   );
 };
 
 export default MovementTabContent;
+
