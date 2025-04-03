@@ -10,6 +10,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TrajectoryPrediction } from '@/utils/videoDetection/trajectoryPrediction';
 
 interface EnhancedMovementAnalysis {
   maxSpeed: number;
@@ -36,9 +37,10 @@ interface EnhancedMovementAnalysis {
 
 interface EnhancedMovementChartProps {
   enhancedMovement: Partial<EnhancedMovementAnalysis>;
+  trajectoryData?: TrajectoryPrediction;
 }
 
-const EnhancedMovementChart: React.FC<EnhancedMovementChartProps> = ({ enhancedMovement }) => {
+const EnhancedMovementChart: React.FC<EnhancedMovementChartProps> = ({ enhancedMovement, trajectoryData }) => {
   const radarData = [
     { subject: 'أقصى سرعة', A: enhancedMovement.maxSpeed || 0, fullMark: 100 },
     { subject: 'متوسط السرعة', A: enhancedMovement.avgSpeed || 0, fullMark: 100 },
