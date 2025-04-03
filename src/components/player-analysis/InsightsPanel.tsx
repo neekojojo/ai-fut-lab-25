@@ -26,6 +26,9 @@ const InsightsPanel = ({ analysis }) => {
                     {skill}
                   </Badge>
                 ))}
+                {(!analysis.distinctiveSkills || analysis.distinctiveSkills.length === 0) && (
+                  <p className="text-sm text-muted-foreground">لا توجد بيانات متاحة</p>
+                )}
               </div>
             </div>
             
@@ -37,6 +40,9 @@ const InsightsPanel = ({ analysis }) => {
                     {area}
                   </Badge>
                 ))}
+                {(!analysis.developmentAreas || analysis.developmentAreas.length === 0) && (
+                  <p className="text-sm text-muted-foreground">لا توجد بيانات متاحة</p>
+                )}
               </div>
             </div>
             

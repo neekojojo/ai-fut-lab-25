@@ -10,7 +10,7 @@ interface InsightsTabContentProps {
 
 const InsightsTabContent: React.FC<InsightsTabContentProps> = ({ analysis }) => {
   // Extract movement analysis data if available
-  const movementData = analysis?.movementAnalysis || {};
+  const movementData = analysis?.physicalMetrics || {};
   const enhancedMovement = analysis?.enhancedMovement || {};
   
   // Create insights from the movement data
@@ -19,19 +19,19 @@ const InsightsTabContent: React.FC<InsightsTabContentProps> = ({ analysis }) => 
       title: "أنماط الحركة",
       description: "تحليل أنماط حركة اللاعب يظهر توازن جيد بين السرعة والرشاقة",
       icon: <Activity className="h-5 w-5 text-blue-500" />,
-      data: `${Math.round(movementData.movementEfficiency || 75)}% كفاءة الحركة`
+      data: `${Math.round(movementData.avgSpeed || 75)}% كفاءة الحركة`
     },
     {
       title: "القدرة على التسارع",
       description: "اللاعب يظهر قدرة متميزة على التسارع السريع والمحافظة على السرعة",
       icon: <Zap className="h-5 w-5 text-amber-500" />,
-      data: `${Math.round(enhancedMovement.accelerationProfile?.explosive * 100 || 68)}% تسارع مفاجئ`
+      data: `${Math.round(movementData.maxSpeed || 68)}% تسارع مفاجئ`
     },
     {
       title: "التحمل والاستمرارية",
       description: "مستوى التحمل والقدرة على الاستمرار بالأداء العالي لفترات طويلة",
       icon: <TrendingUp className="h-5 w-5 text-green-500" />,
-      data: `${Math.round(enhancedMovement.stamina || 82)}% القدرة على التحمل`
+      data: `${Math.round(movementData.endurance || 82)}% القدرة على التحمل`
     }
   ];
 
@@ -61,9 +61,8 @@ const InsightsTabContent: React.FC<InsightsTabContentProps> = ({ analysis }) => 
           <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/10">
             <h4 className="font-medium mb-2">تفاصيل التحليل المتقدم</h4>
             <p className="text-sm text-muted-foreground">
-              يظهر اللاعب قدرة فائقة على تغيير السرعة واتجاه الحركة بكفاءة عالية، مما يعطيه ميزة 
-              تنافسية في المواقف التي تتطلب استجابة سريعة. كفاءة استخدام الطاقة أثناء الحركة تشير إلى 
-              إمكانية تحسين التحمل البدني من خلال تمارين مخصصة.
+              {analysis.movementAnalysis || 
+                "يظهر اللاعب قدرة فائقة على تغيير السرعة واتجاه الحركة بكفاءة عالية، مما يعطيه ميزة تنافسية في المواقف التي تتطلب استجابة سريعة. كفاءة استخدام الطاقة أثناء الحركة تشير إلى إمكانية تحسين التحمل البدني من خلال تمارين مخصصة."}
             </p>
           </div>
         </CardContent>
