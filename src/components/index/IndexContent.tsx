@@ -24,7 +24,6 @@ interface StageArticle {
   content: React.ReactNode;
 }
 
-// استبدال صور اللاعبين بتأثيرات بصرية
 const VISUAL_EFFECTS = [
   { id: 1, color: "from-primary/20 to-secondary/20" },
   { id: 2, color: "from-secondary/20 to-primary/20" },
@@ -414,7 +413,6 @@ const IndexContent: React.FC = () => {
             </div>
             
             <div className="mt-8 md:hidden">
-              {/* استبدال معرض الصور بتأثيرات بصرية */}
               <div className="relative w-full max-w-md mx-auto overflow-hidden rounded-xl h-48">
                 <div className="absolute inset-0 bg-primary/10 rounded-xl blur-3xl -z-10 animate-pulse opacity-70"></div>
                 {VISUAL_EFFECTS.map((effect) => (
@@ -446,7 +444,6 @@ const IndexContent: React.FC = () => {
           
           <div className="hidden md:block relative">
             <div className="relative overflow-hidden rounded-2xl shadow-2xl h-64">
-              {/* استبدال معرض الصور بتأثيرات بصرية */}
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 animate-pulse"></div>
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="grid grid-cols-2 gap-4">
