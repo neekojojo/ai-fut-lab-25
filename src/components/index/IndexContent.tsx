@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -111,7 +110,6 @@ const IndexContent: React.FC = () => {
           <h3 className="text-lg font-semibold mt-4">تقنيات التحليل</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
             <li>خرائط حرارية لمناطق تواجد اللاعب</li>
-            <li>رسوم بيانية للأداء عبر فترات المباراة</li>
             <li>مقارنة الأداء مع معايير محددة</li>
             <li>تحليل الفروقات بين الشوطين</li>
           </ul>
@@ -121,7 +119,7 @@ const IndexContent: React.FC = () => {
             <li>تقرير شامل عن أداء اللاعب الفني والبدني</li>
             <li>تحديد نقاط القوة ومجالات التحسين</li>
             <li>مؤشرات اللياقة البدنية والتعب</li>
-            <li>أن��اط اللعب المفضلة للاعب</li>
+            <li>أنماط اللعب المفضلة للاعب</li>
           </ul>
         </div>
       )
@@ -176,7 +174,7 @@ const IndexContent: React.FC = () => {
           <h3 className="text-lg font-semibold mt-4">قاعدة بيانات المقارنة</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
             <li>بيانات أداء من أكثر من 10,000 لاعب محترف</li>
-            <li>تغطية لل��طولات والدوريات العالمية ا��كبرى</li>
+            <li>تغطية للبطولات والدوريات العالمية الكبرى</li>
             <li>مجموعات بيانات مقسمة حسب الفئة العمرية والمستوى</li>
             <li>تحديث البيانات بشكل دوري</li>
           </ul>
@@ -278,11 +276,11 @@ const IndexContent: React.FC = () => {
             <li>تحليلات متقاطعة مع بيانات المنافسات المختلفة</li>
           </ul>
           
-          <h3 className="text-lg font-semibold mt-4">الفوائد وا��مخرجات</h3>
+          <h3 className="text-lg font-semibold mt-4">الفوائد والمخرجات</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
             <li>رؤية شاملة لأداء اللاعب من مصادر متعددة</li>
             <li>تعزيز فرص اكتشاف اللاعب من قبل المراقبين الدوليين</li>
-            <li>توحيد معايير التقيي�� مع المستويات العالمية</li>
+            <li>توحيد معايير التقييم مع المستويات العالمية</li>
             <li>تسهيل انتقال اللاعبين للأندية الاحترافية</li>
             <li>المساهمة في تطوير منظومة كرة القدم المحلية والعالمية</li>
           </ul>
