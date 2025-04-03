@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -50,7 +49,6 @@ const FeaturesSection = () => {
           <p>يستخدم نظامنا مزيجاً من:</p>
           <ul className="list-disc list-inside space-y-2 pr-4">
             <li>تتبع الفيديو بالذكاء الاصطناعي</li>
-            <li>أجهزة GPS متخصصة للاعبين</li>
             <li>خوارزميات متقدمة لتحليل البيانات</li>
           </ul>
         </div>
