@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '@/components/Header';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -67,8 +66,17 @@ const Dashboard: React.FC = () => {
   const [isLoadingAnalyses, setIsLoadingAnalyses] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, loading, signOut } = useAuth();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const tabParam = searchParams.get('tab');
+    if (tabParam && ['overview', 'analyses', 'training', 'badges', 'profile'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [location]);
 
   useEffect(() => {
     if (!loading) {
@@ -83,6 +91,26 @@ const Dashboard: React.FC = () => {
     }
   }, [user, navigate, loading]);
 
+  useEffect(() => {
+    if (!user) return;
+    
+    const subscription = supabase
+      .channel('profile-updates')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'profiles',
+        filter: `id=eq.${user.id}`,
+      }, () => {
+        fetchUserProfileData();
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [user]);
+
   const fetchUserProfileData = async () => {
     if (!user) return;
     
@@ -96,7 +124,6 @@ const Dashboard: React.FC = () => {
         
       if (error) throw error;
       
-      // Convert preferred_foot to a valid union type value
       const preferredFoot = data.preferred_foot as 'Left' | 'Right' | 'Both' | undefined;
       
       const initialProfile: UserProfile = {
@@ -139,8 +166,8 @@ const Dashboard: React.FC = () => {
       console.error('Error fetching user profile:', error);
       toast({
         variant: "destructive",
-        title: "Error Loading Profile",
-        description: "We couldn't load your profile data. Please try again.",
+        title: "خطأ في تحميل الملف الشخصي",
+        description: "تعذر تحميل بيانات ملفك الشخصي. يرجى المحاولة مرة أخرى.",
       });
       
       if (user) {
@@ -186,8 +213,8 @@ const Dashboard: React.FC = () => {
     } catch (error) {
       console.error('Error fetching analyses:', error);
       toast({
-        title: "Error Loading Analyses",
-        description: "We couldn't load your previous analyses. Please try again.",
+        title: "خطأ في تحميل التحليلات",
+        description: "تعذر تحميل التحليلات السابقة الخاصة بك. يرجى المحاولة مرة أخرى.",
         variant: "destructive",
       });
     } finally {
@@ -200,8 +227,13 @@ const Dashboard: React.FC = () => {
     navigate('/sign-in', { replace: true });
   };
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    navigate(`/dashboard?tab=${value}`, { replace: true });
+  };
+
   if (loading || !userProfile || isLoadingProfile) {
-    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+    return <div className="flex justify-center items-center min-h-screen">جاري التحميل...</div>;
   }
 
   return (
@@ -211,19 +243,19 @@ const Dashboard: React.FC = () => {
       <main className="flex-1 container mx-auto py-8 px-4 md:px-6">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold">Dashboard</h1>
-            <p className="text-muted-foreground">Welcome back, {userProfile.name}</p>
+            <h1 className="text-3xl font-bold">لوحة التحكم</h1>
+            <p className="text-muted-foreground">أهلاً بك مجدداً، {userProfile.name}</p>
           </div>
-          <Button onClick={() => navigate('/')}>New Analysis</Button>
+          <Button onClick={() => navigate('/')}>تحليل جديد</Button>
         </div>
         
-        <Tabs defaultValue="overview" className="space-y-6" onValueChange={setActiveTab}>
+        <Tabs defaultValue={activeTab} className="space-y-6" onValueChange={handleTabChange}>
           <TabsList className="grid grid-cols-4 md:grid-cols-5 lg:w-[600px]">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="analyses">Analyses</TabsTrigger>
-            <TabsTrigger value="training">Training</TabsTrigger>
-            <TabsTrigger value="badges">Badges</TabsTrigger>
-            <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
+            <TabsTrigger value="analyses">التحليلات</TabsTrigger>
+            <TabsTrigger value="training">التدريب</TabsTrigger>
+            <TabsTrigger value="badges">الشارات</TabsTrigger>
+            <TabsTrigger value="profile">الملف الشخصي</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview">

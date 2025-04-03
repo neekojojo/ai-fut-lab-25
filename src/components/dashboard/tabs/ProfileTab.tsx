@@ -1,7 +1,7 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { UserProfile } from '@/components/AnalysisReport.d';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import AvatarUpload from '../AvatarUpload';
 
 interface ProfileTabProps {
   userProfile: UserProfile;
@@ -18,6 +19,7 @@ interface ProfileTabProps {
 const ProfileTab: React.FC<ProfileTabProps> = ({ userProfile, onSignOut }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState(userProfile.avatarUrl || '');
   const [formData, setFormData] = useState({
     name: userProfile.name || '',
     bio: userProfile.bio || '',
@@ -43,6 +45,10 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userProfile, onSignOut }) => {
       ...formData,
       [name]: value
     });
+  };
+  
+  const handleAvatarUpdate = (url: string) => {
+    setAvatarUrl(url);
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -74,8 +80,8 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userProfile, onSignOut }) => {
       if (error) throw error;
       
       toast({
-        title: "Profile Updated",
-        description: "Your profile information has been updated successfully.",
+        title: "تم تحديث الملف الشخصي",
+        description: "تم تحديث معلومات الملف الشخصي بنجاح.",
       });
       
       setIsEditing(false);
@@ -83,8 +89,8 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userProfile, onSignOut }) => {
       console.error('Error updating profile:', error);
       toast({
         variant: "destructive",
-        title: "Update Failed",
-        description: "We couldn't update your profile. Please try again.",
+        title: "فشل التحديث",
+        description: "تعذر تحديث ملفك الشخصي. يرجى المحاولة مرة أخرى.",
       });
     } finally {
       setIsLoading(false);
@@ -94,81 +100,81 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userProfile, onSignOut }) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-2xl font-bold">Your Profile</h3>
+        <h3 className="text-2xl font-bold">الملف الشخصي</h3>
         {!isEditing ? (
-          <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
+          <Button onClick={() => setIsEditing(true)}>تعديل الملف الشخصي</Button>
         ) : (
-          <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
+          <Button variant="outline" onClick={() => setIsEditing(false)}>إلغاء</Button>
         )}
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="md:col-span-2">
           <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
+            <CardTitle>معلومات الملف الشخصي</CardTitle>
             <CardDescription>
-              Update your personal information
+              تحديث معلوماتك الشخصية
             </CardDescription>
           </CardHeader>
           <CardContent>
             {!isEditing ? (
               <div className="space-y-4">
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">Name</div>
+                  <div className="text-sm font-medium text-muted-foreground">الاسم</div>
                   <div>{userProfile.name}</div>
                 </div>
                 
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">Email</div>
+                  <div className="text-sm font-medium text-muted-foreground">البريد الإلكتروني</div>
                   <div>{userProfile.email}</div>
                 </div>
                 
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">Bio</div>
-                  <div>{userProfile.bio || 'No bio available'}</div>
+                  <div className="text-sm font-medium text-muted-foreground">نبذة شخصية</div>
+                  <div>{userProfile.bio || 'لا توجد نبذة متاحة'}</div>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <div className="text-sm font-medium text-muted-foreground">Age</div>
-                    <div>{userProfile.age || 'Not specified'}</div>
+                    <div className="text-sm font-medium text-muted-foreground">العمر</div>
+                    <div>{userProfile.age || 'غير محدد'}</div>
                   </div>
                   
                   <div>
-                    <div className="text-sm font-medium text-muted-foreground">Position</div>
-                    <div>{userProfile.position || 'Not specified'}</div>
+                    <div className="text-sm font-medium text-muted-foreground">المركز</div>
+                    <div>{userProfile.position || 'غير محدد'}</div>
                   </div>
                   
                   <div>
-                    <div className="text-sm font-medium text-muted-foreground">Country</div>
-                    <div>{userProfile.country || 'Not specified'}</div>
+                    <div className="text-sm font-medium text-muted-foreground">الدولة</div>
+                    <div>{userProfile.country || 'غير محدد'}</div>
                   </div>
                   
                   <div>
-                    <div className="text-sm font-medium text-muted-foreground">City</div>
-                    <div>{userProfile.city || 'Not specified'}</div>
+                    <div className="text-sm font-medium text-muted-foreground">المدينة</div>
+                    <div>{userProfile.city || 'غير محدد'}</div>
                   </div>
                   
                   <div>
-                    <div className="text-sm font-medium text-muted-foreground">Height</div>
-                    <div>{userProfile.height || 'Not specified'}</div>
+                    <div className="text-sm font-medium text-muted-foreground">الطول</div>
+                    <div>{userProfile.height || 'غير محدد'}</div>
                   </div>
                   
                   <div>
-                    <div className="text-sm font-medium text-muted-foreground">Weight</div>
-                    <div>{userProfile.weight || 'Not specified'}</div>
+                    <div className="text-sm font-medium text-muted-foreground">الوزن</div>
+                    <div>{userProfile.weight || 'غير محدد'}</div>
                   </div>
                   
                   <div>
-                    <div className="text-sm font-medium text-muted-foreground">Preferred Foot</div>
-                    <div>{userProfile.preferredFoot || 'Not specified'}</div>
+                    <div className="text-sm font-medium text-muted-foreground">القدم المفضلة</div>
+                    <div>{userProfile.preferredFoot || 'غير محدد'}</div>
                   </div>
                 </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="name">الاسم</Label>
                   <Input
                     id="name"
                     name="name"
@@ -178,7 +184,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userProfile, onSignOut }) => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="bio">Bio</Label>
+                  <Label htmlFor="bio">نبذة شخصية</Label>
                   <Textarea
                     id="bio"
                     name="bio"
@@ -190,7 +196,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userProfile, onSignOut }) => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="age">Age</Label>
+                    <Label htmlFor="age">العمر</Label>
                     <Input
                       id="age"
                       name="age"
@@ -201,25 +207,25 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userProfile, onSignOut }) => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="position">Position</Label>
+                    <Label htmlFor="position">المركز</Label>
                     <Select 
                       value={formData.position}
                       onValueChange={(value) => handleSelectChange('position', value)}
                     >
                       <SelectTrigger id="position">
-                        <SelectValue placeholder="Select a position" />
+                        <SelectValue placeholder="اختر المركز" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Forward">Forward</SelectItem>
-                        <SelectItem value="Midfielder">Midfielder</SelectItem>
-                        <SelectItem value="Defender">Defender</SelectItem>
-                        <SelectItem value="Goalkeeper">Goalkeeper</SelectItem>
+                        <SelectItem value="Forward">مهاجم</SelectItem>
+                        <SelectItem value="Midfielder">وسط</SelectItem>
+                        <SelectItem value="Defender">مدافع</SelectItem>
+                        <SelectItem value="Goalkeeper">حارس مرمى</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="country">Country</Label>
+                    <Label htmlFor="country">الدولة</Label>
                     <Input
                       id="country"
                       name="country"
@@ -229,7 +235,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userProfile, onSignOut }) => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="city">City</Label>
+                    <Label htmlFor="city">المدينة</Label>
                     <Input
                       id="city"
                       name="city"
@@ -239,40 +245,40 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userProfile, onSignOut }) => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="height">Height (cm)</Label>
+                    <Label htmlFor="height">الطول (سم)</Label>
                     <Input
                       id="height"
                       name="height"
                       value={formData.height}
                       onChange={handleInputChange}
-                      placeholder="e.g. 180"
+                      placeholder="مثال: 180"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="weight">Weight (kg)</Label>
+                    <Label htmlFor="weight">الوزن (كجم)</Label>
                     <Input
                       id="weight"
                       name="weight"
                       value={formData.weight}
                       onChange={handleInputChange}
-                      placeholder="e.g. 75"
+                      placeholder="مثال: 75"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="preferredFoot">Preferred Foot</Label>
+                    <Label htmlFor="preferredFoot">القدم المفضلة</Label>
                     <Select 
                       value={formData.preferredFoot}
                       onValueChange={(value) => handleSelectChange('preferredFoot', value)}
                     >
                       <SelectTrigger id="preferredFoot">
-                        <SelectValue placeholder="Select preferred foot" />
+                        <SelectValue placeholder="اختر القدم المفضلة" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Left">Left</SelectItem>
-                        <SelectItem value="Right">Right</SelectItem>
-                        <SelectItem value="Both">Both</SelectItem>
+                        <SelectItem value="Left">اليسرى</SelectItem>
+                        <SelectItem value="Right">اليمنى</SelectItem>
+                        <SelectItem value="Both">كلتاهما</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -280,7 +286,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userProfile, onSignOut }) => {
                 
                 <div className="flex justify-end space-x-2 pt-4">
                   <Button type="submit" disabled={isLoading}>
-                    {isLoading ? 'Saving...' : 'Save Changes'}
+                    {isLoading ? 'جاري الحفظ...' : 'حفظ التغييرات'}
                   </Button>
                 </div>
               </form>
@@ -290,16 +296,18 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userProfile, onSignOut }) => {
         
         <Card>
           <CardHeader>
-            <CardTitle>Account</CardTitle>
+            <CardTitle>الحساب</CardTitle>
             <CardDescription>
-              Manage your account settings
+              إدارة إعدادات حسابك
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center space-y-6">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={userProfile.avatarUrl || ''} />
-              <AvatarFallback className="text-2xl">{userProfile.name?.substring(0, 2)}</AvatarFallback>
-            </Avatar>
+            <AvatarUpload
+              userId={userProfile.id}
+              url={avatarUrl}
+              onAvatarUpdate={handleAvatarUpdate}
+              size="lg"
+            />
             
             <div className="text-center">
               <div className="font-medium text-lg">{userProfile.name}</div>
@@ -317,7 +325,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userProfile, onSignOut }) => {
                 className="w-full" 
                 onClick={onSignOut}
               >
-                Sign Out
+                تسجيل الخروج
               </Button>
             </div>
           </CardContent>

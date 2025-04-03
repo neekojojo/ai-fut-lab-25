@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
@@ -32,6 +31,28 @@ const Header = () => {
     
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    
+    const subscription = supabase
+      .channel('profile-changes')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'profiles',
+        filter: `id=eq.${user.id}`,
+      }, (payload) => {
+        if (payload.new && payload.new.avatar_url !== undefined) {
+          setAvatarUrl(payload.new.avatar_url);
+        }
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(subscription);
+    };
   }, [user]);
 
   const fetchUserAvatar = async () => {
