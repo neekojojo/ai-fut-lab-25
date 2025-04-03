@@ -39,15 +39,15 @@ export const OverallStats: React.FC<OverallStatsProps> = ({
 
   return (
     <Card className={`overflow-hidden border-none shadow-md bg-gradient-to-br from-gray-50 to-white dark:from-gray-900/50 dark:to-black/50 ${className}`}>
-      <CardHeader className="bg-gradient-to-r from-primary/10 to-transparent pb-2">
-        <CardTitle>الإحصائيات العامة</CardTitle>
-        <CardDescription>
+      <CardHeader className="bg-gradient-to-r from-primary/10 to-transparent pb-2 text-left">
+        <CardTitle className="text-left">الإحصائيات العامة</CardTitle>
+        <CardDescription className="text-left">
           مقاييس الأداء الرئيسية
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-4 pb-8">
         <ChartContainer>
-          <div className="h-64">
+          <div className="h-64 mt-6">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={statsData}
