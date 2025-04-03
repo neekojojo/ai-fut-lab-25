@@ -5,6 +5,7 @@ import PlayerMovementVisualization from '@/components/PlayerMovementVisualizatio
 import EnhancedMovementChart from '@/components/player-movement/EnhancedMovementChart';
 import PositionSpecificAnalysis from '@/components/player-movement/PositionSpecificAnalysis';
 import AchievementBadges from '@/components/player-analysis/AchievementBadges';
+import MarketValueForecast from '@/components/player-movement/MarketValueForecast';
 import { determineEarnedBadges } from '@/utils/analysis/badgeService';
 
 interface MovementTabContentProps {
@@ -29,6 +30,15 @@ const MovementTabContent: React.FC<MovementTabContentProps> = ({ analysis, onVie
   // تحديد الشارات بناءً على التحليل
   const earnedBadges = determineEarnedBadges(analysis);
   
+  // استخراج بيانات اللاعب للتوقع المالي
+  const playerName = analysis.playerName || "اللاعب";
+  const position = analysis.position || "وسط";
+  const currentValue = analysis.marketValue 
+    ? parseInt(analysis.marketValue.replace(/[^0-9]/g, '')) 
+    : 750000;
+  const age = analysis.age || 24;
+  const potential = analysis.talentScore || 78;
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <PlayerMovementVisualization data={analysis} />
@@ -36,6 +46,14 @@ const MovementTabContent: React.FC<MovementTabContentProps> = ({ analysis, onVie
       <EnhancedMovementChart enhancedMovement={enhancedMovement} />
       
       <PositionSpecificAnalysis position={analysis.position || 'وسط'} />
+      
+      <MarketValueForecast 
+        playerName={playerName}
+        position={position}
+        currentValue={currentValue}
+        age={age}
+        potential={potential}
+      />
       
       {/* إضافة مكون الشارات والإنجازات */}
       <AchievementBadges 
