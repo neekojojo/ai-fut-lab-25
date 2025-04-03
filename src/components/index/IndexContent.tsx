@@ -169,7 +169,7 @@ const IndexContent: React.FC = () => {
       title: "مقارنة النتائج مع لاعبين محترفين",
       content: (
         <div className="space-y-4">
-          <p>تعتبر مقارنة نتائج اللاعب مع اللاعبين المحترفين من أهم الخطوات في تقييم المستوى الحقيقي والإمكانيات المستقبلية.</p>
+          <p>تعتبر مقارنة نتائج اللاعب مع اللاعبين المحترفين من أهم الخطوات في تقييم ا��مستوى الحقيقي والإمكانيات المستقبلية.</p>
           
           <h3 className="text-lg font-semibold mt-4">قاعدة بيانات المقارنة</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
@@ -242,47 +242,6 @@ const IndexContent: React.FC = () => {
             <li>اكتشاف مبكر لأي تراجع في المستوى</li>
             <li>توثيق المسيرة التطويرية للاعب</li>
             <li>تقييم فعالية البرامج التدريبية المطبقة</li>
-          </ul>
-        </div>
-      )
-    },
-    6: {
-      title: "التكامل مع الأنظمة الخارجية",
-      content: (
-        <div className="space-y-4">
-          <p>التكامل مع الأنظمة الخارجية يمثل المرحلة المتقدمة من تطوير النظام، حيث يتم ربط تحليلاتنا مع منظومات عالمية للاستفادة القصوى من البيانات.</p>
-          
-          <h3 className="text-lg font-semibold mt-4">التكامل مع أنظمة الاتحاد الدولي</h3>
-          <ul className="list-disc list-inside space-y-2 pr-4">
-            <li>ربط مع منظومة FIFA للمواهب الشابة</li>
-            <li>تبادل البيانات مع أنظمة الاتحادات القارية</li>
-            <li>المشاركة في برامج تطوير المواهب العالمية</li>
-            <li>الاستفادة من معايير التقييم المعتمدة دولياً</li>
-          </ul>
-          
-          <h3 className="text-lg font-semibold mt-4">التكامل مع الأندية والأكاديميات</h3>
-          <ul className="list-disc list-inside space-y-2 pr-4">
-            <li>واجهات برمجية للتكامل مع أنظمة الأندية</li>
-            <li>مشاركة التقارير والتحليلات مع الجهاز الفني</li>
-            <li>دمج البيانات مع منظومات التدريب</li>
-            <li>تسهيل عمليات الكشف عن المواهب</li>
-          </ul>
-          
-          <h3 className="text-lg font-semibold mt-4">تكامل البيانات</h3>
-          <ul className="list-disc list-inside space-y-2 pr-4">
-            <li>استيراد بيانات من منصات التحليل العالمية</li>
-            <li>تكامل مع بيانات GPS وأنظمة القياس المتقدمة</li>
-            <li>ربط مع السجلات الطبية والفسيولوجية</li>
-            <li>تحليلات متقاطعة مع بيانات المنافسات المختلفة</li>
-          </ul>
-          
-          <h3 className="text-lg font-semibold mt-4">الفوائد والمخرجات</h3>
-          <ul className="list-disc list-inside space-y-2 pr-4">
-            <li>رؤية شاملة لأداء اللاعب من مصادر متعددة</li>
-            <li>تعزيز فرص اكتشاف اللاعب من قبل المراقبين الدوليين</li>
-            <li>توحيد معايير التقييم مع المستويات العالمية</li>
-            <li>تسهيل انتقال اللاعبين للأندية الاحترافية</li>
-            <li>المساهمة في تطوير منظومة كرة القدم المحلية والعالمية</li>
           </ul>
         </div>
       )
@@ -557,14 +516,6 @@ const IndexContent: React.FC = () => {
                     description="تحليل التطور وتحديد مجالات التحسين"
                     icon={<CalendarCheck className="h-8 w-8 text-primary" />}
                     onReadMore={() => handleOpenStageArticle(5)}
-                  />
-                  
-                  <StageCard
-                    number={6}
-                    title="التكامل مع الأنظمة الخارجية"
-                    description="ربط مع أنظمة FIFA وتحسين الأداء"
-                    icon={<Globe className="h-8 w-8 text-primary" />}
-                    onReadMore={() => handleOpenStageArticle(6)}
                   />
                 </div>
               </CardContent>
