@@ -38,20 +38,20 @@ export const OverallStats: React.FC<OverallStatsProps> = ({
   ];
 
   return (
-    <Card className={`overflow-hidden border-none shadow-md bg-gradient-to-br from-gray-50 to-white dark:from-gray-900/50 dark:to-black/50 ${className}`}>
+    <Card className={`overflow-hidden border-none shadow-md bg-gradient-to-br from-gray-50 to-white dark:from-gray-900/50 dark:to-black/50 ${className} mt-10`}>
       <CardHeader className="bg-gradient-to-r from-primary/10 to-transparent pb-2 text-left">
         <CardTitle className="text-left">الإحصائيات العامة</CardTitle>
         <CardDescription className="text-left">
           مقاييس الأداء الرئيسية
         </CardDescription>
       </CardHeader>
-      <CardContent className="pt-4 pb-8">
+      <CardContent className="pt-6 pb-10">
         <ChartContainer>
-          <div className="h-64 mt-6">
+          <div className="h-72 mt-8">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={statsData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
               >
                 <defs>
                   {colors.map((color, index) => (
