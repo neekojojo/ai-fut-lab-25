@@ -11,17 +11,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/auth/AuthContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { UserIcon, Trash2 } from 'lucide-react';
+import { UserIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { clearAllAppData } from '@/utils/clearAppData';
-import { useToast } from "@/components/ui/use-toast";
-import { useTheme } from '@/components/ui/theme-provider';
 
 const Header = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const { toast } = useToast();
-  const { clearThemePreference } = useTheme();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
 
@@ -59,24 +54,6 @@ const Header = () => {
     }
   };
 
-  const handleClearAppData = async () => {
-    try {
-      await clearAllAppData();
-      clearThemePreference();
-      toast({
-        title: "تم مسح البيانات",
-        description: "تم مسح جميع بيانات التطبيق بنجاح",
-      });
-      navigate('/', { replace: true });
-    } catch (error) {
-      toast({
-        title: "خطأ في مسح البيانات",
-        description: "حدث خطأ أثناء محاولة مسح بيانات التطبيق",
-        variant: "destructive",
-      });
-    }
-  };
-
   return (
     <header className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'glass backdrop-blur-md py-2' : 'bg-transparent py-4'}`}>
       <div className="container mx-auto flex justify-between items-center px-4">
@@ -105,16 +82,6 @@ const Header = () => {
         </NavigationMenu>
 
         <div className="flex items-center gap-4">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleClearAppData}
-            className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive transition-all flex items-center gap-1"
-          >
-            <Trash2 className="h-4 w-4" />
-            <span>مسح البيانات</span>
-          </Button>
-          
           {user ? (
             <div className="flex items-center gap-4">
               <Link to="/dashboard?tab=profile">
