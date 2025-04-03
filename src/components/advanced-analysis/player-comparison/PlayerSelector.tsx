@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { PlayerAnalysis } from '@/types/playerAnalysis';
+import { ComparisonSummary } from './ComparisonSummary'; // Added import for ComparisonSummary
 
 interface PlayerSelectorProps {
   currentAnalysis: PlayerAnalysis;

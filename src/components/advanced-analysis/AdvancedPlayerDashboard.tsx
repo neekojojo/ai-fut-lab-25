@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PlayerAnalysis } from '@/types/playerAnalysis';
 import { AdvancedMetricsPanel } from './AdvancedMetricsPanel';
-import { PlayerComparisonChart } from './PlayerComparisonChart';
+import { PlayerComparisonChart } from './player-comparison/PlayerComparisonChart'; // Fixed import path
 import { DevelopmentTracker } from './DevelopmentTracker';
 import { TrainingPlanGenerator } from './TrainingPlanGenerator';
 import { Button } from '@/components/ui/button';
