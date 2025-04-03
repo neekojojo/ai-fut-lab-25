@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -8,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import VideoUpload from '../VideoUpload';
 import { ANALYSIS_STAGES } from '@/utils/analysis/constants';
 import { Separator } from '@/components/ui/separator';
-import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, ChevronRight, Target, Football } from 'lucide-react';
+import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, ChevronRight, Target, CircleDot } from 'lucide-react';
 import AnalysisProcessing from './analysis-processing/AnalysisProcessing';
 import AnalysisOptions from '@/components/analysis/ModelSelection';
 import { analyzeFootballVideo } from '@/utils/analysis';
@@ -61,7 +60,7 @@ const IndexContent: React.FC = () => {
           <h3 className="text-lg font-semibold mt-4">كيفية العمل</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
             <li>التقاط الفيديو وتقسيمه إلى إطارات</li>
-            <li>تحديد مواقع اللاعبين في كل إطار</li>
+            <li>تحديد مواقع اللاعبين ��ي كل إطار</li>
             <li>تصنيف اللاعبين حسب الفريق</li>
             <li>إنشاء نظام تتبع فريد لكل لاعب</li>
           </ul>
@@ -116,7 +115,7 @@ const IndexContent: React.FC = () => {
           
           <h3 className="text-lg font-semibold mt-4">مخرجات التحليل</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
-            <li>تقرير شامل عن أداء ال��اعب الفني والبدني</li>
+            <li>تقر��ر شامل عن أداء ال��اعب الفني والبدني</li>
             <li>تحديد نقاط القوة ومجالات التحسين</li>
             <li>مؤشرات اللياقة البدنية والتعب</li>
             <li>أنماط اللعب المفضلة للاعب</li>
@@ -221,7 +220,7 @@ const IndexContent: React.FC = () => {
           <h3 className="text-lg font-semibold mt-4">المؤشرات المتابعة</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
             <li>التطور في المهارات الفنية المستهدفة</li>
-            <li>تحسن الأداء البدني والفسيولوجي</li>
+            <li>تحسن الأداء البدني و��لفسيولوجي</li>
             <li>التقدم في الجوانب التكتيكية والذهنية</li>
             <li>مؤشرات الأداء خلال المباريات الرسمية</li>
           </ul>
@@ -410,7 +409,6 @@ const IndexContent: React.FC = () => {
           </p>
         </div>
         
-        {/* Football icon centered */}
         <div className="flex flex-col items-center justify-center space-y-6">
           <div className="relative w-32 h-32 flex justify-center items-center">
             <div className="absolute inset-0 bg-primary/10 rounded-xl blur-3xl -z-10 animate-pulse opacity-70"></div>
@@ -422,7 +420,14 @@ const IndexContent: React.FC = () => {
               />
             ))}
             <div className="absolute inset-0 flex items-center justify-center">
-              <Football className="h-20 w-20 text-white animate-float" />
+              <div className="relative h-20 w-20 rounded-full bg-white animate-float">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <CircleDot className="h-16 w-16 text-gray-800/20" />
+                </div>
+                <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-800/30"></div>
+                <div className="absolute bottom-0 top-0 left-1/2 w-0.5 bg-gray-800/30"></div>
+                <div className="absolute top-1/4 left-1/4 right-1/4 bottom-1/4 border border-gray-800/20 rounded-full"></div>
+              </div>
             </div>
           </div>
           <p className="text-lg font-semibold text-primary">Play football like a pro</p>
