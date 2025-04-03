@@ -5,12 +5,19 @@ import type { PlayerPosition } from '@/utils/videoDetection/types';
 import { CHART_COLORS } from '@/components/charts/constants';
 
 interface PlayerMovementVisualizationProps {
-  playerPositions: PlayerPosition[];
+  data?: any;
+  playerPositions?: PlayerPosition[];
 }
 
 const PlayerMovementVisualization: React.FC<PlayerMovementVisualizationProps> = ({
-  playerPositions
+  data,
+  playerPositions = []
 }) => {
+  // Use data prop to get playerPositions if not directly provided
+  const positions = playerPositions.length > 0 ? 
+    playerPositions : 
+    (data?.movements?.filter((m: any) => m.isActive) || []);
+    
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [currentFrame, setCurrentFrame] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);

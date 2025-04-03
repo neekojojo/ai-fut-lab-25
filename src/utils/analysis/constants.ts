@@ -9,6 +9,80 @@ interface BadgeDefinition {
   unlockCondition: (analysis: PlayerAnalysis) => boolean;
 }
 
+// Define analysis stages for progress tracking
+export const ANALYSIS_STAGES = [
+  "تحليل الفيديو",
+  "اكتشاف اللاعب",
+  "تحليل الحركة",
+  "تقييم المهارات",
+  "الإحصائيات والمقارنة",
+  "إنشاء التقرير"
+];
+
+// Professional players for comparison
+export const PROFESSIONAL_PLAYERS = [
+  {
+    name: "Cristiano Ronaldo",
+    team: "Al Nassr",
+    position: "Forward",
+    skills: ["Finishing", "Heading", "Long shots", "Pace"]
+  },
+  {
+    name: "Lionel Messi",
+    team: "Inter Miami",
+    position: "Forward",
+    skills: ["Dribbling", "Passing", "Vision", "Finishing"]
+  },
+  {
+    name: "Kylian Mbappé",
+    team: "Real Madrid",
+    position: "Forward",
+    skills: ["Pace", "Finishing", "Dribbling", "Movement"]
+  },
+  {
+    name: "Erling Haaland",
+    team: "Manchester City",
+    position: "Forward",
+    skills: ["Finishing", "Strength", "Positioning", "Heading"]
+  },
+  {
+    name: "Kevin De Bruyne",
+    team: "Manchester City",
+    position: "Midfielder",
+    skills: ["Passing", "Vision", "Crossing", "Long shots"]
+  },
+  {
+    name: "Luka Modric",
+    team: "Real Madrid",
+    position: "Midfielder",
+    skills: ["Passing", "Vision", "Ball control", "Game intelligence"]
+  },
+  {
+    name: "N'Golo Kanté",
+    team: "Al-Ittihad",
+    position: "Midfielder",
+    skills: ["Tackling", "Interception", "Stamina", "Positioning"]
+  },
+  {
+    name: "Mohamed Salah",
+    team: "Liverpool",
+    position: "Forward",
+    skills: ["Finishing", "Pace", "Dribbling", "Positioning"]
+  },
+  {
+    name: "Neymar Jr",
+    team: "Al-Hilal",
+    position: "Forward",
+    skills: ["Dribbling", "Technique", "Passing", "Creativity"]
+  },
+  {
+    name: "Karim Benzema",
+    team: "Al-Ittihad",
+    position: "Forward",
+    skills: ["Finishing", "Link-up play", "Technical ability", "Intelligence"]
+  }
+];
+
 export const AVAILABLE_BADGES: BadgeDefinition[] = [
   {
     name: "التحليل الأول",

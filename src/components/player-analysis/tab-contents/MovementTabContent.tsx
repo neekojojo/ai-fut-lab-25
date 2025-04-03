@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { PlayerMovementVisualization } from '@/components/PlayerMovementVisualization';
+import PlayerMovementVisualization from '@/components/PlayerMovementVisualization';
 import EnhancedMovementChart from '@/components/player-movement/EnhancedMovementChart';
 import PositionSpecificAnalysis from '@/components/player-movement/PositionSpecificAnalysis';
 import AchievementBadges from '@/components/player-analysis/AchievementBadges';
