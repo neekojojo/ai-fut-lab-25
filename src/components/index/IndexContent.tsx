@@ -172,8 +172,6 @@ const IndexContent: React.FC = () => {
           
           <h3 className="text-lg font-semibold mt-4">قاعدة بيانات المقارنة</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
-            <li>بيانات أداء من أكثر من 10,000 لاعب محترف</li>
-            <li>تغطية للبطولات والدوريات العالمية الكبرى</li>
             <li>مجموعات بيانات مقسمة حسب الفئة العمرية والمستوى</li>
             <li>تحديث البيانات بشكل دوري</li>
           </ul>
