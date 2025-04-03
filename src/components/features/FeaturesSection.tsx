@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -135,7 +136,6 @@ const FeaturesSection = () => {
           
           <h3 className="text-lg font-semibold mt-4">بيانات التطور المتاحة</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
-            <li>رسوم بيانية توضح مسار التطور</li>
             <li>مقارنات بين الفترات المختلفة</li>
             <li>تحليل نقاط التحول الإيجابية والسلبية</li>
             <li>توقعات مستقبلية بناءً على معدلات التطور</li>
@@ -168,7 +168,6 @@ const FeaturesSection = () => {
           
           <h3 className="text-lg font-semibold mt-4">طرق عرض البيانات</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
-            <li>رسوم بيانية وتوضيحية سهلة القراءة</li>
             <li>مقاييس ومؤشرات رقمية</li>
             <li>تحليلات بصرية ملونة حسب مستوى الأداء</li>
             <li>خرائط حرارية للأداء في الملعب</li>
