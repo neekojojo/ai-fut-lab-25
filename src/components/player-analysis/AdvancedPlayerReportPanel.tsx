@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -22,42 +23,6 @@ const AdvancedPlayerReportPanel: React.FC<AdvancedPlayerReportPanelProps> = ({ a
     }
     return `€${value}`;
   };
-
-  const technicalSkills = [
-    { name: 'Ball Control', value: 60 },
-    { name: 'Passing', value: 73 },
-    { name: 'Shooting', value: 63 },
-    { name: 'First Touch', value: 56 },
-    { name: 'Dribbling', value: 70 },
-    { name: 'Heading', value: 60 }
-  ];
-
-  const physicalSkills = [
-    { name: 'Speed', value: 78 },
-    { name: 'Strength', value: 63 },
-    { name: 'Jumping', value: 67 },
-    { name: 'Stamina', value: 74 },
-    { name: 'Agility', value: 60 },
-    { name: 'Balance', value: 63 }
-  ];
-
-  const tacticalSkills = [
-    { name: 'Positioning', value: 85 },
-    { name: 'Awareness', value: 72 },
-    { name: 'Decision Making', value: 76 },
-    { name: 'Off-ball Movement', value: 89 },
-    { name: 'Defensive Contribution', value: 68 },
-    { name: 'Game Reading', value: 72 }
-  ];
-
-  const mentalSkills = [
-    { name: 'Composure', value: 63 },
-    { name: 'Concentration', value: 70 },
-    { name: 'Work Rate', value: 60 },
-    { name: 'Leadership', value: 73 },
-    { name: 'Decision Making', value: 56 },
-    { name: 'Teamwork', value: 60 }
-  ];
 
   const proComparison = {
     name: 'Alisson Becker',
@@ -189,78 +154,8 @@ const AdvancedPlayerReportPanel: React.FC<AdvancedPlayerReportPanelProps> = ({ a
           <TabsContent value="detailed" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>تقييم المهارات الشامل</CardTitle>
-                <CardDescription>تحليل معمق لجميع جوانب الأداء</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-8">
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4">التحليل الفني</h3>
-                    <div className="space-y-3">
-                      {technicalSkills.map((skill, index) => (
-                        <div key={index} className="space-y-1">
-                          <div className="flex justify-between">
-                            <span>{skill.name}</span>
-                            <span className="font-medium">{skill.value}/100</span>
-                          </div>
-                          <Progress value={skill.value} className="h-2" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4">التحليل البدني</h3>
-                    <div className="space-y-3">
-                      {physicalSkills.map((skill, index) => (
-                        <div key={index} className="space-y-1">
-                          <div className="flex justify-between">
-                            <span>{skill.name}</span>
-                            <span className="font-medium">{skill.value}/100</span>
-                          </div>
-                          <Progress value={skill.value} className="h-2" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4">التحليل التكتيكي</h3>
-                    <div className="space-y-3">
-                      {tacticalSkills.map((skill, index) => (
-                        <div key={index} className="space-y-1">
-                          <div className="flex justify-between">
-                            <span>{skill.name}</span>
-                            <span className="font-medium">{skill.value}/100</span>
-                          </div>
-                          <Progress value={skill.value} className="h-2" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4">التحليل الذهني</h3>
-                    <div className="space-y-3">
-                      {mentalSkills.map((skill, index) => (
-                        <div key={index} className="space-y-1">
-                          <div className="flex justify-between">
-                            <span>{skill.name}</span>
-                            <span className="font-medium">{skill.value}/100</span>
-                          </div>
-                          <Progress value={skill.value} className="h-2" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>المقارنة مع لاعب محترف</CardTitle>
-                <CardDescription>مقارنة أسلوب اللاعب مع {proComparison.name}</CardDescription>
+                <CardTitle>تحليل المهارات المفصل</CardTitle>
+                <CardDescription>مقارنة تفصيلية بين مهاراتك والمعايير المهنية</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">

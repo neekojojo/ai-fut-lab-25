@@ -106,6 +106,7 @@ const AdvancedPlayerDashboard: React.FC<AdvancedPlayerDashboardProps> = ({
               }}
             />
             <InjuryRiskPanel injuryRisk={injuryRiskData} />
+            <ComprehensiveSkillsPanel />
           </div>
         </TabsContent>
 
@@ -138,7 +139,6 @@ const AdvancedPlayerDashboard: React.FC<AdvancedPlayerDashboardProps> = ({
         <TabsContent value="comprehensive" className="mt-6">
           <div className="space-y-6">
             <AdvancedPlayerReportPanel analysis={analysis} />
-            <ComprehensiveSkillsPanel />
           </div>
         </TabsContent>
       </Tabs>
