@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import VideoUpload from '../VideoUpload';
 import { ANALYSIS_STAGES } from '@/utils/analysis/constants';
 import { Separator } from '@/components/ui/separator';
-import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, ChevronRight, Target, Trophy } from 'lucide-react';
+import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, ChevronRight, Target, Trophy, Glasses } from 'lucide-react';
 import AnalysisProcessing from './analysis-processing/AnalysisProcessing';
 import AnalysisOptions from '@/components/analysis/ModelSelection';
 import { analyzeFootballVideo } from '@/utils/analysis';
@@ -60,7 +60,7 @@ const IndexContent: React.FC = () => {
           <h3 className="text-lg font-semibold mt-4">كيفية العمل</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
             <li>التقاط الفيديو وتقسيمه إلى إطارات</li>
-            <li>تحديد مواقع اللاعبين ��ي كل إطار</li>
+            <li>تحديد مواقع اللاعبين ���ي كل إطار</li>
             <li>تصنيف اللاعبين حسب الفريق</li>
             <li>إنشاء نظام تتبع فريد لكل لاعب</li>
           </ul>
@@ -341,6 +341,10 @@ const IndexContent: React.FC = () => {
     setOpenStageArticle(null);
   };
 
+  const goToARExperience = () => {
+    navigate('/ar-experience');
+  };
+
   if (showPeopleDetection) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -429,12 +433,22 @@ const IndexContent: React.FC = () => {
             <div className="flex flex-col items-center gap-4">
               <VideoUpload onUpload={handleFileSelected} />
               
-              <button 
-                onClick={handleTogglePeopleDetection}
-                className="mt-2 px-8 py-3 font-medium text-primary border border-primary rounded-md hover:bg-primary/10 transition-colors backdrop-blur-sm"
-              >
-                تجربة كشف اللاعبين
-              </button>
+              <div className="flex flex-wrap gap-4 justify-center mt-4">
+                <button 
+                  onClick={handleTogglePeopleDetection}
+                  className="px-8 py-3 font-medium text-primary border border-primary rounded-md hover:bg-primary/10 transition-colors backdrop-blur-sm"
+                >
+                  تجربة كشف اللاعبين
+                </button>
+                
+                <button 
+                  onClick={goToARExperience}
+                  className="px-8 py-3 font-medium text-white border border-primary bg-primary rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2"
+                >
+                  <Glasses className="h-5 w-5" />
+                  تجربة الواقع المعزز
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -442,6 +456,77 @@ const IndexContent: React.FC = () => {
       
       {!videoFile ? (
         <>
+          <div className="mt-12 mb-16">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold mb-2">تجربة الواقع المعزز</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                استمتع بتجربة تدريب كرة القدم المبتكرة باستخدام تقنية الواقع المعزز
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="border-primary/10 hover:border-primary/40 transition-all duration-500">
+                <CardHeader>
+                  <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                    <Target className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle>التدريب الافتراضي</CardTitle>
+                  <CardDescription>تدرب على مهاراتك الكروية باستخدام الملاعب والأهداف الافتراضية</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="list-disc list-inside space-y-2 pr-4">
+                    <li>تحديات تمرير دقيقة</li>
+                    <li>تدريبات مراوغة متقدمة</li>
+                    <li>تسديد على أهداف متحركة</li>
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Button onClick={goToARExperience} className="w-full">تجربة الآن</Button>
+                </CardFooter>
+              </Card>
+              
+              <Card className="border-primary/10 hover:border-primary/40 transition-all duration-500">
+                <CardHeader>
+                  <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                    <FileVideo className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle>الملعب الافتراضي</CardTitle>
+                  <CardDescription>استخدم كاميرا هاتفك لتجربة ملعب كرة قدم في محيطك الحقيقي</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="list-disc list-inside space-y-2 pr-4">
+                    <li>ملعب ثلاثي الأبعاد كامل</li>
+                    <li>مرمى وخطوط ملعب افتراضية</li>
+                    <li>كرة تفاعلية للتدريب</li>
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Button onClick={goToARExperience} className="w-full">تجربة الآن</Button>
+                </CardFooter>
+              </Card>
+              
+              <Card className="border-primary/10 hover:border-primary/40 transition-all duration-500">
+                <CardHeader>
+                  <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                    <Medal className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle>تحديات المهارات</CardTitle>
+                  <CardDescription>اختبر مهاراتك مع تحديات مختلفة بدرجات صعوبة متنوعة</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="list-disc list-inside space-y-2 pr-4">
+                    <li>تتبع تقدمك في كل تحدي</li>
+                    <li>مستويات صعوبة متدرجة</li>
+                    <li>تحسين دقة وسرعة اللعب</li>
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Button onClick={goToARExperience} className="w-full">تجربة الآن</Button>
+                </CardFooter>
+              </Card>
+            </div>
+          </div>
+          
           <FeaturesSection />
           <SubscriptionPlans />
           

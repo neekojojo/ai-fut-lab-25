@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
@@ -89,6 +90,12 @@ const Header = () => {
             <NavigationMenuItem>
               <NavigationMenuLink asChild className={navigationMenuTriggerStyle({ className: "bg-transparent hover:bg-primary/10" })}>
                 <Link to="/">الصفحة الرئيسية</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild className={navigationMenuTriggerStyle({ className: "bg-transparent hover:bg-primary/10" })}>
+                <Link to="/ar-experience">الواقع المعزز</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
             
