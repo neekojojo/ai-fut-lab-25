@@ -1,9 +1,8 @@
 
 import React from 'react';
-import { PositionSpecificAnalysis } from '@/components/player-movement/PositionSpecificAnalysis';
-import { EnhancedMovementChart } from '@/components/player-movement/EnhancedMovementChart';
+import PositionSpecificAnalysis from '@/components/player-movement/PositionSpecificAnalysis';
+import EnhancedMovementChart from '@/components/player-movement/EnhancedMovementChart';
 import { Button } from '@/components/ui/button';
-import { LineWave } from 'lucide-react';
 import { Grid2X2 } from 'lucide-react';
 import PlayerHeatMapPanel from '../PlayerHeatMapPanel';
 
@@ -12,7 +11,7 @@ interface MovementTabContentProps {
   onViewAdvanced: () => void;
 }
 
-export const MovementTabContent: React.FC<MovementTabContentProps> = ({ analysis, onViewAdvanced }) => {
+const MovementTabContent: React.FC<MovementTabContentProps> = ({ analysis, onViewAdvanced }) => {
   // Mock data for testing
   const mockEnhancedMovement = {
     maxSpeed: 82,
@@ -68,3 +67,5 @@ export const MovementTabContent: React.FC<MovementTabContentProps> = ({ analysis
     </div>
   );
 };
+
+export default MovementTabContent;

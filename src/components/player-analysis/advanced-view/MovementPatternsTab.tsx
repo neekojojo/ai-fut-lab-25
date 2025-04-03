@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { EnhancedMovementChart } from '@/components/player-movement/EnhancedMovementChart';
+import EnhancedMovementChart from '@/components/player-movement/EnhancedMovementChart';
 import PlayerHeatMapPanel from '../PlayerHeatMapPanel';
 import { Separator } from '@/components/ui/separator';
 
