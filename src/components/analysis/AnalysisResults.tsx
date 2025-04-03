@@ -10,6 +10,9 @@ import { useToast } from '@/hooks/use-toast';
 import { determineEarnedBadges } from '@/utils/analysis/badgeService';
 import AnalysisAchievementsPanel from '@/components/player-analysis/AnalysisAchievementsPanel';
 
+// Track whether analysis completion notification has been shown
+let analysisCompletionShown = false;
+
 interface AnalysisResultsProps {
   analysis: any;
   onResetAnalysis: () => void;
@@ -24,19 +27,25 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // تحديد الشارات المكتسبة بناء على تحليل اللاعب
-  const earnedBadges = determineEarnedBadges(analysis);
+  // Memoize badges determination to prevent re-calculation on every render
+  const earnedBadges = React.useMemo(() => {
+    if (!analysis) return [];
+    return determineEarnedBadges(analysis);
+  }, [analysis?.id]); // Only recalculate when analysis ID changes
   
   useEffect(() => {
-    // إظهار إشعار عند اكتمال التحليل بنجاح
-    if (analysis && earnedBadges.length > 0) {
+    // Show notification only once per session and only if we have analysis data and badges
+    if (analysis && earnedBadges.length > 0 && !analysisCompletionShown) {
+      analysisCompletionShown = true;
+      
       toast({
         title: "تم اكتمال التحليل بنجاح!",
         description: `حصلت على ${earnedBadges.length} شارة جديدة. تهانينا!`,
         className: "bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border-primary/20",
+        duration: 3000 // Short 3-second duration
       });
     }
-  }, [analysis, earnedBadges.length, toast]);
+  }, [analysis?.id]); // Only trigger when analysis ID changes
 
   const handleAdvancedAnalysis = () => {
     // Check if onAdvancedAnalysis prop exists and call it
@@ -49,6 +58,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
       toast({
         title: "فتح التحليل المتقدم",
         description: "جاري فتح التحليل المتقدم للاعب",
+        duration: 2000 // Even shorter duration for this action toast
       });
     }
   };

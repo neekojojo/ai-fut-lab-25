@@ -12,8 +12,8 @@ interface MovementTabContentProps {
 }
 
 const MovementTabContent: React.FC<MovementTabContentProps> = ({ analysis, onViewAdvanced }) => {
-  // المتغيرات الخاصة بالحركة المحسنة
-  const enhancedMovement = {
+  // Memoize movement data to prevent regeneration on each render
+  const enhancedMovement = React.useMemo(() => ({
     maxSpeed: analysis.physicalMetrics?.maxSpeed || 78,
     avgSpeed: analysis.physicalMetrics?.avgSpeed || 72,
     maxAcceleration: analysis.physicalMetrics?.maxAcceleration || 81,
@@ -23,7 +23,7 @@ const MovementTabContent: React.FC<MovementTabContentProps> = ({ analysis, onVie
     movementEfficiency: analysis.physicalMetrics?.efficiency || 82,
     tacticaAwareness: analysis.physicalMetrics?.awareness || 73,
     recoverySpeed: analysis.physicalMetrics?.recovery || 79
-  };
+  }), [analysis.id]); // Only recalculate when analysis ID changes
   
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -34,5 +34,5 @@ const MovementTabContent: React.FC<MovementTabContentProps> = ({ analysis, onVie
   );
 };
 
-export default MovementTabContent;
-
+// Use memo to prevent unnecessary re-renders
+export default React.memo(MovementTabContent);

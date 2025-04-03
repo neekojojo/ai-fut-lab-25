@@ -12,6 +12,9 @@ import {
   getTrainingRecommendations 
 } from './player-analysis/mockData';
 
+// Track whether the welcome message has been shown
+let welcomeMessageShown = false;
+
 interface PlayerAnalysisViewProps {
   videoFile: File;
   onResetAnalysis: () => void;
@@ -22,30 +25,42 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
   const [viewMode, setViewMode] = useState<'tabs' | 'advanced'>('tabs');
   const { toast } = useToast();
   
-  const playerStats = getPlayerStats();
-  const mockAnalysis = getMockAnalysis();
-  const playerComparison = getPlayerComparison().similarProfessionals; // Get the array from the PlayerComparison object
-  const trainingRecommendations = getTrainingRecommendations();
+  // Memoize data to prevent recreation on every render
+  const playerStats = React.useMemo(() => getPlayerStats(), []);
+  const mockAnalysis = React.useMemo(() => getMockAnalysis(), []);
+  const playerComparison = React.useMemo(() => 
+    getPlayerComparison().similarProfessionals, []
+  );
+  const trainingRecommendations = React.useMemo(() => 
+    getTrainingRecommendations(), []
+  );
   
   useEffect(() => {
-    toast({
-      title: "تحليل متقدم جاهز",
-      description: "استكشف أنماط الحركة التفصيلية ومقاييس الأداء عبر علامات التبويب المختلفة، بما في ذلك توافق اللاعب مع الأندية.",
-      className: "bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border-primary/20",
-    });
-  }, [toast]);
+    // Show welcome message only once per session
+    if (!welcomeMessageShown) {
+      welcomeMessageShown = true;
+      
+      toast({
+        title: "تحليل متقدم جاهز",
+        description: "استكشف أنماط الحركة التفصيلية ومقاييس الأداء عبر علامات التبويب المختلفة، بما في ذلك توافق اللاعب مع الأندية.",
+        className: "bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border-primary/20",
+        duration: 4000
+      });
+    }
+  }, []);
 
-  // معالج لعرض التحليل المتقدم للحركة
-  const handleViewAdvanced = () => {
+  // Memoize the handler to avoid recreating it on every render
+  const handleViewAdvanced = React.useCallback(() => {
     console.log("Opening advanced view mode");
     setViewMode('advanced');
     
-    // إضافة إشعار لتأكيد التنفيذ
+    // Add toast notification - but only when actually changing modes
     toast({
       title: "تم فتح التحليل المتقدم",
-      description: "تم الانتقال إلى عرض التحليل المتقدم للحركة"
+      description: "تم الانتقال إلى عرض التحليل المتقدم للحركة",
+      duration: 2000
     });
-  };
+  }, [toast]);
 
   // Render advanced analysis view when viewMode is 'advanced'
   if (viewMode === 'advanced') {

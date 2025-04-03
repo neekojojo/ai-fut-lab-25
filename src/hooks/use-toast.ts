@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import type {
@@ -6,7 +7,7 @@ import type {
 } from "@/components/ui/toast"
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_REMOVE_DELAY = 5000 // Reduced from 1000000 to 5000ms (5 seconds)
 
 type ToasterToast = ToastProps & {
   id: string
@@ -137,10 +138,28 @@ function dispatch(action: Action) {
   })
 }
 
+// Track if a notification has been shown recently
+let lastToastTime = 0;
+const TOAST_COOLDOWN = 5000; // 5 seconds cooldown between toasts
+
 type Toast = Omit<ToasterToast, "id">
 
 function toast({ ...props }: Toast) {
   const id = genId()
+  
+  // Check if we're within the cooldown period
+  const now = Date.now();
+  if (now - lastToastTime < TOAST_COOLDOWN) {
+    console.log("Toast throttled - too soon after previous toast");
+    return {
+      id,
+      dismiss: () => {},
+      update: () => {},
+    };
+  }
+  
+  // Update the last toast time
+  lastToastTime = now;
 
   const update = (props: ToasterToast) =>
     dispatch({
