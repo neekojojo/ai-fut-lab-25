@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { PlayerAnalysis } from '@/types/playerAnalysis';
 import { Progress } from '@/components/ui/progress';
-import { Euro, Trophy, Users, Check } from 'lucide-react';
+import { Euro, Trophy, Users, Check, Award, Target, Zap } from 'lucide-react';
 
 interface AdvancedPlayerReportPanelProps {
   analysis: PlayerAnalysis;
@@ -74,6 +74,25 @@ const AdvancedPlayerReportPanel: React.FC<AdvancedPlayerReportPanelProps> = ({ a
       }
     ]
   };
+  
+  // New data for comprehensive insights tab
+  const advancedInsights = [
+    {
+      title: "التوقعات المستقبلية",
+      icon: <Target className="h-5 w-5 text-blue-500" />,
+      content: "اللاعب لديه إمكانات كبيرة للتطور في جوانب متعددة من اللعب، خاصة في دقة التمريرات الطويلة والتموضع الدفاعي."
+    },
+    {
+      title: "المهارات المميزة",
+      icon: <Award className="h-5 w-5 text-amber-500" />,
+      content: "القدرة على التمرير بدقة تحت الضغط وسرعة اتخاذ القرارات في الثلث الأخير من الملعب."
+    },
+    {
+      title: "فرص التحسين الفورية",
+      icon: <Zap className="h-5 w-5 text-green-500" />,
+      content: "التركيز على التحسين المستمر في اللياقة البدنية والقدرة على التحمل خاصة في الدقائق الأخيرة من المباريات."
+    }
+  ];
 
   return (
     <Card className="w-full">
@@ -90,10 +109,11 @@ const AdvancedPlayerReportPanel: React.FC<AdvancedPlayerReportPanelProps> = ({ a
       </CardHeader>
       <CardContent className="pt-6">
         <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-3 mb-6">
+          <TabsList className="grid grid-cols-4 mb-6">
             <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
             <TabsTrigger value="detailed">تحليل مفصل</TabsTrigger>
             <TabsTrigger value="training">خطة التدريب</TabsTrigger>
+            <TabsTrigger value="insights">رؤى متقدمة</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -302,6 +322,38 @@ const AdvancedPlayerReportPanel: React.FC<AdvancedPlayerReportPanelProps> = ({ a
                         </Card>
                       ))}
                     </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          {/* New tab for advanced insights */}
+          <TabsContent value="insights" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>الرؤى المتقدمة</CardTitle>
+                <CardDescription>تحليل عميق لإمكانات اللاعب ومجالات التطوير</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {advancedInsights.map((insight, index) => (
+                    <div key={index} className="border-l-4 border-primary/50 pl-4 py-2">
+                      <div className="flex items-center mb-2">
+                        <div className="mr-2 rtl:ml-2 rtl:mr-0">
+                          {insight.icon}
+                        </div>
+                        <h3 className="font-semibold text-lg">{insight.title}</h3>
+                      </div>
+                      <p className="text-muted-foreground">{insight.content}</p>
+                    </div>
+                  ))}
+                  
+                  <div className="bg-primary/5 p-4 rounded-lg mt-4">
+                    <h3 className="font-semibold mb-2">ملخص تحليل الخبراء</h3>
+                    <p className="text-muted-foreground">
+                      {analysis.summary || "يظهر اللاعب إمكانات عالية في التطور في المراكز المتقدمة، مع وجود مهارات تقنية متميزة وقدرة على اتخاذ القرارات السريعة. مع التركيز على تحسين القدرة البدنية والمراوغة في المساحات الضيقة، يمكن أن يصل إلى مستوى أعلى في المواسم القادمة."}
+                    </p>
                   </div>
                 </div>
               </CardContent>
