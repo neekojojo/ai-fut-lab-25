@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import VideoUpload from '../VideoUpload';
 import { ANALYSIS_STAGES } from '@/utils/analysis/constants';
 import { Separator } from '@/components/ui/separator';
-import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, Globe, ChevronRight, Trophy, Target } from 'lucide-react';
+import { ArrowRight, FileVideo, Sparkles, BarChart3, Medal, CalendarCheck, ChevronRight, Trophy, Target } from 'lucide-react';
 import AnalysisProcessing from './analysis-processing/AnalysisProcessing';
 import AnalysisOptions from '@/components/analysis/ModelSelection';
 import { analyzeFootballVideo } from '@/utils/analysis';
@@ -169,7 +169,7 @@ const IndexContent: React.FC = () => {
       title: "مقارنة النتائج مع لاعبين محترفين",
       content: (
         <div className="space-y-4">
-          <p>تعتبر مقارنة نتائج اللاعب مع اللاعبين المحترفين من أهم الخطوات في تقييم ا��مستوى الحقيقي والإمكانيات المستقبلية.</p>
+          <p>تعتبر مقارنة نتائج اللاعب مع اللاعبين المحترفين من أهم الخطوات في تقييم المستوى الحقيقي والإمكانيات المستقبلية.</p>
           
           <h3 className="text-lg font-semibold mt-4">قاعدة بيانات المقارنة</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
