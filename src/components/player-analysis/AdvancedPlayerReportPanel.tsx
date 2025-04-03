@@ -5,6 +5,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { PlayerAnalysis } from '@/types/playerAnalysis';
 import { Progress } from '@/components/ui/progress';
 import { Euro, Trophy, Users, Check, Award, Target, Zap } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { professionalPlayers } from '@/types/training';
 
 interface AdvancedPlayerReportPanelProps {
   analysis: PlayerAnalysis;
@@ -12,6 +14,7 @@ interface AdvancedPlayerReportPanelProps {
 
 const AdvancedPlayerReportPanel: React.FC<AdvancedPlayerReportPanelProps> = ({ analysis }) => {
   const [activeTab, setActiveTab] = useState('overview');
+  const [selectedProPlayer, setSelectedProPlayer] = useState('Kylian Mbappé');
 
   const formatMarketValue = (value?: number) => {
     if (!value) return '€0';
@@ -24,20 +27,23 @@ const AdvancedPlayerReportPanel: React.FC<AdvancedPlayerReportPanelProps> = ({ a
     return `€${value}`;
   };
 
+  // Find selected pro player from the professionals list
+  const selectedPro = professionalPlayers.find(p => p.name === selectedProPlayer) || professionalPlayers[0];
+  
   const proComparison = {
-    name: 'Alisson Becker',
-    similarity: 41,
+    name: selectedPro.name,
+    similarity: selectedPro.similarity || 75,
     skills: [
-      { name: 'Reflexes', you: 55, pro: 93 },
-      { name: 'Positioning', you: 56, pro: 94 },
-      { name: 'Handling', you: 54, pro: 91 },
-      { name: 'Passing', you: 52, pro: 87 },
-      { name: 'Command', you: 55, pro: 92 }
+      { name: 'التكنيك', you: 55, pro: 93 },
+      { name: 'التمركز', you: 56, pro: 94 },
+      { name: 'المراوغة', you: 54, pro: 91 },
+      { name: 'التمرير', you: 52, pro: 87 },
+      { name: 'التحكم', you: 55, pro: 92 }
     ],
     developmentPath: [
-      'Improve your Positioning with specialized training',
-      'Improve your Reflexes with specialized training',
-      'Improve your Command with specialized training'
+      `تحسين قدراتك في ${selectedPro.strengths[0]} مع تمارين متخصصة`,
+      `تحسين قدراتك في ${selectedPro.strengths[1]} مع تمارين متخصصة`,
+      `تحسين قدراتك في ${selectedPro.strengths[2]} مع تمارين متخصصة`
     ]
   };
 
@@ -93,6 +99,10 @@ const AdvancedPlayerReportPanel: React.FC<AdvancedPlayerReportPanelProps> = ({ a
       content: "التركيز على التحسين المستمر في اللياقة البدنية والقدرة على التحمل خاصة في الدقائق الأخيرة من المباريات."
     }
   ];
+
+  // Filter players by position (forward or midfielder)
+  const forwardPlayers = professionalPlayers.filter(p => p.position === 'forward').slice(0, 40);
+  const midfielderPlayers = professionalPlayers.filter(p => p.position === 'midfielder').slice(0, 40);
 
   return (
     <Card className="w-full">
@@ -176,24 +186,61 @@ const AdvancedPlayerReportPanel: React.FC<AdvancedPlayerReportPanelProps> = ({ a
               <CardHeader>
                 <CardTitle>تحليل المهارات المفصل</CardTitle>
                 <CardDescription>مقارنة تفصيلية بين مهاراتك والمعايير المهنية</CardDescription>
+                
+                <div className="mt-4 grid w-full items-center gap-1.5">
+                  <h3 className="text-base font-medium">اختر لاعباً للمقارنة:</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="text-sm font-medium mb-2">لاعبي الهجوم:</h4>
+                      <Select value={selectedProPlayer} onValueChange={setSelectedProPlayer}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="اختر لاعب هجوم" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[300px]">
+                          {forwardPlayers.map(player => (
+                            <SelectItem key={player.name} value={player.name}>
+                              {player.name} ({player.team})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium mb-2">لاعبي الوسط:</h4>
+                      <Select value={selectedProPlayer} onValueChange={setSelectedProPlayer}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="اختر لاعب وسط" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[300px]">
+                          {midfielderPlayers.map(player => (
+                            <SelectItem key={player.name} value={player.name}>
+                              {player.name} ({player.team})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mr-4 rtl:ml-4 rtl:mr-0">
-                        <img 
-                          src="/placeholder.svg" 
-                          alt="Player avatar" 
-                          className="h-12 w-12 object-cover rounded-full"
-                        />
+                        <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-white text-lg font-bold">
+                          {selectedPro.name.charAt(0)}
+                        </div>
                       </div>
                       <div>
                         <h3 className="text-xl font-semibold">تشابه الأسلوب</h3>
-                        <p className="text-muted-foreground">مدى التشابه في أسلوب اللعب</p>
+                        <p className="text-muted-foreground">مدى التشابه في أسلوب اللعب مع {selectedPro.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {selectedPro.team} - {selectedPro.position === 'forward' ? 'مهاجم' : 'وسط'}
+                        </p>
                       </div>
                     </div>
-                    <div className="text-4xl font-bold">{proComparison.similarity}%</div>
+                    <div className="text-4xl font-bold">{selectedPro.similarity}%</div>
                   </div>
 
                   <div>
@@ -205,7 +252,7 @@ const AdvancedPlayerReportPanel: React.FC<AdvancedPlayerReportPanelProps> = ({ a
                             <span>{skill.name}</span>
                             <div className="space-x-2 rtl:space-x-reverse">
                               <span>أنت: {skill.you}</span>
-                              <span className="text-primary">{proComparison.name}: {skill.pro}</span>
+                              <span className="text-primary">{selectedPro.name}: {skill.pro}</span>
                             </div>
                           </div>
                           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -218,7 +265,7 @@ const AdvancedPlayerReportPanel: React.FC<AdvancedPlayerReportPanelProps> = ({ a
 
                   <div>
                     <h3 className="text-xl font-semibold mb-4">مسار التطوير</h3>
-                    <p className="mb-4">للوصول إلى مستوى مشابه لـ {proComparison.name}، ركز على هذه المجالات الرئيسية:</p>
+                    <p className="mb-4">للوصول إلى مستوى مشابه لـ {selectedPro.name}، ركز على هذه المجالات الرئيسية:</p>
                     <div className="space-y-2">
                       {proComparison.developmentPath.map((tip, index) => (
                         <div key={index} className="flex items-start">
@@ -328,7 +375,6 @@ const AdvancedPlayerReportPanel: React.FC<AdvancedPlayerReportPanelProps> = ({ a
             </Card>
           </TabsContent>
           
-          {/* New tab for advanced insights */}
           <TabsContent value="insights" className="space-y-6">
             <Card>
               <CardHeader>
