@@ -1,72 +1,70 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowRightIcon, TrendingUp } from "lucide-react";
-import MovementPanel from '../MovementPanel';
-import MovementAnalysis from '@/components/MovementAnalysis';
+import { PositionSpecificAnalysis } from '@/components/player-movement/PositionSpecificAnalysis';
+import { EnhancedMovementChart } from '@/components/player-movement/EnhancedMovementChart';
+import { Button } from '@/components/ui/button';
+import { LineWave } from 'lucide-react';
+import { Grid2X2 } from 'lucide-react';
+import PlayerHeatMapPanel from '../PlayerHeatMapPanel';
 
 interface MovementTabContentProps {
   analysis: any;
   onViewAdvanced: () => void;
 }
 
-const MovementTabContent: React.FC<MovementTabContentProps> = ({ analysis, onViewAdvanced }) => {
+export const MovementTabContent: React.FC<MovementTabContentProps> = ({ analysis, onViewAdvanced }) => {
+  // Mock data for testing
+  const mockEnhancedMovement = {
+    maxSpeed: 82,
+    avgSpeed: 65,
+    maxAcceleration: 76,
+    avgAcceleration: 62,
+    stamina: 78,
+    consistency: 72,
+    movementEfficiency: 75,
+    tacticaAwareness: 82, 
+    recoverySpeed: 70,
+    accelerationProfile: {
+      explosive: 0.45,
+      sustained: 0.35,
+      deceleration: 0.2
+    },
+    directionalData: {
+      forward: 0.6,
+      backward: 0.1,
+      sideways: 0.3
+    },
+    positionalHeatmap: [
+      {x: 20, y: 30, value: 0.8},
+      {x: 30, y: 40, value: 0.7},
+      {x: 40, y: 50, value: 0.9},
+      {x: 60, y: 20, value: 0.5},
+      {x: 70, y: 60, value: 0.3},
+      {x: 80, y: 40, value: 0.6},
+    ]
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between mb-2">
-        <div>
-          <h2 className="text-2xl font-bold">{analysis.playerName || 'اللاعب'}</h2>
-          <p className="text-muted-foreground">{analysis.position || 'وسط'} • تحليل الحركة</p>
-        </div>
-        <Button onClick={onViewAdvanced} variant="default" className="gap-2">
-          <span>عرض التحليل المتقدم</span>
-          <ArrowRightIcon className="h-4 w-4 rtl:rotate-180" />
-        </Button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <PositionSpecificAnalysis position={analysis.position || 'Forward'} />
+        <PlayerHeatMapPanel 
+          heatmapData={analysis.heatmap?.map(point => ({ 
+            x: point.x, 
+            y: point.y, 
+            intensity: point.value || point.intensity || 0.5 
+          }))}
+        />
       </div>
       
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle>نظرة عامة على الحركة</CardTitle>
-          <CardDescription>
-            تحليل أنماط الحركة وملامح الأداء الرئيسية
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col md:flex-row gap-4 md:items-center">
-            <div className="flex-1">
-              <MovementPanel analysis={analysis} />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <EnhancedMovementChart enhancedMovement={mockEnhancedMovement} />
       
-      <MovementAnalysis analysis={analysis} />
-      
-      <Card>
-        <CardHeader className="pb-2">
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle>تطور الكفاءة الحركية</CardTitle>
-              <CardDescription>تقدم مستوى الحركة مقارنة بالتحليل السابق</CardDescription>
-            </div>
-            <div className="bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
-              <TrendingUp className="h-4 w-4" />
-              <span>+5.7% مقارنة بالسابق</span>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="border-t pt-4 mt-2">
-            <h4 className="font-medium mb-2">ملاحظات من المدرب</h4>
-            <p className="text-sm text-muted-foreground">
-              {analysis.coachNotes || "أظهر اللاعب تحسناً ملحوظاً في الاستجابة الحركية والتوازن أثناء تغيير الاتجاه. يحتاج إلى مزيد من العمل على السرعة القصوى والتسارع في المساحات المفتوحة."}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex justify-center mt-4">
+        <Button onClick={onViewAdvanced} className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+          <Grid2X2 className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
+          عرض التحليل المتقدم للحركة
+        </Button>
+      </div>
     </div>
   );
 };
-
-export default MovementTabContent;
