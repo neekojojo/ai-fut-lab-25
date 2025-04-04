@@ -1,127 +1,183 @@
 
-import { DetectionResult } from './types';
+import * as tf from '@tensorflow/tfjs';
+import * as poseDetection from '@tensorflow-models/pose-detection';
+import { DetectionResult, FrameResult, PlayerPosition } from './types';
 
-// Create a deterministic hash function for video files
-// This ensures the same video always produces the same analysis result
-const hashVideoFile = async (file: File): Promise<string> => {
-  // In a real implementation, we would compute an actual hash of the video content
-  // For this mock implementation, we'll use the file name and size as a pseudo-hash
-  return `${file.name}-${file.size}-${file.lastModified}`;
+// تهيئة نماذج TensorFlow.js
+const initializeTensorFlow = async () => {
+  await tf.ready();
+  console.log("تم تهيئة TensorFlow.js بنجاح");
 };
 
-// Set a fixed seed for random number generation based on the video hash
-// This ensures deterministic "random" values for the same video
-const getSeededRandom = (seed: number): () => number => {
-  // Simple LCG (Linear Congruential Generator) implementation
-  // for deterministic pseudo-random numbers
-  let m = 2**31 - 1;
-  let a = 1103515245;
-  let c = 12345;
-  let state = seed;
-
-  return function() {
-    state = (a * state + c) % m;
-    return state / m;
-  };
+// استخراج إطارات من الفيديو
+const extractFramesFromVideo = async (videoFile: File, frameCount: number = 15): Promise<HTMLCanvasElement[]> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // إنشاء عنصر فيديو
+      const video = document.createElement('video');
+      video.autoplay = false;
+      video.muted = true;
+      video.playsInline = true;
+      
+      // إنشاء رابط URL للفيديو
+      const videoURL = URL.createObjectURL(videoFile);
+      video.src = videoURL;
+      
+      // انتظار استعداد البيانات الوصفية للفيديو
+      video.onloadedmetadata = async () => {
+        const frames: HTMLCanvasElement[] = [];
+        const duration = video.duration;
+        
+        // إذا كان الفيديو قصيرًا جدًا
+        if (duration < 1) {
+          reject(new Error("الفيديو قصير جدًا للتحليل"));
+          return;
+        }
+        
+        // حساب الفاصل الزمني بين الإطارات
+        const frameInterval = duration / frameCount;
+        
+        // إنشاء سياق الرسم للحصول على الإطارات
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+          reject(new Error("فشل إنشاء سياق الرسم"));
+          return;
+        }
+        
+        // استخراج الإطارات على فترات منتظمة
+        for (let i = 0; i < frameCount; i++) {
+          const time = i * frameInterval;
+          video.currentTime = time;
+          
+          // انتظار تحديث موضع الفيديو
+          await new Promise<void>(resolveSeek => {
+            const onSeeked = () => {
+              video.removeEventListener('seeked', onSeeked);
+              resolveSeek();
+            };
+            video.addEventListener('seeked', onSeeked);
+          });
+          
+          // رسم الإطار الحالي على Canvas
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          
+          // استنساخ Canvas للإطار الحالي
+          const frameCanvas = document.createElement('canvas');
+          frameCanvas.width = canvas.width;
+          frameCanvas.height = canvas.height;
+          const frameCtx = frameCanvas.getContext('2d');
+          
+          if (frameCtx) {
+            frameCtx.drawImage(canvas, 0, 0);
+            frames.push(frameCanvas);
+          }
+        }
+        
+        // تحرير موارد الفيديو
+        URL.revokeObjectURL(videoURL);
+        resolve(frames);
+      };
+      
+      video.onerror = () => {
+        URL.revokeObjectURL(videoURL);
+        reject(new Error("فشل في تحميل الفيديو"));
+      };
+      
+    } catch (error) {
+      console.error("خطأ في استخراج إطارات الفيديو:", error);
+      reject(error);
+    }
+  });
 };
 
-// Global cache for storing previous detection results
-// This ensures the exact same results for the same video
-const detectionCache = new Map<string, DetectionResult>();
-
-// Optimized version for faster performance and consistent results
+// كشف الأشخاص في الفيديو باستخدام TensorFlow.js
 export const detectPeopleInVideo = async (
   videoFile: File
 ): Promise<DetectionResult> => {
-  // Calculate hash for the video file
-  const videoHash = await hashVideoFile(videoFile);
-  
-  // Check if we've already analyzed this exact video file
-  if (detectionCache.has(videoHash)) {
-    console.log("Using cached result for video analysis");
-    return detectionCache.get(videoHash)!;
-  }
-  
-  // Generate a deterministic seed based on the video hash
-  const hashSum = videoHash.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
-  const seededRandom = getSeededRandom(hashSum);
-  
-  // Generate deterministic frame results
-  const frameCount = 12; // Fixed frame count for consistency
-  const frameResults = [];
-  const playerPositions = [];
-  
-  let totalDetections = 0;
-  for (let i = 0; i < frameCount; i++) {
-    // Create deterministic number of detections for each frame
-    const frameDetections = Math.floor(seededRandom() * 5) + 3; // 3-7 people per frame
-    totalDetections += frameDetections;
+  try {
+    console.log("بدء تحليل الفيديو باستخدام TensorFlow.js...");
     
-    frameResults.push({
-      frameNumber: i,
-      detections: frameDetections,
-      timestamp: i * (1000 / 30) // Assuming 30fps
-    });
+    // تهيئة TensorFlow.js
+    await initializeTensorFlow();
     
-    // Generate deterministic player positions - only for key frames
-    if (i % 3 === 0) { // Only every 3rd frame
-      const timestamp = i * (1000 / 30);
+    // استخراج إطارات من الفيديو
+    const frames = await extractFramesFromVideo(videoFile);
+    console.log(`تم استخراج ${frames.length} إطار من الفيديو`);
+    
+    // تهيئة نموذج كشف الوضعية
+    const detector = await poseDetection.createDetector(
+      poseDetection.SupportedModels.MoveNet,
+      { modelType: poseDetection.movenet.modelType.MULTIPOSE_LIGHTNING }
+    );
+    
+    // تحليل كل إطار
+    const frameResults: FrameResult[] = [];
+    const playerPositions: PlayerPosition[] = [];
+    
+    let totalDetections = 0;
+    
+    for (let i = 0; i < frames.length; i++) {
+      // تقدير الوضعيات في الإطار
+      const poses = await detector.estimatePoses(frames[i]);
       
-      // Create a deterministic but varying position for the player over time
-      const seedOffset1 = hashSum % 10;
-      const seedOffset2 = (hashSum / 10) % 10;
-      const centerX = 300 + Math.sin((i + seedOffset1) / 5) * 50;
-      const centerY = 200 + Math.cos((i + seedOffset2) / 3) * 30;
-      
-      // Generate deterministic keypoints
-      const keypoints = [
-        // Face
-        { x: centerX, y: centerY - 50, part: "nose", confidence: 0.9 },
-        { x: centerX - 15, y: centerY - 55, part: "left_eye", confidence: 0.85 },
-        { x: centerX + 15, y: centerY - 55, part: "right_eye", confidence: 0.85 },
-        
-        // Upper body
-        { x: centerX - 40, y: centerY - 20, part: "left_shoulder", confidence: 0.9 },
-        { x: centerX + 40, y: centerY - 20, part: "right_shoulder", confidence: 0.9 },
-        { x: centerX - 60, y: centerY, part: "left_elbow", confidence: 0.85 },
-        { x: centerX + 60, y: centerY, part: "right_elbow", confidence: 0.85 },
-        
-        // Lower body
-        { x: centerX - 20, y: centerY + 40, part: "left_hip", confidence: 0.9 },
-        { x: centerX + 20, y: centerY + 40, part: "right_hip", confidence: 0.9 },
-        { x: centerX - 25, y: centerY + 80, part: "left_knee", confidence: 0.85 },
-        { x: centerX + 25, y: centerY + 80, part: "right_knee", confidence: 0.85 },
-      ];
-      
-      // Add player position data
-      playerPositions.push({
+      // إضافة نتائج الإطار
+      const timestamp = i * (1000 / frames.length); // تقريب زمني
+      frameResults.push({
         frameNumber: i,
-        timestamp,
-        keypoints,
-        bbox: {
-          x: centerX - 80,
-          y: centerY - 70,
-          width: 160,
-          height: 220
-        }
+        detections: poses.length,
+        timestamp
       });
+      
+      totalDetections += poses.length;
+      
+      // إضافة بيانات اللاعبين
+      if (poses.length > 0) {
+        for (const pose of poses) {
+          playerPositions.push({
+            frameNumber: i,
+            timestamp,
+            keypoints: pose.keypoints,
+            bbox: {
+              x: Math.min(...pose.keypoints.filter(kp => kp.x).map(kp => kp.x)),
+              y: Math.min(...pose.keypoints.filter(kp => kp.y).map(kp => kp.y)),
+              width: Math.max(...pose.keypoints.filter(kp => kp.x).map(kp => kp.x)) - 
+                     Math.min(...pose.keypoints.filter(kp => kp.x).map(kp => kp.x)),
+              height: Math.max(...pose.keypoints.filter(kp => kp.y).map(kp => kp.y)) - 
+                      Math.min(...pose.keypoints.filter(kp => kp.y).map(kp => kp.y))
+            }
+          });
+        }
+      }
     }
+    
+    // حساب متوسط عدد اللاعبين وثقة الكشف
+    const avgCount = Math.round(totalDetections / frames.length);
+    const confidence = 0.85; // قد تحتاج إلى حساب هذا من بيانات الثقة بالكشف الفعلية
+    
+    console.log("تم الانتهاء من تحليل الفيديو");
+    
+    return {
+      count: avgCount,
+      confidence,
+      frameResults,
+      playerPositions
+    };
+  } catch (error) {
+    console.error("خطأ في تحليل الفيديو:", error);
+    
+    // في حالة حدوث خطأ، إرجاع بيانات فارغة
+    return {
+      count: 0,
+      confidence: 0,
+      frameResults: [],
+      playerPositions: []
+    };
   }
-  
-  // Calculate fully deterministic count and confidence
-  const avgCount = Math.round(totalDetections / frameCount);
-  // Ensure confidence is completely deterministic
-  const confidence = 0.7 + ((hashSum % 20) / 100);
-  
-  const result: DetectionResult = {
-    count: avgCount,
-    confidence: parseFloat(confidence.toFixed(2)),
-    frameResults,
-    playerPositions
-  };
-  
-  // Cache the result for future use
-  detectionCache.set(videoHash, result);
-  
-  return result;
 };
+
+// كشف الأشخاص باستخدام TensorFlow.js
+export const detectWithTensorflow = detectPeopleInVideo;
