@@ -109,19 +109,20 @@ const ARExperience = () => {
                     <TabsTrigger value="field">الملعب الافتراضي</TabsTrigger>
                     <TabsTrigger value="challenges">تحديات المهارات</TabsTrigger>
                   </TabsList>
-                </CardHeader>
+                </Tabs>
+              </CardHeader>
                 
-                <CardContent className="pt-2">
-                  <TabsContent value="field" className="mt-0">
-                    <VirtualFieldAR onError={handlePermissionsError} />
-                  </TabsContent>
+              <CardContent className="pt-2">
+                <TabsContent value="field" className="mt-0">
+                  <VirtualFieldAR onError={handlePermissionsError} />
+                </TabsContent>
                   
-                  <TabsContent value="challenges" className="mt-0">
-                    <SkillChallengeAR onError={handlePermissionsError} />
-                  </TabsContent>
-                </CardContent>
-              </Card>
-            </div>
+                <TabsContent value="challenges" className="mt-0">
+                  <SkillChallengeAR onError={handlePermissionsError} />
+                </TabsContent>
+              </CardContent>
+            </Card>
+          </div>
           
           <div className="lg:col-span-1">
             <Card>

@@ -180,6 +180,53 @@ export const createPathAnimation = (
 };
 
 /**
+ * Create a particle system for visual effects (returns JSX element)
+ */
+export const createParticleSystem = (
+  position: string,
+  color: string = '#FFFFFF',
+  count: number = 20,
+  duration: number = 2000,
+  size: number = 0.05
+): JSX.Element => {
+  return (
+    <a-entity position={position}>
+      {Array(count).fill(0).map((_, i) => {
+        const angle = (i / count) * Math.PI * 2;
+        const radius = 0.5 + Math.random() * 0.5;
+        const x = Math.sin(angle) * radius;
+        const y = Math.random() * 0.5;
+        const z = Math.cos(angle) * radius;
+        
+        return (
+          <a-sphere
+            key={`particle-${i}`}
+            radius={size}
+            position="0 0 0"
+            color={color}
+            opacity="0.7"
+            transparent="true"
+            animation={createAnimation({
+              property: 'position',
+              to: `${x} ${y} ${z}`,
+              dur: duration + (Math.random() * 500),
+              easing: 'easeOutQuad'
+            })}
+            animation__fade={createAnimation({
+              property: 'opacity',
+              from: 0.7,
+              to: 0,
+              dur: duration * 0.8,
+              delay: duration * 0.2
+            })}
+          />
+        );
+      })}
+    </a-entity>
+  );
+};
+
+/**
  * Create celebratory particle effect (returns JSX element)
  */
 export const createSuccessEffect = (position: string): JSX.Element => {
@@ -210,6 +257,71 @@ export const createSuccessEffect = (position: string): JSX.Element => {
               delay: 500
             })}
           />
+        );
+      })}
+    </a-entity>
+  );
+};
+
+/**
+ * Create an environmental effect (rain, snow, etc.)
+ */
+export const createWeatherEffect = (
+  type: 'rain' | 'snow' | 'leaves',
+  intensity: number = 1.0,
+  area: number = 10
+): JSX.Element => {
+  const count = Math.floor(50 * intensity);
+  const colors = {
+    rain: '#8Bf5FF',
+    snow: '#FFFFFF',
+    leaves: '#65A15A'
+  };
+  const sizes = {
+    rain: 0.03,
+    snow: 0.05,
+    leaves: 0.1
+  };
+  const speeds = {
+    rain: 3,
+    snow: 1,
+    leaves: 1.5
+  };
+  
+  return (
+    <a-entity position="0 8 0" id={`weather-${type}`}>
+      {Array(count).fill(0).map((_, i) => {
+        const x = (Math.random() - 0.5) * area;
+        const z = (Math.random() - 0.5) * area;
+        const delay = Math.random() * 5000;
+        const duration = 2000 / speeds[type];
+        
+        return (
+          <a-entity
+            key={`weather-particle-${i}`}
+            position={`${x} 0 ${z}`}
+          >
+            <a-sphere
+              radius={sizes[type]}
+              color={colors[type]}
+              opacity="0.7"
+              transparent="true"
+              animation={createAnimation({
+                property: 'position.y',
+                from: 0,
+                to: -8,
+                dur: duration,
+                delay: delay,
+                loop: true
+              })}
+              animation__rotate={type === 'leaves' ? createAnimation({
+                property: 'rotation',
+                to: '360 360 360',
+                dur: duration * 2,
+                loop: true
+              }) : ''}
+            />
+          </a-entity>
         );
       })}
     </a-entity>
