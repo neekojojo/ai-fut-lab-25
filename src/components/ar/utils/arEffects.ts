@@ -15,6 +15,53 @@ export interface AnimationConfig {
   resumeEvents?: string;
 }
 
+export interface TrailConfig {
+  key: string;
+  className: string;
+  geometry: string;
+  material: string;
+  position: string;
+  animation__fade: string;
+  animation__scale: string;
+}
+
+export interface ParticleConfig {
+  key: string;
+  radius: number;
+  position: string;
+  color: string;
+  opacity: string;
+  transparent: string;
+  animation: string;
+  animation__fade: string;
+}
+
+export interface SuccessParticleConfig {
+  key: string;
+  geometry: string;
+  material: string;
+  position: string;
+  animation: string;
+  animation__opacity: string;
+}
+
+export interface WeatherParticleConfig {
+  key: string;
+  position: string;
+  radius: number;
+  color: string;
+  opacity: string;
+  transparent: string;
+  animation: string;
+  animation__rotate?: string;
+}
+
+export interface EntityConfig {
+  position: string;
+  id?: string;
+  particles: WeatherParticleConfig[] | ParticleConfig[] | SuccessParticleConfig[];
+}
+
 /**
  * Create an animation string for A-Frame elements
  */
@@ -109,40 +156,38 @@ export const createHighlightAnimation = (): string => {
 };
 
 /**
- * Create a trail effect (returns JSX elements)
+ * Create a trail effect config (returns config objects)
  */
-export const createTrailEffect = (
+export const createTrailEffectConfig = (
   positionAttribute: string,
   count: number = 5,
   color: string = '#FFFFFF',
   fadeDuration: number = 1000
-): JSX.Element[] => {
-  const trails: JSX.Element[] = [];
+): TrailConfig[] => {
+  const trails: TrailConfig[] = [];
   
   for (let i = 0; i < count; i++) {
-    trails.push(
-      <a-entity
-        key={`trail-${i}`}
-        className="trail-particle"
-        geometry="primitive: sphere; radius: 0.05"
-        material={`color: ${color}; opacity: 0.7; transparent: true`}
-        position={positionAttribute}
-        animation__fade={createAnimation({
-          property: 'material.opacity',
-          from: 0.7,
-          to: 0,
-          dur: fadeDuration,
-          delay: i * (fadeDuration / count)
-        })}
-        animation__scale={createAnimation({
-          property: 'scale',
-          from: '1 1 1',
-          to: '0.5 0.5 0.5',
-          dur: fadeDuration,
-          delay: i * (fadeDuration / count)
-        })}
-      />
-    );
+    trails.push({
+      key: `trail-${i}`,
+      className: "trail-particle",
+      geometry: "primitive: sphere; radius: 0.05",
+      material: `color: ${color}; opacity: 0.7; transparent: true`,
+      position: positionAttribute,
+      animation__fade: createAnimation({
+        property: 'material.opacity',
+        from: 0.7,
+        to: 0,
+        dur: fadeDuration,
+        delay: i * (fadeDuration / count)
+      }),
+      animation__scale: createAnimation({
+        property: 'scale',
+        from: '1 1 1',
+        to: '0.5 0.5 0.5',
+        dur: fadeDuration,
+        delay: i * (fadeDuration / count)
+      })
+    });
   }
   
   return trails;
@@ -180,97 +225,98 @@ export const createPathAnimation = (
 };
 
 /**
- * Create a particle system for visual effects (returns JSX element)
+ * Create a particle system config (returns config object)
  */
-export const createParticleSystem = (
+export const createParticleSystemConfig = (
   position: string,
   color: string = '#FFFFFF',
   count: number = 20,
   duration: number = 2000,
   size: number = 0.05
-): JSX.Element => {
-  return (
-    <a-entity position={position}>
-      {Array(count).fill(0).map((_, i) => {
-        const angle = (i / count) * Math.PI * 2;
-        const radius = 0.5 + Math.random() * 0.5;
-        const x = Math.sin(angle) * radius;
-        const y = Math.random() * 0.5;
-        const z = Math.cos(angle) * radius;
-        
-        return (
-          <a-sphere
-            key={`particle-${i}`}
-            radius={size}
-            position="0 0 0"
-            color={color}
-            opacity="0.7"
-            transparent="true"
-            animation={createAnimation({
-              property: 'position',
-              to: `${x} ${y} ${z}`,
-              dur: duration + (Math.random() * 500),
-              easing: 'easeOutQuad'
-            })}
-            animation__fade={createAnimation({
-              property: 'opacity',
-              from: 0.7,
-              to: 0,
-              dur: duration * 0.8,
-              delay: duration * 0.2
-            })}
-          />
-        );
-      })}
-    </a-entity>
-  );
+): EntityConfig => {
+  const particles: ParticleConfig[] = [];
+  
+  for (let i = 0; i < count; i++) {
+    const angle = (i / count) * Math.PI * 2;
+    const radius = 0.5 + Math.random() * 0.5;
+    const x = Math.sin(angle) * radius;
+    const y = Math.random() * 0.5;
+    const z = Math.cos(angle) * radius;
+    
+    particles.push({
+      key: `particle-${i}`,
+      radius: size,
+      position: "0 0 0",
+      color: color,
+      opacity: "0.7",
+      transparent: "true",
+      animation: createAnimation({
+        property: 'position',
+        to: `${x} ${y} ${z}`,
+        dur: duration + (Math.random() * 500),
+        easing: 'easeOutQuad'
+      }),
+      animation__fade: createAnimation({
+        property: 'opacity',
+        from: 0.7,
+        to: 0,
+        dur: duration * 0.8,
+        delay: duration * 0.2
+      })
+    });
+  }
+  
+  return {
+    position,
+    particles
+  };
 };
 
 /**
- * Create celebratory particle effect (returns JSX element)
+ * Create celebratory particle effect config
  */
-export const createSuccessEffect = (position: string): JSX.Element => {
-  return (
-    <a-entity position={position}>
-      {/* Generate multiple particles with random directions */}
-      {Array(10).fill(0).map((_, i) => {
-        const angle = (i / 10) * Math.PI * 2;
-        const x = Math.sin(angle) * 0.5;
-        const z = Math.cos(angle) * 0.5;
-        
-        return (
-          <a-entity
-            key={`particle-${i}`}
-            geometry="primitive: sphere; radius: 0.05"
-            material="color: #44FF44; emissive: #22AA22"
-            position="0 0 0"
-            animation={createAnimation({
-              property: 'position',
-              to: `${x} 0.5 ${z}`,
-              dur: 1000 + (Math.random() * 500)
-            })}
-            animation__opacity={createAnimation({
-              property: 'material.opacity',
-              from: 1,
-              to: 0,
-              dur: 1000,
-              delay: 500
-            })}
-          />
-        );
-      })}
-    </a-entity>
-  );
+export const createSuccessEffectConfig = (position: string): EntityConfig => {
+  const particles: SuccessParticleConfig[] = [];
+  
+  for (let i = 0; i < 10; i++) {
+    const angle = (i / 10) * Math.PI * 2;
+    const x = Math.sin(angle) * 0.5;
+    const z = Math.cos(angle) * 0.5;
+    
+    particles.push({
+      key: `particle-${i}`,
+      geometry: "primitive: sphere; radius: 0.05",
+      material: "color: #44FF44; emissive: #22AA22",
+      position: "0 0 0",
+      animation: createAnimation({
+        property: 'position',
+        to: `${x} 0.5 ${z}`,
+        dur: 1000 + (Math.random() * 500)
+      }),
+      animation__opacity: createAnimation({
+        property: 'material.opacity',
+        from: 1,
+        to: 0,
+        dur: 1000,
+        delay: 500
+      })
+    });
+  }
+  
+  return {
+    position,
+    particles
+  };
 };
 
 /**
- * Create an environmental effect (rain, snow, etc.)
+ * Create an environmental effect config (rain, snow, etc.)
  */
-export const createWeatherEffect = (
+export const createWeatherEffectConfig = (
   type: 'rain' | 'snow' | 'leaves',
   intensity: number = 1.0,
   area: number = 10
-): JSX.Element => {
+): EntityConfig => {
   const count = Math.floor(50 * intensity);
   const colors = {
     rain: '#8Bf5FF',
@@ -288,42 +334,46 @@ export const createWeatherEffect = (
     leaves: 1.5
   };
   
-  return (
-    <a-entity position="0 8 0" id={`weather-${type}`}>
-      {Array(count).fill(0).map((_, i) => {
-        const x = (Math.random() - 0.5) * area;
-        const z = (Math.random() - 0.5) * area;
-        const delay = Math.random() * 5000;
-        const duration = 2000 / speeds[type];
-        
-        return (
-          <a-entity
-            key={`weather-particle-${i}`}
-            position={`${x} 0 ${z}`}
-          >
-            <a-sphere
-              radius={sizes[type]}
-              color={colors[type]}
-              opacity="0.7"
-              transparent="true"
-              animation={createAnimation({
-                property: 'position.y',
-                from: 0,
-                to: -8,
-                dur: duration,
-                delay: delay,
-                loop: true
-              })}
-              animation__rotate={type === 'leaves' ? createAnimation({
-                property: 'rotation',
-                to: '360 360 360',
-                dur: duration * 2,
-                loop: true
-              }) : ''}
-            />
-          </a-entity>
-        );
-      })}
-    </a-entity>
-  );
+  const particles: WeatherParticleConfig[] = [];
+  
+  for (let i = 0; i < count; i++) {
+    const x = (Math.random() - 0.5) * area;
+    const z = (Math.random() - 0.5) * area;
+    const delay = Math.random() * 5000;
+    const duration = 2000 / speeds[type];
+    
+    const particleConfig: WeatherParticleConfig = {
+      key: `weather-particle-${i}`,
+      position: `${x} 0 ${z}`,
+      radius: sizes[type],
+      color: colors[type],
+      opacity: "0.7",
+      transparent: "true",
+      animation: createAnimation({
+        property: 'position.y',
+        from: 0,
+        to: -8,
+        dur: duration,
+        delay: delay,
+        loop: true
+      })
+    };
+    
+    if (type === 'leaves') {
+      particleConfig.animation__rotate = createAnimation({
+        property: 'rotation',
+        to: '360 360 360',
+        dur: duration * 2,
+        loop: true
+      });
+    }
+    
+    particles.push(particleConfig);
+  }
+  
+  return {
+    position: "0 8 0",
+    id: `weather-${type}`,
+    particles
+  };
 };
