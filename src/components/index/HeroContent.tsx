@@ -1,9 +1,12 @@
 
 import React from 'react';
 import { User } from '@supabase/supabase-js';
+import { useNavigate } from 'react-router-dom';
 import VideoUpload from '@/components/VideoUpload';
 import { FeaturesGrid } from '@/components/landing/FeaturesGrid';
 import PlatformSummary from '@/components/landing/PlatformSummary';
+import { Play } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface HeroContentProps {
   user: User | null;
@@ -20,6 +23,8 @@ const HeroContent: React.FC<HeroContentProps> = ({
   onGoToDashboard,
   isMobile
 }) => {
+  const navigate = useNavigate();
+  
   return (
     <>
       <div className="space-y-8 md:space-y-12">
@@ -33,6 +38,16 @@ const HeroContent: React.FC<HeroContentProps> = ({
           <p className={`${isMobile ? 'text-base' : 'text-lg'} text-muted-foreground max-w-2xl mx-auto`}>
             <span className="text-primary font-semibold">AI-powered</span> football talent assessment and development platform
           </p>
+          
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="mt-2 gap-2"
+            onClick={() => navigate('/intro-video')}
+          >
+            <Play className="h-4 w-4" />
+            شاهد الفيديو التعريفي
+          </Button>
         </div>
         
         <PlatformSummary isMobile={isMobile} />
