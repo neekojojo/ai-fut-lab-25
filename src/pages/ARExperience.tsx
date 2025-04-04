@@ -113,13 +113,15 @@ const ARExperience = () => {
               </CardHeader>
                 
               <CardContent className="pt-2">
-                <TabsContent value="field" className="mt-0">
-                  <VirtualFieldAR onError={handlePermissionsError} />
-                </TabsContent>
+                <Tabs value={activeTab} defaultValue={activeTab}>
+                  <TabsContent value="field" className="mt-0">
+                    <VirtualFieldAR onError={handlePermissionsError} />
+                  </TabsContent>
                   
-                <TabsContent value="challenges" className="mt-0">
-                  <SkillChallengeAR onError={handlePermissionsError} />
-                </TabsContent>
+                  <TabsContent value="challenges" className="mt-0">
+                    <SkillChallengeAR onError={handlePermissionsError} />
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           </div>
