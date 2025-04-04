@@ -50,7 +50,8 @@ export const renderParticleSystem = (
   
   return (
     <a-entity position={particleSystem.position}>
-      {particleSystem.particles.map((particle: ParticleConfig) => (
+      {/* Use type assertion to tell TypeScript what specific type we're using */}
+      {(particleSystem.particles as ParticleConfig[]).map((particle) => (
         <a-sphere
           key={particle.key}
           radius={particle.radius}
@@ -75,7 +76,8 @@ export const renderSuccessEffect = (position: string): JSX.Element => {
   return (
     <a-entity position={successEffect.position}>
       {/* Generate multiple particles with random directions */}
-      {successEffect.particles.map((particle: SuccessParticleConfig) => (
+      {/* Use type assertion to tell TypeScript what specific type we're using */}
+      {(successEffect.particles as SuccessParticleConfig[]).map((particle) => (
         <a-entity
           key={particle.key}
           geometry={particle.geometry}
@@ -101,7 +103,8 @@ export const renderWeatherEffect = (
   
   return (
     <a-entity position={weatherEffect.position} id={weatherEffect.id}>
-      {weatherEffect.particles.map((particle: WeatherParticleConfig) => (
+      {/* Use type assertion to tell TypeScript what specific type we're using */}
+      {(weatherEffect.particles as WeatherParticleConfig[]).map((particle) => (
         <a-entity
           key={particle.key}
           position={particle.position}

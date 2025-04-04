@@ -1,4 +1,3 @@
-
 // Advanced AR effect utilities
 
 export interface AnimationConfig {
@@ -56,10 +55,10 @@ export interface WeatherParticleConfig {
   animation__rotate?: string;
 }
 
-export interface EntityConfig {
+export interface EntityConfig<T = any> {
   position: string;
   id?: string;
-  particles: WeatherParticleConfig[] | ParticleConfig[] | SuccessParticleConfig[];
+  particles: T[];
 }
 
 /**
@@ -233,7 +232,7 @@ export const createParticleSystemConfig = (
   count: number = 20,
   duration: number = 2000,
   size: number = 0.05
-): EntityConfig => {
+): EntityConfig<ParticleConfig> => {
   const particles: ParticleConfig[] = [];
   
   for (let i = 0; i < count; i++) {
@@ -275,7 +274,7 @@ export const createParticleSystemConfig = (
 /**
  * Create celebratory particle effect config
  */
-export const createSuccessEffectConfig = (position: string): EntityConfig => {
+export const createSuccessEffectConfig = (position: string): EntityConfig<SuccessParticleConfig> => {
   const particles: SuccessParticleConfig[] = [];
   
   for (let i = 0; i < 10; i++) {
@@ -316,7 +315,7 @@ export const createWeatherEffectConfig = (
   type: 'rain' | 'snow' | 'leaves',
   intensity: number = 1.0,
   area: number = 10
-): EntityConfig => {
+): EntityConfig<WeatherParticleConfig> => {
   const count = Math.floor(50 * intensity);
   const colors = {
     rain: '#8Bf5FF',
