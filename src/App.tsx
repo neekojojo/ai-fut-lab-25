@@ -8,7 +8,6 @@ import Index from '@/pages/Index';
 import Dashboard from '@/pages/Dashboard';
 import AdvancedAnalysis from '@/pages/AdvancedAnalysis';
 import ARExperience from '@/pages/ARExperience';
-import IntroVideo from '@/pages/IntroVideo';
 import NotFound from '@/pages/NotFound';
 import SignIn from '@/components/auth/SignIn';
 import SignUp from '@/components/auth/SignUp';
@@ -25,7 +24,6 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/advanced-analysis/:id" element={<AdvancedAnalysis />} />
               <Route path="/ar-experience" element={<ARExperience />} />
-              <Route path="/intro-video" element={<IntroVideo />} />
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="*" element={<NotFound />} />
