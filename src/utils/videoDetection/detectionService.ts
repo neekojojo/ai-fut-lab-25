@@ -1,7 +1,6 @@
-
 import * as tf from '@tensorflow/tfjs';
 import * as poseDetection from '@tensorflow-models/pose-detection';
-import { DetectionResult, FrameResult, PlayerPosition } from './types';
+import { DetectionResult, FrameResult, PlayerPosition, Keypoint, BoundingBox } from './types';
 
 // تهيئة نماذج TensorFlow.js
 const initializeTensorFlow = async () => {
@@ -94,6 +93,63 @@ const extractFramesFromVideo = async (videoFile: File, frameCount: number = 15):
   });
 };
 
+// تحويل نقاط المفاصل من تنسيق TensorFlow إلى التنسيق المخصص
+const mapKeypoints = (tfKeypoints: poseDetection.Keypoint[]): Keypoint[] => {
+  // خريطة أسماء المفاصل من TensorFlow إلى التنسيق المخصص
+  const keypointMapping: Record<string, string> = {
+    'nose': 'nose',
+    'left_eye': 'left_eye',
+    'right_eye': 'right_eye',
+    'left_ear': 'left_ear',
+    'right_ear': 'right_ear',
+    'left_shoulder': 'left_shoulder',
+    'right_shoulder': 'right_shoulder',
+    'left_elbow': 'left_elbow',
+    'right_elbow': 'right_elbow',
+    'left_wrist': 'left_wrist',
+    'right_wrist': 'right_wrist',
+    'left_hip': 'left_hip',
+    'right_hip': 'right_hip',
+    'left_knee': 'left_knee',
+    'right_knee': 'right_knee',
+    'left_ankle': 'left_ankle',
+    'right_ankle': 'right_ankle'
+  };
+
+  return tfKeypoints.map(kp => {
+    return {
+      x: kp.x,
+      y: kp.y,
+      part: keypointMapping[kp.name] || kp.name, // تحويل اسم المفصل
+      confidence: kp.score || 0 // استخدام score كقيمة للثقة
+    };
+  });
+};
+
+// حساب الـ bounding box من نقاط المفاصل
+const calculateBoundingBox = (keypoints: Keypoint[]): BoundingBox => {
+  const validKeypoints = keypoints.filter(kp => kp.x !== undefined && kp.y !== undefined);
+  
+  if (validKeypoints.length === 0) {
+    return { x: 0, y: 0, width: 0, height: 0 };
+  }
+  
+  const xValues = validKeypoints.map(kp => kp.x);
+  const yValues = validKeypoints.map(kp => kp.y);
+  
+  const minX = Math.min(...xValues);
+  const minY = Math.min(...yValues);
+  const maxX = Math.max(...xValues);
+  const maxY = Math.max(...yValues);
+  
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY
+  };
+};
+
 // كشف الأشخاص في الفيديو باستخدام TensorFlow.js
 export const detectPeopleInVideo = async (
   videoFile: File
@@ -134,21 +190,21 @@ export const detectPeopleInVideo = async (
       
       totalDetections += poses.length;
       
-      // إضافة بيانات اللاعبين
+      // إضافة بيانات اللاعبين - تصحيح: تحويل الـ keypoints إلى التنسيق المطلوب
       if (poses.length > 0) {
         for (const pose of poses) {
+          // تحويل الـ keypoints إلى التنسيق المطلوب
+          const mappedKeypoints = mapKeypoints(pose.keypoints);
+          
+          // حساب الـ bounding box من الـ keypoints
+          const bbox = calculateBoundingBox(mappedKeypoints);
+          
           playerPositions.push({
             frameNumber: i,
             timestamp,
-            keypoints: pose.keypoints,
-            bbox: {
-              x: Math.min(...pose.keypoints.filter(kp => kp.x).map(kp => kp.x)),
-              y: Math.min(...pose.keypoints.filter(kp => kp.y).map(kp => kp.y)),
-              width: Math.max(...pose.keypoints.filter(kp => kp.x).map(kp => kp.x)) - 
-                     Math.min(...pose.keypoints.filter(kp => kp.x).map(kp => kp.x)),
-              height: Math.max(...pose.keypoints.filter(kp => kp.y).map(kp => kp.y)) - 
-                      Math.min(...pose.keypoints.filter(kp => kp.y).map(kp => kp.y))
-            }
+            keypoints: mappedKeypoints,
+            bbox: bbox,
+            confidence: pose.score || 0.8 // استخدام score كقيمة للثقة أو 0.8 افتراضيًا
           });
         }
       }
