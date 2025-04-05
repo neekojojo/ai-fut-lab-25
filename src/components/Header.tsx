@@ -29,9 +29,6 @@ const Header: React.FC = () => {
           <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">
             الرئيسية
           </Link>
-          <Link to="/ar-experience" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-            الواقع المعزز
-          </Link>
           
           {user ? (
             <Button variant="outline" size="sm" onClick={handleDashboardClick}>
