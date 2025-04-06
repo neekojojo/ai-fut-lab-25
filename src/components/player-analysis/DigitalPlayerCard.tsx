@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { CalendarIcon, Award, Zap, DollarSign, MapPin, User, Ruler, Weight, Flag } from 'lucide-react';
-import { PlayerAnalysis } from '@/components/AnalysisReport.d';
+import { PlayerAnalysis } from '@/types/playerAnalysis';
 
 interface PlayerDigitalIdentityProps {
   analysis: PlayerAnalysis;

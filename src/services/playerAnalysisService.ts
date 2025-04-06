@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { PlayerAnalysis } from '@/components/AnalysisReport.d';
+import { PlayerAnalysis } from '@/types/playerAnalysis';
 
 // تحويل تحليل اللاعب من القاعدة إلى نموذج الواجهة
 const mapToPlayerAnalysis = (dbAnalysis: any): PlayerAnalysis => {
@@ -129,6 +129,11 @@ const createMockAnalysis = (id: string): PlayerAnalysis => {
   const positions = ["مهاجم", "وسط", "مدافع", "حارس مرمى", "جناح"];
   const randomIndex = Math.floor(Math.random() * playerNames.length);
   
+  // Generate random talent score and market value based on it
+  const talentScore = Math.floor(Math.random() * 30) + 60; // 60-90 range
+  const baseValue = (talentScore * 10000) + (Math.random() * 50000);
+  const marketValue = '$' + Math.floor(baseValue).toLocaleString();
+  
   return {
     id: id,
     playerId: `player-${id}`,
@@ -139,8 +144,8 @@ const createMockAnalysis = (id: string): PlayerAnalysis => {
     confidence: 0.85,
     videoUrl: "",
     thumbnailUrl: "",
-    marketValue: "$750,000",
-    talentScore: 78,
+    marketValue: marketValue,
+    talentScore: talentScore,
     strengths: ["سرعة عالية", "تمرير دقيق", "رؤية ممتازة للملعب"],
     weaknesses: ["ضعف في التسديد من بعيد", "بحاجة لتحسين اللياقة البدنية"],
     summary: "لاعب واعد يتمتع بمهارات فنية عالية وقدرات بدنية جيدة",

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { PlayerAnalysis } from '@/components/AnalysisReport.d';
+import { PlayerAnalysis } from '@/types/playerAnalysis';
 import { Loader2, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -45,7 +45,7 @@ const AnalysesTab: React.FC<AnalysesTabProps> = ({ analyses, isLoading = false }
                         <Badge variant="outline" className="mt-1">{analysis.position}</Badge>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium text-primary">{analysis.marketValue}</p>
+                        <p className="font-medium text-primary">{analysis.marketValue || '$750,000'}</p>
                         <p className="text-sm text-muted-foreground">القيمة السوقية</p>
                       </div>
                     </div>
@@ -53,36 +53,36 @@ const AnalysesTab: React.FC<AnalysesTabProps> = ({ analyses, isLoading = false }
                     <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
                         <p className="text-sm text-muted-foreground">تقني</p>
-                        <Progress value={analysis.performance.technical} className="h-2 mt-1" 
+                        <Progress value={analysis.performance?.technical} className="h-2 mt-1" 
                           style={{background: 'linear-gradient(to right, #e2e8f0, #cbd5e1)'}}
                         />
-                        <p className="text-xs text-right mt-1">{analysis.performance.technical}%</p>
+                        <p className="text-xs text-right mt-1">{analysis.performance?.technical}%</p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">بدني</p>
-                        <Progress value={analysis.performance.physical} className="h-2 mt-1"
+                        <Progress value={analysis.performance?.physical} className="h-2 mt-1"
                           style={{background: 'linear-gradient(to right, #e2e8f0, #cbd5e1)'}}
                         />
-                        <p className="text-xs text-right mt-1">{analysis.performance.physical}%</p>
+                        <p className="text-xs text-right mt-1">{analysis.performance?.physical}%</p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">تكتيكي</p>
-                        <Progress value={analysis.performance.tactical} className="h-2 mt-1"
+                        <Progress value={analysis.performance?.tactical} className="h-2 mt-1"
                           style={{background: 'linear-gradient(to right, #e2e8f0, #cbd5e1)'}}
                         />
-                        <p className="text-xs text-right mt-1">{analysis.performance.tactical}%</p>
+                        <p className="text-xs text-right mt-1">{analysis.performance?.tactical}%</p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">ذهني</p>
-                        <Progress value={analysis.performance.mental} className="h-2 mt-1"
+                        <Progress value={analysis.performance?.mental} className="h-2 mt-1"
                           style={{background: 'linear-gradient(to right, #e2e8f0, #cbd5e1)'}}
                         />
-                        <p className="text-xs text-right mt-1">{analysis.performance.mental}%</p>
+                        <p className="text-xs text-right mt-1">{analysis.performance?.mental}%</p>
                       </div>
                     </div>
                     
                     <div className="mt-4 flex justify-end">
-                      <Button variant="ghost" size="sm" onClick={() => navigate(`/movement-analysis`)} 
+                      <Button variant="ghost" size="sm" onClick={() => navigate(`/advanced-analysis/${analysis.id}`)} 
                         className="group-hover:bg-primary/10 transition-colors group-hover:text-primary">
                         <span>عرض التحليل الكامل</span>
                         <ArrowRight className="mr-2 h-4 w-4" />
