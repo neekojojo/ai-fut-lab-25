@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { PlayerAnalysis } from '@/types/playerAnalysis';
-import { Loader2, ArrowRight } from "lucide-react";
+import { Loader2, ArrowRight, DollarSign } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface AnalysesTabProps {
@@ -45,7 +45,10 @@ const AnalysesTab: React.FC<AnalysesTabProps> = ({ analyses, isLoading = false }
                         <Badge variant="outline" className="mt-1">{analysis.position}</Badge>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium text-primary">{analysis.marketValue || '$750,000'}</p>
+                        <p className="font-medium text-primary flex items-center justify-end">
+                          <DollarSign className="h-4 w-4 mr-1" />
+                          {analysis.marketValue || '$750,000'}
+                        </p>
                         <p className="text-sm text-muted-foreground">القيمة السوقية</p>
                       </div>
                     </div>
