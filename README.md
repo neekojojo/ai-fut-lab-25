@@ -1,69 +1,138 @@
-# Welcome to your Lovable project
+FootballAI Analyzer
+منصة تحليل موهبة كرة القدم باستخدام الذكاء الاصطناعي
 
-## Project info
+وصف المشروع:
+يهدف هذا المشروع إلى تقييم مهارات لاعبي كرة القدم تلقائياً باستخدام تقنيات الذكاء الاصطناعي ورؤية الحاسوب. يمكن للمستخدم رفع مقطع فيديو، ليتم تحليله وتقييم اللاعب بناءً على الأداء الفني مثل التمرير، التسديد، المراوغة، والتوقع السوقي.
 
-**URL**: https://lovable.dev/projects/acd6e2e9-c9e8-4a88-8900-dd5806c652e9
+المميزات الأساسية:
+التحليل الفني (Technical Analysis): تقييم دقيق للتمرير، التسديد، المراوغة والمهارات الأخرى.
 
-## How can I edit this code?
+التقييم السوقي (Market Valuation): تقدير قيمة اللاعب في السوق بناءً على الأداء والمعايير الإحصائية.
 
-There are several ways of editing your application.
+التقارير المفصلة (Detailed Reports): تقارير قابلة للتنزيل تقدم رؤى قابلة للتنفيذ.
 
-**Use Lovable**
+رفع فيديو وتحليل مباشر باستخدام الذكاء الاصطناعي.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/acd6e2e9-c9e8-4a88-8900-dd5806c652e9) and start prompting.
+دعم صيغ متعددة للفيديو (MP4، MOV، AVI).
 
-Changes made via Lovable will be committed automatically to this repo.
+طريقة التشغيل:
+افتح التطبيق.
 
-**Use your preferred IDE**
+ارفع مقطع فيديو للاعب.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+اختر نوع النموذج (Google AutoML أو Kaggle).
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+اضغط على "Analyze with AI" لبدء التحليل.
 
-Follow these steps:
+استعرض النتائج والتقارير.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+التقنيات المستخدمة:
+Back-end:
+FastAPI – لإنشاء واجهة API سريعة وعصرية.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Python
 
-# Step 3: Install the necessary dependencies.
-npm i
+Computer Vision & AI:
+OpenCV – لمعالجة الفيديوهات.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+YOLOv8 – لاكتشاف الأشخاص وتتبعهم.
 
-**Edit a file directly in GitHub**
+MediaPipe و OpenPose – لتقدير وضعيات الجسم (Pose Estimation).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Transfer Learning – لتحسين نتائج النماذج.
 
-**Use GitHub Codespaces**
+Machine Learning & Deep Learning:
+Google AutoML Vision
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Kaggle Datasets
 
-## What technologies are used for this project?
+TensorFlow، PyTorch
 
-This project is built with .
+Neural Networks
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Scikit-learn
 
-## How can I deploy this project?
+OpenAI Models (عند الحاجة لتحليلات ذكية)
 
-Simply open [Lovable](https://lovable.dev/projects/acd6e2e9-c9e8-4a88-8900-dd5806c652e9) and click on Share -> Publish.
+تحليل البيانات:
+NumPy
 
-## I want to use a custom domain - is that possible?
+Pandas
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+مخرجات المشروع:
+تحليل شامل للفيديوهات الرياضية.
+
+تقييم فني دقيق لمهارات اللاعبين.
+
+تقارير مفصلة تساعد في تطوير أداء اللاعبين.
+
+تقدير القيمة السوقية اعتماداً على الأداء.
+
+شرح مفصل لكيفية عمل مشروع FootballAI Analyzer
+مشروع FootballAI Analyzer هو تطبيق مبني على الذكاء الاصطناعي لتحليل أداء اللاعبين في كرة القدم من خلال مقاطع الفيديو باستخدام تقنيات Computer Vision وMachine Learning.
+
+1. مدخلات النظام (Input)
+المستخدم يقوم برفع فيديو لكرة القدم (بصيغة MP4 أو MOV أو AVI).
+
+الفيديو يحتوي على لقطات للاعبين أثناء التمرير، التسديد، المراوغة، والتحركات المختلفة داخل الملعب.
+
+2. المعالجة وتحليل الفيديو
+المرحلة الأولى: المعالجة الأولية للفيديو
+استخدام مكتبات مثل OpenCV وMediaPipe لقراءة وتحليل كل إطار (Frame) في الفيديو.
+
+تحديد أماكن اللاعبين وحركات أجسامهم باستخدام Pose Estimation (مثل OpenPose أو MediaPipe Pose).
+
+تتبع اللاعبين عبر الإطارات باستخدام خوارزميات التتبع مثل YOLOv8 وDeep SORT.
+
+المرحلة الثانية: استخراج المزايا (Features Extraction)
+تحليل الأداء الفني:
+
+التمرير (Passing): التعرف على دقة التمرير واتجاهه.
+
+التسديد (Shooting): تحليل الزوايا والقوة واتجاه الكرة.
+
+المراوغة (Dribbling): تحديد المحاولات الناجحة وعدد المراوغات.
+
+تقنيات مستخدمة:
+
+OpenCV لتحليل الحركات.
+
+MediaPipe / OpenPose لاكتشاف الوضعيات.
+
+Numpy & Pandas لمعالجة البيانات وتحليلها.
+
+المرحلة الثالثة: التقييم الذكي
+استخدام نماذج Machine Learning / Deep Learning مدربة مسبقًا:
+
+تصنيف نوع المهارة (تمرير، تسديد، إلخ).
+
+تقييم كل مهارة بناءً على بيانات تاريخية من لاعبين محترفين.
+
+تم استخدام Google AutoML Vision لتدريب نموذج تصنيف بصري.
+
+كما تمت مقارنة البيانات مع Kaggle Datasets لاحتساب الأداء القياسي.
+
+3. المخرجات (Output)
+تقرير فني وتقني يشمل:
+درجة أداء اللاعب في كل مهارة (من 10 مثلاً).
+
+تحليل مفصل للحركات ومستوى الإتقان.
+
+عرض رسوم بيانية وإحصائيات.
+
+تقييم السوق (Market Valuation):
+يتم تقدير القيمة السوقية للاعب بناءً على أدائه مقارنة بلاعبين آخرين (باستخدام بيانات من TransferMarket أو Kaggle).
+
+4. مميزات إضافية
+واجهة سهلة الاستخدام تسمح للمستخدم باختيار النموذج المستخدم في التحليل (AutoML أو Kaggle).
+
+إمكانية التبديل بين واجهات مختلفة وتجربة "People Detection" لتحديد اللاعبين داخل الفيديو.
+
+تقرير PDF قابل للتنزيل يمكن مشاركته مع الأندية أو المدربين.
+
+التقنيات والأدوات المستخدمة
+المجال	التقنيات
+
+
+فريق العمل:
+اسمك ( FUTLAP)
