@@ -12,7 +12,10 @@ interface VideoUploadProps {
   selectedFile?: FileWithPreview | null;
 }
 
-const VideoUpload: React.FC<VideoUploadProps> = ({ onFileSelected, selectedFile }) => {
+const VideoUpload: React.FC<VideoUploadProps> = ({ 
+  onFileSelected, 
+  selectedFile 
+}) => {
   const [videoFile, setVideoFile] = useState<FileWithPreview | null>(selectedFile || null);
   const { toast } = useToast();
   

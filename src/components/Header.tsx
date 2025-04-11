@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ModeToggle } from '@/components/ui/mode-toggle';
-import { FileVideo, Home, LineChart, UserCircle } from 'lucide-react';
+import { Home, LineChart, UserCircle } from 'lucide-react';
 
 const Header = () => {
   return (

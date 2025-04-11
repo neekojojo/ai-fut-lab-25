@@ -1,87 +1,106 @@
+export interface ProfessionalPlayer {
+  name: string;
+  team: string;
+  position: string;
+  match: number;
+  similarity: number;
+  strengths: string[];
+}
 
-// Import required types
-import { PlayerMovement, PassAttempt, PositionHeatmap } from './playerMovement';
-import { PlayerStats, PerformanceMetrics, DetailedSkills, MarketData } from './playerStats';
-import { Badge } from './badges';
-import { ProgressData } from './progress';
-import { InjuryRiskData } from './injuries';
-import { SimilarProfessional } from './training';
-
-// Re-export the types from playerMovement.ts with proper syntax
-export type { PlayerMovement, PassAttempt, PositionHeatmap } from './playerMovement';
-
-// Core player analysis type
 export interface PlayerAnalysis {
   id: string;
-  playerId?: string;
-  playerName: string;
-  position: string;
-  timestamp: string;
-  duration: number;
-  confidence: number;
-  videoUrl?: string;
-  thumbnailUrl?: string;
-  stats: PlayerStats;
-  movements: PlayerMovement[];
-  passes: PassAttempt[];
-  heatmap: PositionHeatmap[];
-  strengths: string[];
-  weaknesses: string[];
-  summary: string;
-  advancedInsights: string[];
-  recommendations: string[];
-  performanceScore: number;
-  similarPlayers?: SimilarProfessional[];
-  marketData?: MarketData;
-  
-  // Additional fields needed by components
-  talentScore?: number;
-  marketValue?: string;
-  compatibilityScore?: number;
-  performance?: PerformanceMetrics;
-  detailedSkills?: DetailedSkills;
-  proComparison?: ProComparison;
-  progress?: ProgressData;
-  injuryRisk?: InjuryRiskData;
-  badges?: Badge[];
-  
-  // New player profile fields
-  age?: number;
-  country?: string;
-  city?: string;
-  height?: string;
-  weight?: string;
-  preferredFoot?: 'Left' | 'Right' | 'Both';
+  date: string;
+  score: number;
 }
 
-export interface ProComparison {
-  name: string;
-  similarity: number;
-  skills: {
-    [key: string]: number;
+export interface AnalysisReport {
+  id: string;
+  date: string;
+  videoUrl: string;
+  overallScore: number;
+  technicalSkills: {
+    passing: number;
+    dribbling: number;
+    shooting: number;
+    firstTouch: number;
+    ballControl: number;
+    heading: number;
+    tackling: number;
   };
-}
-
-// New types for enhanced analysis
-export interface AdvancedAnalysisMetrics {
-  speedDistribution: number[];
-  accelerationProfile: number[];
-  bodyAlignment: number[];
-  movementEfficiency: number;
-  technicalConsistency: number;
-  decisionMakingTime: number;
-  fatigueResistance: number;
-  recoveryRate: number;
-  gameImpactScore: number;
-}
-
-export interface AdvancedPlayerComparison {
-  playerId: string;
-  playerName: string;
-  similarityScore: number;
-  strengthAreas: string[];
-  weaknessAreas: string[];
-  comparisonMetrics: {
-    [key: string]: number;
+  physicalAttributes: {
+    speed: number;
+    agility: number;
+    stamina: number;
+    strength: number;
+    jump: number;
   };
+  mentalSkills: {
+    decisionMaking: number;
+    focus: number;
+    composure: number;
+    aggression: number;
+    leadership: number;
+  };
+  tacticalAwareness: {
+    positioning: number;
+    teamwork: number;
+    vision: number;
+    adaptability: number;
+    discipline: number;
+  };
+  performanceMetrics: {
+    technicalAccuracy: number;
+    efficiency: number;
+    tacticalAwareness: number;
+    physicalPerformance: number;
+    consistency: number;
+    overall: number;
+  };
+  movementAnalysis: {
+    averageSpeed: number;
+    totalDistance: number;
+    maxAcceleration: number;
+    speedZones: {
+      zone: string;
+      percentage: number;
+    }[];
+    heatmap: number[][];
+  };
+  eyeTracking: {
+    fieldAwarenessScore: number;
+    decisionSpeed: number;
+    anticipationScore: number;
+    visualScanFrequency: number;
+    fixationDuration: number;
+  };
+  injuries: {
+    type: string;
+    severity: string;
+    recoveryTime: string;
+  }[];
+  progressTracking: {
+    date: string;
+    overallScore: number;
+    technicalSkills: number;
+    physicalAttributes: number;
+    mentalSkills: number;
+    tacticalAwareness: number;
+  }[];
+  badges: {
+    name: string;
+    description: string;
+    icon: string;
+    level: string;
+    category: string;
+    unlocked: boolean;
+    progress: number;
+  }[];
+  professionalComparison: {
+    name: string;
+    team: string;
+    position: string;
+    match: number;
+    similarity: number;
+    strengths: string[];
+  }[];
 }

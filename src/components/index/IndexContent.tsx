@@ -115,7 +115,7 @@ const IndexContent: React.FC = () => {
           
           <h3 className="text-lg font-semibold mt-4">مخرجات التحليل</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
-            <li>تق����ر شامل عن أداء ال��اعب الفني والبدني</li>
+            <li>تق����ر شامل ��ن أداء ال��اعب الفني والبدني</li>
             <li>تحديد نقاط القوة ومجالات التحسين</li>
             <li>مؤشرات اللياقة البدنية والتعب</li>
             <li>أنماط اللعب المفضلة للاعب</li>
@@ -246,58 +246,48 @@ const IndexContent: React.FC = () => {
     }
   };
 
-  const handleFileSelected = (file: FileWithPreview) => {
+  const handleFileSelected = (file: FileWithPreview | null) => {
     setVideoFile(file);
-  };
-
-  const handleStartAnalysis = async () => {
-    if (!videoFile) {
-      toast({
-        title: "لم يتم اختيار فيديو",
-        description: "الرجاء تحميل ملف فيديو للمتابعة",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setAnalysisStarted(true);
-    setAnalysisProgress(5);
-    setAnalysisStage('بدء تحليل الفيديو');
-    
-    toast({
-      title: "بدأ التحليل",
-      description: "جاري تحليل فيديو كرة القدم الخاص بك",
-    });
-    
-    try {
-      const analysisData = await analyzeFootballVideo(videoFile);
+    if (file) {
+      setAnalysisStarted(true);
+      setAnalysisProgress(5);
+      setAnalysisStage('بدء تحليل الفيديو');
       
-      analysisData.progressUpdates((progress, stage) => {
-        setAnalysisProgress(progress);
-        if (stage) {
-          setAnalysisStage(stage);
-        }
-        
-        if (progress >= 100) {
-          setTimeout(() => {
-            setAnalysisCompleted(true);
-            setAnalysisResult(analysisData.analysis);
-            
-            toast({
-              title: "اكتمل التحليل",
-              description: "تحليل فيديو كرة القدم الخاص بك جاهز",
-            });
-          }, 1500);
-        }
-      });
-    } catch (error) {
-      console.error("Error analyzing video:", error);
       toast({
-        title: "خطأ في التحليل",
-        description: "حدث خطأ أثناء تحليل الفيديو",
-        variant: "destructive",
+        title: "بدأ التحليل",
+        description: "جاري تحليل فيديو كرة القدم الخاص بك",
       });
-      handleResetAnalysis();
+      
+      try {
+        const analysisData = await analyzeFootballVideo(file);
+        
+        analysisData.progressUpdates((progress, stage) => {
+          setAnalysisProgress(progress);
+          if (stage) {
+            setAnalysisStage(stage);
+          }
+          
+          if (progress >= 100) {
+            setTimeout(() => {
+              setAnalysisCompleted(true);
+              setAnalysisResult(analysisData.analysis);
+              
+              toast({
+                title: "اكتمل التحليل",
+                description: "تحليل فيديو كرة القدم الخاص بك جاهز",
+              });
+            }, 1500);
+          }
+        });
+      } catch (error) {
+        console.error("Error analyzing video:", error);
+        toast({
+          title: "خطأ في التحليل",
+          description: "حدث خطأ أثناء تحليل الفيديو",
+          variant: "destructive",
+        });
+        handleResetAnalysis();
+      }
     }
   };
 
@@ -395,7 +385,7 @@ const IndexContent: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <main className="flex-1 container mx-auto px-4 py-8">
       <div className="space-y-8 md:space-y-12">
         <div className="text-center space-y-3 md:space-y-4 animate-fade-in">
           <div className="inline-block px-3 py-1 text-xs font-medium bg-secondary text-secondary-foreground rounded-full">
@@ -427,7 +417,7 @@ const IndexContent: React.FC = () => {
           
           {!videoFile && (
             <div className="flex flex-col items-center gap-4">
-              <VideoUpload onUpload={handleFileSelected} />
+              <VideoUpload onFileSelected={handleFileSelected} selectedFile={videoFile} />
               
               <div className="flex flex-wrap gap-4 justify-center mt-4">
                 <button 
@@ -523,7 +513,7 @@ const IndexContent: React.FC = () => {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </main>
   );
 };
 
