@@ -1,12 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Play } from 'lucide-react';
+import { ArrowLeft, Play, Database, Cloud } from 'lucide-react';
+import { toast } from 'sonner';
+import { AnalysisModel } from '@/utils/analysis/modelSelectionService';
 
 interface AnalysisOptionsProps {
   videoFile: File;
-  onSelectModel: (model: 'google-automl' | 'kaggle-datasets') => void;
+  onSelectModel: (model: AnalysisModel) => void;
   onAnalyzeWithAI: () => void;
   isMobile?: boolean;
 }
@@ -17,6 +19,14 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
   onAnalyzeWithAI,
   isMobile
 }) => {
+  const [selectedModel, setSelectedModel] = useState<AnalysisModel | null>(null);
+  
+  const handleSelectModel = (model: AnalysisModel) => {
+    setSelectedModel(model);
+    onSelectModel(model);
+    toast.success(`تم اختيار نموذج ${model === 'google-automl' ? 'Google AutoML' : 'Kaggle Datasets'}`);
+  };
+  
   return (
     <div className="space-y-6 w-full max-w-3xl mx-auto">
       <div className="text-center">
@@ -36,10 +46,13 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card
-          className="border-primary/20 cursor-pointer hover:border-primary/50 transition-all"
-          onClick={() => onSelectModel('google-automl')}
+          className={`border-primary/20 cursor-pointer hover:border-primary/50 transition-all ${
+            selectedModel === 'google-automl' ? 'bg-primary/5 border-primary/50' : ''
+          }`}
+          onClick={() => handleSelectModel('google-automl')}
         >
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center gap-2">
+            <Cloud className="h-5 w-5 text-primary" />
             <CardTitle className="text-lg">نموذج Google AutoML</CardTitle>
           </CardHeader>
           <CardContent>
@@ -50,10 +63,13 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
         </Card>
         
         <Card
-          className="border-primary/20 cursor-pointer hover:border-primary/50 transition-all"
-          onClick={() => onSelectModel('kaggle-datasets')}
+          className={`border-primary/20 cursor-pointer hover:border-primary/50 transition-all ${
+            selectedModel === 'kaggle-datasets' ? 'bg-primary/5 border-primary/50' : ''
+          }`}
+          onClick={() => handleSelectModel('kaggle-datasets')}
         >
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center gap-2">
+            <Database className="h-5 w-5 text-primary" />
             <CardTitle className="text-lg">نموذج Kaggle المجتمعي</CardTitle>
           </CardHeader>
           <CardContent>
@@ -77,6 +93,7 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
         <Button
           className="gap-2"
           onClick={onAnalyzeWithAI}
+          disabled={!selectedModel}
         >
           <Play className="h-4 w-4" />
           بدء التحليل

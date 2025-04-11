@@ -1,11 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import AIConfigModal from './AIConfigModal';
+import { Database, Cloud } from 'lucide-react';
+import { toast } from 'sonner';
+import { AnalysisModel, getModelInformation } from '@/utils/analysis/modelSelectionService';
 
 interface ModelSelectionProps {
   videoFile: File;
-  onSelectModel: (model: 'google-automl' | 'kaggle-datasets') => void;
+  onSelectModel: (model: AnalysisModel) => void;
   onAnalyzeWithAI: () => void;
 }
 
@@ -14,11 +17,14 @@ const ModelSelection: React.FC<ModelSelectionProps> = ({
   onSelectModel,
   onAnalyzeWithAI
 }) => {
-  const [selectedModel, setSelectedModel] = React.useState<'google-automl' | 'kaggle-datasets' | null>(null);
+  const [selectedModel, setSelectedModel] = React.useState<AnalysisModel | null>(null);
   
-  const handleSelectModel = (model: 'google-automl' | 'kaggle-datasets') => {
+  const handleSelectModel = (model: AnalysisModel) => {
+    console.log("Selected model:", model);
     setSelectedModel(model);
     onSelectModel(model);
+    
+    toast.success(`تم اختيار نموذج ${model === 'google-automl' ? 'Google AutoML' : 'Kaggle Datasets'}`);
   };
   
   return (
@@ -41,6 +47,7 @@ const ModelSelection: React.FC<ModelSelectionProps> = ({
                 : 'hover:bg-accent'
             }`}
           >
+            <Cloud className="h-8 w-8 text-primary mb-2" />
             <div className="text-lg font-medium">Google AutoML Vision</div>
             <p className="text-sm text-muted-foreground text-center mt-2">
               متخصص في تحليل المهارات التقنية وتحديد مواقع اللاعبين
@@ -55,6 +62,7 @@ const ModelSelection: React.FC<ModelSelectionProps> = ({
                 : 'hover:bg-accent'
             }`}
           >
+            <Database className="h-8 w-8 text-primary mb-2" />
             <div className="text-lg font-medium">Kaggle Datasets Model</div>
             <p className="text-sm text-muted-foreground text-center mt-2">
               تم تدريبه على إحصائيات كرة القدم الشاملة ومقاييس الأداء
