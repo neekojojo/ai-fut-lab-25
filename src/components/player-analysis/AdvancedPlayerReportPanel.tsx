@@ -3,7 +3,7 @@ import React from 'react';
 import { PlayerAnalysis } from '@/types/playerAnalysis';
 import InsightsPanel from './InsightsPanel';
 import AchievementBadges from './AchievementBadges';
-import { determineEarnedBadges } from '@/utils/analysis/badgeService';
+import determineEarnedBadges from '@/utils/analysis/badgeService';
 
 interface AdvancedPlayerReportPanelProps {
   analysis: PlayerAnalysis;

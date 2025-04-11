@@ -6,7 +6,7 @@ import { PerformanceProfile } from '@/components/charts/PerformanceProfile';
 import { PerformanceDistribution } from '@/components/charts/PerformanceDistribution';
 import { OverallStats } from '@/components/charts/OverallStats';
 import AchievementBadges from '../AchievementBadges';
-import { determineEarnedBadges } from '@/utils/analysis/badgeService';
+import determineEarnedBadges from '@/utils/analysis/badgeService';
 
 interface StatsTabContentProps {
   playerStats: any;

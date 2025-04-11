@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import PlayerMovementVisualization from '@/components/PlayerMovementVisualization';
 import EnhancedMovementChart from '@/components/player-movement/EnhancedMovementChart';
 import PositionSpecificAnalysis from '@/components/player-movement/PositionSpecificAnalysis';
-import { determineEarnedBadges } from '@/utils/analysis/badgeService';
+import determineEarnedBadges from '@/utils/analysis/badgeService';
 
 interface MovementTabContentProps {
   analysis: any;
