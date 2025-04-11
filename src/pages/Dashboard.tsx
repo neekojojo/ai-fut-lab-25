@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Container } from "@/components/ui/container";
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { UserCircle, Medal, Dumbbell, BarChart2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -15,6 +15,9 @@ import AnalysesTab from '@/components/dashboard/tabs/AnalysesTab';
 import { Badge } from '@/types/badges';
 import { UserProfile } from '@/types/userProfile';
 import { TrainingVideo } from '@/types/training';
+import { useAuth } from '@/components/auth/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 // Mock data
 const mockUserProfile: UserProfile = {
@@ -167,11 +170,27 @@ const Dashboard = () => {
   const [userProfile] = useState(mockUserProfile);
   const [trainingVideos] = useState(mockTrainingVideos);
   const [analyses] = useState(userProfile.analyses);
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/sign-in');
+    }
+  }, [user, loading, navigate]);
 
   const handleSignOut = () => {
     console.log("User signed out");
     // Implementation of sign out logic
   };
+
+  if (loading) {
+    return <div className="flex justify-center items-center min-h-screen">جاري التحميل...</div>;
+  }
+
+  if (!user) {
+    return null; // Will be redirected by useEffect
+  }
 
   return (
     <>
@@ -237,11 +256,21 @@ const Dashboard = () => {
               </div>
               
               <div className="p-4">
-                <OverviewTab userProfile={userProfile} />
-                <ProfileTab userProfile={userProfile} onSignOut={handleSignOut} />
-                <BadgesTab badges={userProfile.badges} />
-                <TrainingTab trainingVideos={trainingVideos} />
-                <AnalysesTab analyses={analyses} />
+                <TabsContent value="overview">
+                  <OverviewTab userProfile={userProfile} />
+                </TabsContent>
+                <TabsContent value="profile">
+                  <ProfileTab userProfile={userProfile} onSignOut={handleSignOut} />
+                </TabsContent>
+                <TabsContent value="badges">
+                  <BadgesTab badges={userProfile.badges} />
+                </TabsContent>
+                <TabsContent value="training">
+                  <TrainingTab trainingVideos={trainingVideos} />
+                </TabsContent>
+                <TabsContent value="analyses">
+                  <AnalysesTab analyses={analyses} />
+                </TabsContent>
               </div>
             </Tabs>
           </CardContent>

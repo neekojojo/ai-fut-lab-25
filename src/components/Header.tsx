@@ -3,9 +3,20 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ModeToggle } from '@/components/ui/mode-toggle';
-import { Home, LineChart, UserCircle } from 'lucide-react';
+import { Home, LineChart, UserCircle, LogIn, UserPlus, LogOut } from 'lucide-react';
+import { useAuth } from '@/components/auth/AuthContext';
 
 const Header = () => {
+  const { user, signOut } = useAuth();
+  
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
   return (
     <header className="py-4 px-6 flex items-center justify-between border-b bg-background/80 backdrop-blur-sm">
       <div className="flex items-center">
@@ -44,11 +55,35 @@ const Header = () => {
       
       <div className="flex items-center gap-2">
         <ModeToggle />
-        <Button variant="outline" size="icon" asChild>
-          <Link to="/dashboard">
-            <UserCircle className="h-5 w-5" />
-          </Link>
-        </Button>
+        
+        {user ? (
+          <>
+            <Button variant="outline" size="icon" asChild>
+              <Link to="/dashboard">
+                <UserCircle className="h-5 w-5" />
+              </Link>
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleSignOut} className="flex items-center gap-1">
+              <LogOut className="h-4 w-4" />
+              <span>تسجيل الخروج</span>
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/sign-in" className="flex items-center gap-1">
+                <LogIn className="h-4 w-4" />
+                <span>تسجيل الدخول</span>
+              </Link>
+            </Button>
+            <Button variant="default" size="sm" asChild>
+              <Link to="/sign-up" className="flex items-center gap-1">
+                <UserPlus className="h-4 w-4" />
+                <span>إنشاء حساب</span>
+              </Link>
+            </Button>
+          </>
+        )}
       </div>
     </header>
   );
