@@ -34,7 +34,14 @@ export const performAnalysis = async (
   
   // تحسين التحليل
   progressTracker.updateProgress(90, "تحسين النتائج");
-  const enhancedAnalysis = createEnhancedAnalysis(baselineAnalysis, eyeMovementData);
+  // Pass mock data for missing parameters to match the expected arguments count
+  const enhancedAnalysis = createEnhancedAnalysis(
+    baselineAnalysis, 
+    eyeMovementData,
+    null,  // movementAnalysis
+    null,  // videoProperties
+    null   // eyeTrackingResult
+  );
   await new Promise(resolve => setTimeout(resolve, 500));
   
   // إكمال التحليل

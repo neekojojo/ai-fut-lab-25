@@ -5,9 +5,9 @@ import { DetectionResult } from '@/utils/videoDetection/types';
 export const createEnhancedAnalysis = (
   baselineAnalysis: PlayerAnalysis,
   detectionResult: any,
-  movementAnalysis: any,
-  videoProperties: any,
-  eyeTrackingResult: any
+  movementAnalysis: any = null,
+  videoProperties: any = null,
+  eyeTrackingResult: any = null
 ): PlayerAnalysis => {
   // Create a deep copy of the baseline analysis
   const enhancedAnalysis = JSON.parse(JSON.stringify(baselineAnalysis));
