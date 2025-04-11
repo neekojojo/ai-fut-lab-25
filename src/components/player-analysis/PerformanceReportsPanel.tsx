@@ -105,7 +105,7 @@ const PerformanceReportsPanel: React.FC<PerformanceReportsPanelProps> = ({ analy
                 <div key={key} className="space-y-1">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">{key}</span>
-                    <span className="text-sm">{value}/100</span>
+                    <span className="text-sm">{String(value)}/100</span>
                   </div>
                   <Progress value={Number(value)} className="h-2" />
                 </div>
@@ -139,7 +139,7 @@ const PerformanceReportsPanel: React.FC<PerformanceReportsPanelProps> = ({ analy
                 <div key={key} className="space-y-1">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">{key}</span>
-                    <span className="text-sm">{value}/100</span>
+                    <span className="text-sm">{String(value)}/100</span>
                   </div>
                   <Progress value={Number(value)} className="h-2" />
                 </div>
@@ -173,7 +173,7 @@ const PerformanceReportsPanel: React.FC<PerformanceReportsPanelProps> = ({ analy
                 <div key={key} className="space-y-1">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">{key}</span>
-                    <span className="text-sm">{value}/100</span>
+                    <span className="text-sm">{String(value)}/100</span>
                   </div>
                   <Progress value={Number(value)} className="h-2" />
                 </div>
@@ -207,7 +207,7 @@ const PerformanceReportsPanel: React.FC<PerformanceReportsPanelProps> = ({ analy
                 <div key={key} className="space-y-1">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">{key}</span>
-                    <span className="text-sm">{value}/100</span>
+                    <span className="text-sm">{String(value)}/100</span>
                   </div>
                   <Progress value={Number(value)} className="h-2" />
                 </div>

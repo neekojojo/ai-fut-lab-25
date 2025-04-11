@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart4, Running, Sparkles, Users2, Dumbbell, Building } from 'lucide-react';
+import { BarChart4, Activity, Sparkles, Users2, Dumbbell, Building } from 'lucide-react';
 
 interface AnalysisTabNavProps {
   activeTab: string;
@@ -10,7 +10,7 @@ interface AnalysisTabNavProps {
 const AnalysisTabNav: React.FC<AnalysisTabNavProps> = ({ activeTab, setActiveTab }) => {
   const tabs = [
     { id: 'stats', label: 'الإحصائيات', icon: <BarChart4 className="h-4 w-4" /> },
-    { id: 'movement', label: 'الحركة', icon: <Running className="h-4 w-4" /> },
+    { id: 'movement', label: 'الحركة', icon: <Activity className="h-4 w-4" /> },
     { id: 'insights', label: 'التحليلات', icon: <Sparkles className="h-4 w-4" /> },
     { id: 'similar-players', label: 'لاعبون مشابهون', icon: <Users2 className="h-4 w-4" /> },
     { id: 'training', label: 'التدريب', icon: <Dumbbell className="h-4 w-4" /> },
