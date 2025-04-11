@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { Container } from "@/components/ui/container";
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserCircle, Medal, Dumbbell, BarChart2 } from 'lucide-react';
