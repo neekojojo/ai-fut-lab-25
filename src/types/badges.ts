@@ -10,7 +10,7 @@ export interface Badge {
   earnedAt?: Date;
 }
 
-// Add BadgeItem type that was missing
+// BadgeItem type - make sure it's exported
 export interface BadgeItem {
   id: string;
   name: string;
@@ -19,7 +19,7 @@ export interface BadgeItem {
   level: string;
 }
 
-// Add the missing InjuryRiskArea and InjuryRiskData types
+// InjuryRiskArea and InjuryRiskData types - make sure they're exported
 export interface InjuryRiskArea {
   name: string;
   risk: number;

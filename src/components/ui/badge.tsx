@@ -16,7 +16,7 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
-        // Add custom variants
+        // Custom variants for score indicators
         high: "border-transparent bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
         medium: "border-transparent bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
         low: "border-transparent bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
