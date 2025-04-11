@@ -8,4 +8,5 @@ export interface InjuryRiskArea {
 export interface InjuryRiskData {
   overall: number;
   areas: InjuryRiskArea[];
+  recommendations: string[];
 }

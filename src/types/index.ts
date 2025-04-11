@@ -5,8 +5,12 @@ export * from './playerStats';
 export * from './playerAnalysis';
 export * from './userProfile';
 export * from './training';
-// Export badge types
-export * from './badges';
+
+// Export badge types - explicitly re-export to avoid ambiguity
+export { Badge, BadgeItem } from './badges';
+
+// Export injury types
+export { InjuryRiskArea, InjuryRiskData } from './injuries';
+
 export * from './progress';
-export * from './injuries';
 export * from './files';
