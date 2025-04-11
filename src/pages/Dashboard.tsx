@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Container } from "@/components/ui/container";
@@ -167,7 +168,19 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [userProfile] = useState(mockUserProfile);
   const [trainingVideos] = useState(mockTrainingVideos);
-  const [analyses] = useState(userProfile.analyses);
+  // Update the analyses to ensure they have unique IDs
+  const [analyses] = useState(userProfile.analyses.map((analysis, index) => ({
+    ...analysis,
+    id: analysis.id || `analysis-${index + 1}`,
+    playerName: `أحمد محمد ${index + 1}`,
+    position: index % 2 === 0 ? "وسط" : "مهاجم",
+    performance: {
+      technical: 68 + Math.floor(Math.random() * 20),
+      physical: 70 + Math.floor(Math.random() * 15),
+      tactical: 75 + Math.floor(Math.random() * 20),
+      mental: 65 + Math.floor(Math.random() * 25)
+    }
+  })));
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 

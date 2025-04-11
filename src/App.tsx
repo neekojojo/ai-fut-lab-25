@@ -14,6 +14,7 @@ import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
 import Index from './pages/Index';
 import Dashboard from './pages/Dashboard';
+import AdvancedAnalysis from './pages/AdvancedAnalysis';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/advanced-analysis/:id" element={<AdvancedAnalysis />} />
           </Routes>
           <Toaster />
         </BrowserRouter>
