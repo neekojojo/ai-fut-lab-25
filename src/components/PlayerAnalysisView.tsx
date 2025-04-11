@@ -11,6 +11,7 @@ import {
   getPlayerComparison, 
   getTrainingRecommendations 
 } from './player-analysis/mockData';
+import { ProfessionalPlayer } from '@/types/playerAnalysis';
 
 // Track whether the welcome message has been shown
 let welcomeMessageShown = false;
@@ -28,8 +29,11 @@ const PlayerAnalysisView: React.FC<PlayerAnalysisViewProps> = ({ videoFile, onRe
   // Memoize data to prevent recreation on every render
   const playerStats = React.useMemo(() => getPlayerStats(), []);
   const mockAnalysis = React.useMemo(() => getMockAnalysis(), []);
-  const playerComparison = React.useMemo(() => 
-    getPlayerComparison().similarProfessionals, []
+  const playerComparison = React.useMemo<ProfessionalPlayer[]>(() => 
+    getPlayerComparison().similarProfessionals.map(player => ({
+      ...player,
+      similarity: player.match // Add missing similarity property
+    })), []
   );
   const trainingRecommendations = React.useMemo(() => 
     getTrainingRecommendations(), []

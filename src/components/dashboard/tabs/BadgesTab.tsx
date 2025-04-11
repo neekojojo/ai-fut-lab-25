@@ -1,63 +1,79 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrophyIcon } from 'lucide-react';
-import { UserProfile } from '@/components/AnalysisReport.d';
+import { TabsContent } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Award, Star, Zap, Target, Brain, Map, Trophy } from "lucide-react";
 
-interface BadgesTabProps {
-  userProfile: UserProfile;
+interface BadgeItem {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  type: string;
+  level: string;
+  earnedAt?: Date;
 }
 
-const BadgesTab: React.FC<BadgesTabProps> = ({ userProfile }) => {
-  const navigate = useNavigate();
+interface BadgesTabProps {
+  badges: BadgeItem[];
+}
+
+const BadgesTab: React.FC<BadgesTabProps> = ({ badges }) => {
+  // Function to render appropriate icon based on badge type
+  const renderIcon = (iconName: string) => {
+    switch(iconName) {
+      case 'star': return <Star className="h-4 w-4" />;
+      case 'zap': return <Zap className="h-4 w-4" />;
+      case 'target': return <Target className="h-4 w-4" />;
+      case 'brain': return <Brain className="h-4 w-4" />;
+      case 'map': return <Map className="h-4 w-4" />;
+      case 'trophy': return <Trophy className="h-4 w-4" />;
+      case 'award':
+      default: return <Award className="h-4 w-4" />;
+    }
+  };
   
+  const getBadgeColorClass = (level: string) => {
+    switch(level) {
+      case 'gold': return 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300';
+      case 'silver': return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+      case 'bronze': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+    }
+  };
+
   return (
-    <div className="space-y-6">
+    <TabsContent value="badges" className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Your Achievements</CardTitle>
-          <CardDescription>Badges and rewards you've earned</CardDescription>
+          <CardTitle>الشارات والإنجازات</CardTitle>
+          <CardDescription>عرض جميع الشارات والإنجازات التي حققتها</CardDescription>
         </CardHeader>
         <CardContent>
-          {userProfile.badges.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {userProfile.badges.map((badge, index) => (
-                <Card key={index} className="overflow-hidden">
-                  <div className="p-4 flex flex-col items-center text-center">
-                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-3 ${
-                      badge.level === 'gold' ? 'bg-yellow-100 text-yellow-700' : 
-                      badge.level === 'silver' ? 'bg-gray-200 text-gray-700' : 
-                      'bg-amber-100 text-amber-700'
-                    }`}>
-                      <TrophyIcon className="h-8 w-8" />
-                    </div>
-                    <h3 className="font-semibold">{badge.name}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">{badge.description}</p>
-                    <div className={`mt-2 text-xs px-2 py-1 rounded-full ${
-                      badge.level === 'gold' ? 'bg-yellow-100 text-yellow-700' : 
-                      badge.level === 'silver' ? 'bg-gray-200 text-gray-700' : 
-                      'bg-amber-100 text-amber-700'
-                    }`}>
-                      {badge.level} level
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Earned on {badge.earnedAt.toLocaleDateString()}
-                    </p>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground mb-4">You haven't earned any badges yet</p>
-              <Button onClick={() => navigate('/')}>Perform Your First Analysis</Button>
-            </div>
-          )}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {badges.map((badge) => (
+              <div key={badge.id} className="flex flex-col items-center space-y-3 p-4 rounded-lg border bg-gradient-to-b from-muted/50 to-muted/30">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center ${getBadgeColorClass(badge.level)}`}>
+                  {renderIcon(badge.icon)}
+                </div>
+                <div className="text-center">
+                  <h3 className="font-semibold text-base">{badge.name}</h3>
+                  <p className="text-xs text-muted-foreground">{badge.description}</p>
+                </div>
+                <Badge variant={badge.level === 'gold' ? 'default' : 'outline'} className="text-xs">
+                  {badge.level === 'gold' ? 'ذهبية' : badge.level === 'silver' ? 'فضية' : 'برونزية'}
+                </Badge>
+                <p className="text-xs text-muted-foreground">
+                  {badge.earnedAt ? `تم الحصول عليها في ${badge.earnedAt.toLocaleDateString('ar-SA')}` : 'تم الحصول عليها مؤخرًا'}
+                </p>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
-    </div>
+    </TabsContent>
   );
 };
 

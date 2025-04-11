@@ -1,191 +1,201 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
+import { Helmet } from 'react-helmet-async';
+import Container from '@/components/ui/container';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { UserCircle, Medal, Dumbbell, BarChart2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileVideo, LineChart, BarChart, Activity, Medal, Target } from 'lucide-react';
-import Header from '@/components/Header';
-import Footer from '@/components/layout/Footer';
+import { UserProfile } from '@/types/userProfile';
+import { TrainingVideo } from '@/types/training';
+
+// Import tab components
 import OverviewTab from '@/components/dashboard/tabs/OverviewTab';
-import VideoUpload from '@/components/VideoUpload';
-import ModelSelection from '@/components/analysis/ModelSelection';
-import { useToast } from '@/hooks/use-toast';
-import { getPlayerStats, getMockAnalysis } from '@/components/player-analysis/mockData';
-import type { FileWithPreview } from '@/types/files';
+import ProfileTab from '@/components/dashboard/tabs/ProfileTab';
+import BadgesTab from '@/components/dashboard/tabs/BadgesTab';
+import TrainingTab from '@/components/dashboard/tabs/TrainingTab';
+import AnalysesTab from '@/components/dashboard/tabs/AnalysesTab';
+
+// Mock data
+const mockUserProfile: UserProfile = {
+  id: 'user-1',
+  name: 'أحمد محمد',
+  email: 'ahmed@example.com',
+  level: 'متقدم',
+  position: 'وسط',
+  performanceScore: 82,
+  improvementRate: 7.5,
+  badges: [
+    {
+      id: '1',
+      name: 'لاعب متميز',
+      description: 'تم تحقيق أداء متميز في 5 مباريات متتالية',
+      icon: 'star',
+      color: 'blue',
+      type: 'performance',
+      level: 'gold',
+      earnedAt: new Date('2023-10-15')
+    },
+    {
+      id: '2',
+      name: 'القائد',
+      description: 'إظهار قدرات قيادية استثنائية في الملعب',
+      icon: 'award',
+      color: 'purple',
+      type: 'leadership',
+      level: 'silver',
+      earnedAt: new Date('2023-09-20')
+    },
+    {
+      id: '3',
+      name: 'صانع اللعب',
+      description: 'إنشاء أكثر من 10 فرص تهديفية في مباراة واحدة',
+      icon: 'zap',
+      color: 'green',
+      type: 'technical',
+      level: 'gold',
+      earnedAt: new Date('2023-11-05')
+    },
+    {
+      id: '4',
+      name: 'لياقة بدنية عالية',
+      description: 'الحفاظ على مستوى عالٍ من اللياقة البدنية طوال الموسم',
+      icon: 'target',
+      color: 'red',
+      type: 'physical',
+      level: 'bronze',
+      earnedAt: new Date('2023-08-12')
+    }
+  ],
+  trainingProgress: 68,
+  analyses: [
+    {
+      id: 'analysis-1',
+      date: '2023-11-10',
+      score: 85
+    },
+    {
+      id: 'analysis-2',
+      date: '2023-10-25',
+      score: 78
+    },
+    {
+      id: 'analysis-3',
+      date: '2023-09-30',
+      score: 72
+    }
+  ]
+};
+
+const mockTrainingVideos: TrainingVideo[] = [
+  {
+    id: 'video-1',
+    title: 'تمارين تحسين السرعة للاعبي الوسط',
+    description: 'مجموعة من التمارين المصممة خصيصًا لتحسين سرعة وخفة لاعبي الوسط',
+    duration: '25:30',
+    thumbnailUrl: 'https://example.com/thumbnails/speed.jpg',
+    videoUrl: 'https://example.com/videos/speed.mp4',
+    level: 'متقدم',
+    difficulty: 3,
+    targetAreas: ['سرعة', 'خفة', 'قوة انفجارية']
+  },
+  {
+    id: 'video-2',
+    title: 'تمارين تحسين دقة التمرير',
+    description: 'تمارين متقدمة لتحسين دقة التمرير في مواقف اللعب المختلفة',
+    duration: '18:45',
+    thumbnailUrl: 'https://example.com/thumbnails/passing.jpg',
+    videoUrl: 'https://example.com/videos/passing.mp4',
+    level: 'متوسط',
+    difficulty: 2,
+    targetAreas: ['تمرير', 'تحكم بالكرة', 'رؤية']
+  },
+  {
+    id: 'video-3',
+    title: 'تمارين تكتيكية لتحسين الوعي الميداني',
+    description: 'سلسلة من التمارين التكتيكية لتحسين الوعي الميداني واتخاذ القرار',
+    duration: '32:15',
+    thumbnailUrl: 'https://example.com/thumbnails/tactical.jpg',
+    videoUrl: 'https://example.com/videos/tactical.mp4',
+    level: 'متقدم',
+    difficulty: 4,
+    targetAreas: ['تكتيك', 'وعي ميداني', 'اتخاذ قرار']
+  },
+  {
+    id: 'video-4',
+    title: 'تمارين تقوية عضلات الجزء السفلي',
+    description: 'مجموعة من التمارين لتقوية عضلات الساقين والحوض لتحسين الأداء',
+    duration: '22:10',
+    thumbnailUrl: 'https://example.com/thumbnails/strength.jpg',
+    videoUrl: 'https://example.com/videos/strength.mp4',
+    level: 'متوسط',
+    difficulty: 3,
+    targetAreas: ['قوة', 'تحمل', 'توازن']
+  }
+];
 
 const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [videoFile, setVideoFile] = useState<FileWithPreview | null>(null);
-  const [showModelSelection, setShowModelSelection] = useState(false);
-  const [selectedModel, setSelectedModel] = useState<'google-automl' | 'kaggle-datasets' | null>(null);
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  
-  // Mock user profile data
-  const userProfile = {
-    name: 'عبدالله محمد',
-    level: 'محترف',
-    position: 'وسط',
-    performanceScore: 82,
-    improvementRate: 12,
-    analyses: [
-      { id: '1', date: '2025-04-08', score: 78 },
-      { id: '2', date: '2025-04-01', score: 75 },
-      { id: '3', date: '2025-03-25', score: 72 }
-    ]
-  };
-  
-  // Mock training videos
-  const trainingVideos = [
-    { id: '1', title: 'تدريبات تحسين تمرير الكرة', duration: '15:20', level: 'متقدم' },
-    { id: '2', title: 'تمارين السرعة والتسارع', duration: '12:45', level: 'متوسط' },
-    { id: '3', title: 'تدريبات الدقة في التسديد', duration: '18:30', level: 'متقدم' }
-  ];
-  
-  const handleFileSelected = (file: FileWithPreview) => {
-    setVideoFile(file);
-    setShowModelSelection(true);
-    
-    toast({
-      title: "تم رفع الفيديو بنجاح",
-      description: "يمكنك الآن اختيار نموذج التحليل المناسب",
-    });
-  };
-  
-  const handleSelectModel = (model: 'google-automl' | 'kaggle-datasets') => {
-    setSelectedModel(model);
-    
-    toast({
-      title: "تم اختيار النموذج",
-      description: `تم اختيار نموذج ${model === 'google-automl' ? 'Google AutoML' : 'Kaggle Datasets'}`,
-    });
-  };
-  
-  const handleAnalyzeWithAI = () => {
-    toast({
-      title: "جاري تحليل الفيديو",
-      description: "سيتم تحويلك إلى صفحة التحليل",
-    });
-    
-    // Redirect to homepage (will show analysis progress)
-    navigate('/');
-  };
-  
+  const [userProfile] = useState<UserProfile>(mockUserProfile);
+  const [trainingVideos] = useState<TrainingVideo[]>(mockTrainingVideos);
+  const [analyses] = useState(userProfile.analyses);
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
+    <>
+      <Helmet>
+        <title>لوحة التحكم | FootballAI Analyzer</title>
+      </Helmet>
       
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">لوحة التحكم</h1>
-            <p className="text-muted-foreground">مرحباً بك في منصة تحليل كرة القدم بالذكاء الاصطناعي</p>
-          </div>
-          <Button className="flex items-center gap-2" onClick={() => navigate('/')}>
-            <FileVideo className="h-4 w-4" />
-            <span>تحليل فيديو جديد</span>
-          </Button>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">التقييم العام</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-end justify-between">
-                <div className="flex items-center">
-                  <Medal className="h-5 w-5 text-primary mr-2" />
-                  <div className="text-2xl font-bold">{userProfile.performanceScore}/100</div>
+      <Container className="py-8">
+        <Card className="border-none shadow-md bg-gradient-to-br from-gray-50 to-white dark:from-gray-900/50 dark:to-black/50">
+          <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-transparent">
+            <CardTitle className="text-2xl font-bold">
+              لوحة التحكم
+            </CardTitle>
+            <CardDescription>
+              مرحبًا {userProfile.name}! استعرض تقدمك وتحليلاتك وخطط تدريبك.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <div className="border-b">
+                <div className="px-4">
+                  <TabsList className="justify-start h-14 bg-transparent p-0 w-full overflow-x-auto no-scrollbar">
+                    <TabsTrigger value="overview" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-6 h-14">
+                      <BarChart2 className="w-4 h-4 mr-2" />
+                      <span>نظرة عامة</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="profile" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-6 h-14">
+                      <UserCircle className="w-4 h-4 mr-2" />
+                      <span>الملف الشخصي</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="badges" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-6 h-14">
+                      <Medal className="w-4 h-4 mr-2" />
+                      <span>الشارات والإنجازات</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="training" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-6 h-14">
+                      <Dumbbell className="w-4 h-4 mr-2" />
+                      <span>خطة التدريب</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="analyses" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-6 h-14">
+                      <BarChart2 className="w-4 h-4 mr-2" />
+                      <span>التحليلات</span>
+                    </TabsTrigger>
+                  </TabsList>
                 </div>
-                <div className="text-sm text-green-600 dark:text-green-400">+{userProfile.improvementRate}%</div>
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">المهارات الفنية</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-end justify-between">
-                <div className="flex items-center">
-                  <LineChart className="h-5 w-5 text-blue-500 mr-2" />
-                  <div className="text-2xl font-bold">84</div>
-                </div>
-                <div className="text-sm text-green-600 dark:text-green-400">+6%</div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">القدرات البدنية</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-end justify-between">
-                <div className="flex items-center">
-                  <Activity className="h-5 w-5 text-green-500 mr-2" />
-                  <div className="text-2xl font-bold">78</div>
-                </div>
-                <div className="text-sm text-green-600 dark:text-green-400">+8%</div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">الذكاء التكتيكي</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-end justify-between">
-                <div className="flex items-center">
-                  <Target className="h-5 w-5 text-purple-500 mr-2" />
-                  <div className="text-2xl font-bold">80</div>
-                </div>
-                <div className="text-sm text-green-600 dark:text-green-400">+4%</div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-8">
-            <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
-            <TabsTrigger value="upload">تحليل فيديو جديد</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="overview">
-            <OverviewTab userProfile={userProfile} trainingVideos={trainingVideos} />
-          </TabsContent>
-          
-          <TabsContent value="upload">
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>رفع فيديو للتحليل</CardTitle>
-                  <CardDescription>قم برفع فيديو لأداء اللاعب لتحليله باستخدام الذكاء الاصطناعي</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <VideoUpload onFileSelected={handleFileSelected} selectedFile={videoFile} />
-                </CardContent>
-              </Card>
               
-              {showModelSelection && (
-                <ModelSelection 
-                  videoFile={videoFile!} 
-                  onSelectModel={handleSelectModel} 
-                  onAnalyzeWithAI={handleAnalyzeWithAI} 
-                />
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </main>
-      
-      <Footer />
-    </div>
+              <div className="p-4">
+                <OverviewTab userProfile={userProfile} />
+                <ProfileTab userProfile={userProfile} />
+                <BadgesTab badges={userProfile.badges} />
+                <TrainingTab trainingVideos={trainingVideos} />
+                <AnalysesTab analyses={analyses} />
+              </div>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </Container>
+    </>
   );
 };
 

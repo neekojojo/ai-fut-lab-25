@@ -1,14 +1,11 @@
 
 export interface Badge {
+  id: string;
   name: string;
   description: string;
-  level: 'bronze' | 'silver' | 'gold';
-  earnedAt?: Date;
-}
-
-export interface UserBadge {
-  name: string;
-  description: string;
-  level: 'bronze' | 'silver' | 'gold';
+  icon: string;
+  color: string;
+  type: string;
+  level?: string;
   earnedAt?: Date;
 }

@@ -1,80 +1,116 @@
 
-import { PROFESSIONAL_PLAYERS } from './constants';
+import { PlayerAnalysis } from '@/types/playerAnalysis';
+import { Badge } from '@/types/badges';
 
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  level: string;
-  category: 'technical' | 'tactical' | 'physical' | 'mental' | 'achievement';
-  unlocked: boolean;
-  progress: number;
-  color: string;
-}
-
-export const generateBadges = (playerStats: any): Badge[] => {
-  const badges: Badge[] = [
-    {
-      id: 'technical-master',
-      name: 'سيد التقنية',
-      description: 'إتقان مهارات التقنية الأساسية بنسبة تفوق 80%',
-      icon: 'award',
-      level: 'متقدم',
-      category: 'technical',
-      unlocked: playerStats.technicalAccuracy > 80,
-      progress: playerStats.technicalAccuracy,
-      color: 'text-blue-500'
-    },
-    {
-      id: 'speed-demon',
-      name: 'سرعة الريح',
-      description: 'الوصول إلى معدلات سرعة استثنائية في المباراة',
+export const determineEarnedBadges = (analysis: PlayerAnalysis): Badge[] => {
+  const badges: Badge[] = [];
+  
+  // Check for technical badges
+  if (analysis.performance?.technical && analysis.performance.technical > 85) {
+    badges.push({
+      id: 'technical-maestro',
+      name: 'Technical Maestro',
+      description: 'Exceptional technical ability across all skills',
       icon: 'zap',
-      level: 'متقدم',
-      category: 'physical',
-      unlocked: playerStats.physicalPerformance > 85,
-      progress: playerStats.physicalPerformance,
-      color: 'text-yellow-500'
-    },
-    {
+      color: 'blue',
+      type: 'technical'
+    });
+  }
+  
+  // Check for physical badges
+  if (analysis.performance?.physical && analysis.performance.physical > 85) {
+    badges.push({
+      id: 'physical-specimen',
+      name: 'Physical Specimen',
+      description: 'Outstanding physical attributes and athleticism',
+      icon: 'activity',
+      color: 'red',
+      type: 'physical'
+    });
+  }
+  
+  // Check for tactical badges
+  if (analysis.performance?.tactical && analysis.performance.tactical > 85) {
+    badges.push({
       id: 'tactical-genius',
-      name: 'العبقرية التكتيكية',
-      description: 'إظهار فهم تكتيكي متفوق واتخاذ قرارات ذكية',
+      name: 'Tactical Genius',
+      description: 'Superior tactical awareness and decision making',
       icon: 'brain',
-      level: 'خبير',
-      category: 'tactical',
-      unlocked: playerStats.tacticalAwareness > 85,
-      progress: playerStats.tacticalAwareness,
-      color: 'text-purple-500'
-    },
-    {
-      id: 'team-player',
-      name: 'لاعب الفريق',
-      description: 'العمل بشكل فعال مع زملاء الفريق والمساهمة في اللعب الجماعي',
-      icon: 'users',
-      level: 'متوسط',
-      category: 'tactical',
-      unlocked: playerStats.efficiency > 80,
-      progress: playerStats.efficiency,
-      color: 'text-green-500'
-    },
-    {
-      id: 'dribble-master',
-      name: 'ملك المراوغة',
-      description: 'إظهار مهارات مراوغة استثنائية',
-      icon: 'sparkles',
-      level: 'متقدم',
-      category: 'technical',
-      unlocked: playerStats.technicalSkills?.dribbling > 80,
-      progress: playerStats.technicalSkills?.dribbling || 0,
-      color: 'text-orange-500'
-    }
-  ];
+      color: 'purple',
+      type: 'tactical'
+    });
+  }
+  
+  // Check for mental badges
+  if (analysis.performance?.mental && analysis.performance.mental > 85) {
+    badges.push({
+      id: 'mental-giant',
+      name: 'Mental Giant',
+      description: 'Exceptional mental fortitude and composure',
+      icon: 'target',
+      color: 'green',
+      type: 'mental'
+    });
+  }
+  
+  // Check for performance badges based on overall performance score
+  if (analysis.performanceScore && analysis.performanceScore > 85) {
+    badges.push({
+      id: 'elite-performer',
+      name: 'Elite Performer',
+      description: 'Among the top performers in all categories',
+      icon: 'award',
+      color: 'gold',
+      type: 'performance'
+    });
+  }
+  
+  // Check for position-specific badges
+  if (analysis.position === 'Forward' && analysis.stats?.shooting && analysis.stats.shooting > 85) {
+    badges.push({
+      id: 'clinical-finisher',
+      name: 'Clinical Finisher',
+      description: 'Exceptional ability to convert chances',
+      icon: 'target',
+      color: 'orange',
+      type: 'technical'
+    });
+  }
+  
+  if (analysis.position === 'Midfielder' && analysis.stats?.passing && analysis.stats.passing > 85) {
+    badges.push({
+      id: 'playmaker',
+      name: 'Playmaker',
+      description: 'Superior passing ability and vision',
+      icon: 'eye',
+      color: 'cyan',
+      type: 'technical'
+    });
+  }
+  
+  if (analysis.position === 'Defender' && analysis.stats?.defending && analysis.stats.defending > 85) {
+    badges.push({
+      id: 'defensive-wall',
+      name: 'Defensive Wall',
+      description: 'Exceptional defensive positioning and tackling',
+      icon: 'shield',
+      color: 'indigo',
+      type: 'defensive'
+    });
+  }
+  
+  if (analysis.position === 'Goalkeeper' && analysis.stats?.reflexes && analysis.stats.reflexes > 85) {
+    badges.push({
+      id: 'shot-stopper',
+      name: 'Shot Stopper',
+      description: 'Remarkable goalkeeping abilities',
+      icon: 'hand',
+      color: 'yellow',
+      type: 'goalkeeping'
+    });
+  }
   
   return badges;
 };
 
-export default {
-  generateBadges
-};
+export default determineEarnedBadges;

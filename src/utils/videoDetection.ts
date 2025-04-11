@@ -1,107 +1,165 @@
 
-import type { FileWithPreview } from '@/types/files';
+import { DetectionResult, PlayerPosition } from './videoDetection/types';
 
-// Mock implementation for video detection using AI models
-export const detectPeopleInVideo = async (
-  videoFile: FileWithPreview,
-  options?: any,
-  onProgress?: (progress: number) => void
-) => {
-  // Simulate progress
-  let progress = 0;
-  const interval = setInterval(() => {
-    progress += 5;
-    if (onProgress) onProgress(Math.min(progress, 95));
-    if (progress >= 100) clearInterval(interval);
-  }, 300);
+// Function to extract frames from a video file
+export const extractVideoFrames = async (videoFile: File, frameCount: number = 10): Promise<HTMLCanvasElement[]> => {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video');
+    const frames: HTMLCanvasElement[] = [];
+    
+    video.preload = 'metadata';
+    video.muted = true;
+    video.playsInline = true;
+    
+    // Create object URL for the video file
+    const videoURL = URL.createObjectURL(videoFile);
+    video.src = videoURL;
+    
+    video.onloadedmetadata = () => {
+      const duration = video.duration;
+      const frameInterval = duration / (frameCount + 1);
+      let frameCounter = 0;
+      
+      video.currentTime = frameInterval;
+      
+      video.onseeked = () => {
+        // Create canvas for the current frame
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          frames.push(canvas);
+          
+          frameCounter++;
+          
+          if (frameCounter < frameCount) {
+            video.currentTime += frameInterval;
+          } else {
+            URL.revokeObjectURL(videoURL);
+            resolve(frames);
+          }
+        } else {
+          URL.revokeObjectURL(videoURL);
+          reject(new Error('Failed to get canvas context'));
+        }
+      };
+      
+      video.onerror = () => {
+        URL.revokeObjectURL(videoURL);
+        reject(new Error('Error seeking video'));
+      };
+    };
+    
+    video.onerror = () => {
+      URL.revokeObjectURL(videoURL);
+      reject(new Error('Error loading video'));
+    };
+  });
+};
 
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 3000));
-
-  clearInterval(interval);
-  if (onProgress) onProgress(100);
-
-  // Return mock detection results
+// Function to detect players in a video
+export const detectPlayersInVideo = async (videoFile: File): Promise<DetectionResult> => {
+  // Mock implementation
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  // Generate random number of detections
+  const count = Math.floor(Math.random() * 5) + 5; // 5-10 players
+  const confidence = 0.8 + (Math.random() * 0.15); // 0.8-0.95 confidence
+  
+  // Generate mock frame results
+  const frameCount = 10;
+  const frameResults = Array.from({ length: frameCount }, (_, i) => ({
+    frameNumber: i,
+    detections: Math.floor(Math.random() * 3) + count - 2, // Slight variation in detections
+    timestamp: (i / frameCount) * 1000 // Timestamp in milliseconds
+  }));
+  
+  // Generate player positions
+  const playerPositions: PlayerPosition[] = [];
+  for (let i = 0; i < frameCount; i++) {
+    for (let p = 0; p < count; p++) {
+      if (Math.random() > 0.2) { // 80% chance of detecting each player in each frame
+        playerPositions.push({
+          frameNumber: i,
+          timestamp: (i / frameCount) * 1000,
+          keypoints: [
+            {
+              // Generate random position within 1080p frame
+              x: Math.random() * 1920,
+              y: Math.random() * 1080,
+              part: 'nose',
+              confidence: 0.7 + (Math.random() * 0.25)
+            },
+            // Add more keypoints as needed
+          ],
+          bbox: {
+            x: Math.random() * 1820, // Leave room for width
+            y: Math.random() * 980, // Leave room for height
+            width: 50 + Math.random() * 70,
+            height: 100 + Math.random() * 80
+          },
+          confidence: 0.7 + (Math.random() * 0.25),
+          speed: 2 + Math.random() * 8, // 2-10 speed
+          distance: Math.random() * 5 // 0-5 distance
+        });
+      }
+    }
+  }
+  
   return {
-    count: 5,
-    confidence: 0.95,
-    frameResults: Array(30).fill(0).map((_, i) => ({
-      frame: i,
-      people: [
-        { id: 1, boundingBox: { x: 100, y: 100, width: 200, height: 400 }, confidence: 0.98 },
-        { id: 2, boundingBox: { x: 400, y: 200, width: 200, height: 400 }, confidence: 0.92 }
-      ]
-    }))
+    count,
+    confidence,
+    frameResults,
+    playerPositions
   };
 };
 
-// Mock implementation for player performance analysis
-export const analyzePlayerPerformance = async (
-  videoFile: FileWithPreview,
-  options?: any,
-  onProgress?: (progress: number) => void
-) => {
-  // Simulate progress
-  let progress = 0;
-  const interval = setInterval(() => {
-    progress += 3;
-    if (onProgress) onProgress(Math.min(progress, 98));
-    if (progress >= 100) clearInterval(interval);
-  }, 250);
-
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 5000));
-
-  clearInterval(interval);
-  if (onProgress) onProgress(100);
-
-  // Return mock analysis results
+// Function to analyze player eye movement (for advanced cognitive analysis)
+export const analyzePlayerEyeMovement = async (videoFile: any, detectionResult?: DetectionResult) => {
+  // Mock implementation
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
   return {
-    detection: {
-      count: 1,
-      confidence: 0.92,
-      frameResults: Array(50).fill(0).map((_, i) => ({
-        frame: i,
-        people: [
-          { id: 1, boundingBox: { x: 250, y: 150, width: 200, height: 400 }, confidence: 0.96 }
-        ]
-      }))
-    },
-    movementAnalysis: {
-      averageSpeed: 15.3,
-      totalDistance: 687.4,
-      maxAcceleration: 4.8,
-      speedZones: [
-        { zone: 'Walking (0-6 km/h)', percentage: 25 },
-        { zone: 'Jogging (6-12 km/h)', percentage: 40 },
-        { zone: 'Running (12-18 km/h)', percentage: 25 },
-        { zone: 'Sprinting (18+ km/h)', percentage: 10 }
-      ],
-      heatmap: Array(10).fill(0).map(() => Array(10).fill(0).map(() => Math.random() * 100))
-    },
-    eyeTracking: {
-      fieldAwarenessScore: 82.5,
-      decisionSpeed: 86.2,
-      anticipationScore: 78.9,
-      visualScanFrequency: 12.4,
-      fixationDuration: 0.35
-    },
-    performanceMetrics: {
-      technicalAccuracy: 87.4,
-      efficiency: 84.2,
-      tacticalAwareness: 79.8,
-      physicalPerformance: 88.5,
-      consistency: 82.1,
-      overall: 84.4
-    },
-    technicalSkills: {
-      passing: 86,
-      dribbling: 78,
-      shooting: 74,
-      firstTouch: 82,
-      ballControl: 85,
-      heading: 69,
-      tackling: 72
-    }
+    scanFrequency: 12.4, // scans per minute
+    focusTime: 0.35, // seconds
+    peripheralAwareness: 85,
+    targetIdentification: 88,
+    fieldAwarenessScore: 82.5,
+    decisionSpeed: 86.2,
+    anticipationScore: 78.9,
+    visualScanFrequency: 12.4,
+    fixationDuration: 0.35
   };
+};
+
+// Function to generate mock professional player comparison
+export const generateProfessionalComparison = (playerPosition: string) => {
+  const professionalsByPosition = {
+    'Forward': [
+      { name: 'Karim Benzema', similarity: 78, team: 'Al-Ittihad', strengths: ['Finishing', 'Link-up play'] },
+      { name: 'Cristiano Ronaldo', similarity: 74, team: 'Al-Nassr', strengths: ['Scoring', 'Aerial ability'] }
+    ],
+    'Midfielder': [
+      { name: 'Sergej Milinković-Savić', similarity: 81, team: 'Al-Hilal', strengths: ['Passing', 'Physical presence'] },
+      { name: 'Marcelo Brozović', similarity: 77, team: 'Al-Nassr', strengths: ['Vision', 'Ball control'] }
+    ],
+    'Defender': [
+      { name: 'Kalidou Koulibaly', similarity: 80, team: 'Al-Hilal', strengths: ['Tackling', 'Strength'] },
+      { name: 'Aymeric Laporte', similarity: 76, team: 'Al-Nassr', strengths: ['Passing', 'Positioning'] }
+    ],
+    'Goalkeeper': [
+      { name: 'Édouard Mendy', similarity: 82, team: 'Al-Ahli', strengths: ['Reflexes', 'Commanding presence'] },
+      { name: 'David Ospina', similarity: 75, team: 'Al-Nassr', strengths: ['Shot stopping', 'Distribution'] }
+    ],
+    'default': [
+      { name: 'Mohamed Kanno', similarity: 73, team: 'Al-Hilal', strengths: ['Versatility', 'Work rate'] },
+      { name: 'Salem Al-Dawsari', similarity: 71, team: 'Al-Hilal', strengths: ['Technique', 'Speed'] }
+    ]
+  };
+  
+  const professionals = professionalsByPosition[playerPosition] || professionalsByPosition.default;
+  return professionals[0];
 };

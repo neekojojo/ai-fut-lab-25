@@ -1,201 +1,278 @@
 
-// Service for analyzing team compatibility
+import { PlayerAnalysis } from '@/types/playerAnalysis';
 
-// This function analyzes how compatible a player is with various teams
+// Types for team tactics service
+export interface ExtendedPlayerStats {
+  avgSpeed: number;
+  maxSpeed: number;
+  avgAcceleration: number;
+  distanceCovered: number;
+  balanceScore: number;
+  technicalScore: number;
+  physicalScore: number;
+  movementEfficiency: number;
+  passing: number;
+  ballControl: number;
+  vision: number;
+  pace: number;
+  stamina: number;
+  physical: number;
+  positioning: number;
+  anticipation: number;
+  decision: number;
+  [key: string]: number;
+}
+
+export interface SaudiLeagueTeam {
+  id: string;
+  name: string;
+  logo: string;
+  formation: string;
+  playingStyle: string;
+  strengths: string[];
+  weaknesses: string[];
+  requiredAttributes: {
+    [position: string]: {
+      [attribute: string]: number;
+    };
+  };
+}
+
+export interface TeamCompatibilityResult {
+  team: SaudiLeagueTeam;
+  compatibilityScore: number;
+  positionFit: number;
+  tacticalFit: number;
+  roleDescription: string;
+  strengthsMatch: string[];
+}
+
+// Mock data for Saudi League teams
+const saudiLeagueTeams: SaudiLeagueTeam[] = [
+  {
+    id: 'al-hilal',
+    name: 'الهلال',
+    logo: 'https://example.com/logos/al-hilal.png',
+    formation: '4-2-3-1',
+    playingStyle: 'هجومي مسيطر',
+    strengths: [
+      'هجمات سريعة',
+      'استحواذ طويل',
+      'ضغط عالي'
+    ],
+    weaknesses: [
+      'ضعف في الهجمات المرتدة',
+      'دفاع غير متماسك أحياناً'
+    ],
+    requiredAttributes: {
+      'Forward': {
+        'pace': 80,
+        'shooting': 85,
+        'technical': 80
+      },
+      'Midfielder': {
+        'passing': 85,
+        'vision': 80,
+        'tactical': 85
+      },
+      'Defender': {
+        'defending': 85,
+        'strength': 80,
+        'positioning': 85
+      },
+      'Goalkeeper': {
+        'reflexes': 85,
+        'positioning': 80,
+        'handling': 80
+      }
+    }
+  },
+  {
+    id: 'al-nassr',
+    name: 'النصر',
+    logo: 'https://example.com/logos/al-nassr.png',
+    formation: '4-3-3',
+    playingStyle: 'هجومي مباشر',
+    strengths: [
+      'هجمات مرتدة سريعة',
+      'تسديدات من خارج منطقة الجزاء',
+      'قوة في الكرات الثابتة'
+    ],
+    weaknesses: [
+      'استحواذ غير مستقر',
+      'مساحات دفاعية كبيرة'
+    ],
+    requiredAttributes: {
+      'Forward': {
+        'pace': 85,
+        'shooting': 85,
+        'physical': 75
+      },
+      'Midfielder': {
+        'passing': 80,
+        'stamina': 85,
+        'physical': 80
+      },
+      'Defender': {
+        'pace': 75,
+        'strength': 85,
+        'aerial': 80
+      },
+      'Goalkeeper': {
+        'reflexes': 80,
+        'distribution': 85,
+        'commanding': 80
+      }
+    }
+  },
+  {
+    id: 'al-ahli',
+    name: 'الأهلي',
+    logo: 'https://example.com/logos/al-ahli.png',
+    formation: '4-4-2',
+    playingStyle: 'متوازن',
+    strengths: [
+      'تنظيم دفاعي متماسك',
+      'هجمات جانبية فعالة',
+      'عمل جماعي منظم'
+    ],
+    weaknesses: [
+      'بطء في التحول من الدفاع للهجوم',
+      'عدم فعالية في اختراق الدفاعات المغلقة'
+    ],
+    requiredAttributes: {
+      'Forward': {
+        'shooting': 80,
+        'heading': 80,
+        'movement': 85
+      },
+      'Midfielder': {
+        'work-rate': 85,
+        'passing': 80,
+        'tactical': 85
+      },
+      'Defender': {
+        'tackling': 85,
+        'positioning': 85,
+        'concentration': 80
+      },
+      'Goalkeeper': {
+        'positioning': 85,
+        'communication': 85,
+        'reflexes': 80
+      }
+    }
+  }
+];
+
+export const getSaudiLeagueTeams = (): SaudiLeagueTeam[] => {
+  return saudiLeagueTeams;
+};
+
+// Analyze team compatibility based on player stats and position
 export const analyzeTeamCompatibility = (
-  playerStats: any,
+  playerStats: ExtendedPlayerStats,
   playerPosition: string,
   playerStrengths: string[]
-) => {
-  // In a real app, this would use complex algorithms and team data
-  // For now, we'll use a simplified version with sample teams
+): TeamCompatibilityResult[] => {
+  const teams = getSaudiLeagueTeams();
+  const results: TeamCompatibilityResult[] = [];
   
-  // Sample Saudi league teams data
-  const saudiLeagueTeams = [
-    {
-      id: "hilal",
-      name: "الهلال",
-      logo: "https://upload.wikimedia.org/wikipedia/en/a/a5/Al_Hilal_FC_logo.svg",
-      formation: "4-3-3",
-      playingStyle: "استحواذ هجومي",
-      tacticalPreferences: {
-        possession: 65,
-        pressing: 70,
-        counterAttack: 60,
-        buildUpPace: "slow",
-        defensiveStyle: "high-line"
-      },
-      positionNeeds: {
-        "وسط": {
-          technicalRequirements: ["vision", "passing", "ballControl"],
-          physicalRequirements: ["stamina"],
-          desiredAttributes: ["الرؤية الميدانية", "التمرير الدقيق", "التحكم بالكرة"]
-        }
-      }
-    },
-    {
-      id: "nassr",
-      name: "النصر",
-      logo: "https://upload.wikimedia.org/wikipedia/en/c/c4/Al-Nassr.png",
-      formation: "4-2-3-1",
-      playingStyle: "هجوم سريع",
-      tacticalPreferences: {
-        possession: 55,
-        pressing: 65,
-        counterAttack: 80,
-        buildUpPace: "fast",
-        defensiveStyle: "medium-block"
-      },
-      positionNeeds: {
-        "وسط": {
-          technicalRequirements: ["passing", "vision", "decision"],
-          physicalRequirements: ["pace", "stamina"],
-          desiredAttributes: ["السرعة", "المراوغة", "اتخاذ القرار"]
-        }
-      }
-    },
-    {
-      id: "ittihad",
-      name: "الاتحاد",
-      logo: "https://upload.wikimedia.org/wikipedia/en/9/97/Ittihad_FC.png",
-      formation: "3-5-2",
-      playingStyle: "ضغط عالٍ",
-      tacticalPreferences: {
-        possession: 50,
-        pressing: 85,
-        counterAttack: 75,
-        buildUpPace: "mixed",
-        defensiveStyle: "aggressive"
-      },
-      positionNeeds: {
-        "وسط": {
-          technicalRequirements: ["ballControl", "passing", "vision"],
-          physicalRequirements: ["stamina", "strength"],
-          desiredAttributes: ["التحكم بالكرة", "الرؤية الميدانية", "القوة البدنية"]
-        }
-      }
-    },
-    {
-      id: "ahli",
-      name: "الأهلي",
-      logo: "https://upload.wikimedia.org/wikipedia/en/2/2d/Al-Ahli_Saudi_FC_logo.svg",
-      formation: "4-4-2",
-      playingStyle: "متوازن",
-      tacticalPreferences: {
-        possession: 58,
-        pressing: 60,
-        counterAttack: 65,
-        buildUpPace: "mixed",
-        defensiveStyle: "balanced"
-      },
-      positionNeeds: {
-        "وسط": {
-          technicalRequirements: ["passing", "vision", "ballControl"],
-          physicalRequirements: ["stamina", "agility"],
-          desiredAttributes: ["التمرير الدقيق", "الرؤية الميدانية", "الرشاقة"]
-        }
-      }
-    },
-    {
-      id: "shabab",
-      name: "الشباب",
-      logo: "https://upload.wikimedia.org/wikipedia/en/c/cc/AlShabab.png",
-      formation: "4-2-3-1",
-      playingStyle: "فني متوازن",
-      tacticalPreferences: {
-        possession: 60,
-        pressing: 65,
-        counterAttack: 70,
-        buildUpPace: "mixed",
-        defensiveStyle: "medium-block"
-      },
-      positionNeeds: {
-        "وسط": {
-          technicalRequirements: ["ballControl", "vision", "positioning"],
-          physicalRequirements: ["stamina", "agility"],
-          desiredAttributes: ["التحكم بالكرة", "الرؤية الميدانية", "التموضع الجيد"]
-        }
+  for (const team of teams) {
+    // Calculate position fit
+    const positionRequirements = team.requiredAttributes[playerPosition] || {};
+    let positionFitScore = 0;
+    let positionFactorsCount = 0;
+    
+    for (const [attribute, requiredValue] of Object.entries(positionRequirements)) {
+      if (playerStats[attribute]) {
+        positionFitScore += Math.min(100, (playerStats[attribute] / requiredValue) * 100);
+        positionFactorsCount++;
       }
     }
-  ];
-  
-  // Analyze compatibility with each team
-  const results = saudiLeagueTeams.map(team => {
-    // Check position fit (simplified)
-    const positionInfo = team.positionNeeds[playerPosition] || team.positionNeeds["وسط"];
-    let positionFit = 70; // Base compatibility
     
-    // Calculate technical match
-    let technicalMatchCount = 0;
-    if (positionInfo) {
-      positionInfo.technicalRequirements.forEach(req => {
-        if (req === "vision" && playerStats.vision > 60) technicalMatchCount++;
-        if (req === "passing" && playerStats.passing > 60) technicalMatchCount++;
-        if (req === "ballControl" && playerStats.ballControl > 60) technicalMatchCount++;
-        if (req === "decision" && playerStats.decision > 60) technicalMatchCount++;
-        if (req === "positioning" && playerStats.positioning > 60) technicalMatchCount++;
-      });
-      
-      positionFit += (technicalMatchCount / positionInfo.technicalRequirements.length) * 15;
-    }
+    const positionFit = positionFactorsCount > 0 
+      ? Math.min(100, positionFitScore / positionFactorsCount)
+      : 60; // Default if no position requirements found
     
-    // Calculate physical match
-    let physicalMatchCount = 0;
-    if (positionInfo) {
-      positionInfo.physicalRequirements.forEach(req => {
-        if (req === "pace" && playerStats.pace > 60) physicalMatchCount++;
-        if (req === "stamina" && playerStats.stamina > 60) physicalMatchCount++;
-        if (req === "strength" && playerStats.strength > 60) physicalMatchCount++;
-        if (req === "agility" && playerStats.agility > 60) physicalMatchCount++;
-      });
-      
-      positionFit += (physicalMatchCount / positionInfo.physicalRequirements.length) * 15;
-    }
-    
-    // Calculate tactical fit (simplified)
+    // Calculate tactical fit
     let tacticalFit = 70; // Base compatibility
     
-    // Adjust based on playing style
-    if (team.playingStyle === "استحواذ هجومي" && playerStats.passing > 75) {
-      tacticalFit += 10;
-    } else if (team.playingStyle === "هجوم سريع" && playerStats.pace > 75) {
-      tacticalFit += 10;
-    } else if (team.playingStyle === "ضغط عالٍ" && playerStats.stamina > 75) {
+    // Style compatibility boost
+    if (team.playingStyle.includes('هجومي') && playerStats.pace > 80) {
       tacticalFit += 10;
     }
     
-    // Calculate attribute match
-    const strengthsMatch = positionInfo 
-      ? playerStrengths.filter(strength => 
-          positionInfo.desiredAttributes.includes(strength)
-        )
-      : [];
-    
-    // Calculate overall compatibility
-    const compatibilityScore = Math.round((positionFit * 0.5) + (tacticalFit * 0.5));
-    
-    // Generate a role description based on team and position
-    let roleDescription = "";
-    if (team.playingStyle === "استحواذ هجومي") {
-      roleDescription = "لاعب وسط إبداعي يركز على التمريرات المفتاحية وبناء الهجمات";
-    } else if (team.playingStyle === "هجوم سريع") {
-      roleDescription = "صانع ألعاب يركز على التمريرات الحاسمة والهجمات المرتدة";
-    } else if (team.playingStyle === "ضغط عالٍ") {
-      roleDescription = "لاعب وسط ديناميكي مسؤول عن الربط بين الدفاع والهجوم";
-    } else {
-      roleDescription = "لاعب وسط متعدد المهام يجمع بين المهارات الدفاعية والهجومية";
+    if (team.playingStyle.includes('متوازن') && playerStats.positioning > 80) {
+      tacticalFit += 10;
     }
     
-    return {
+    if (team.playingStyle.includes('دفاعي') && playerStats.defending > 80) {
+      tacticalFit += 10;
+    }
+    
+    // Find matching strengths
+    const strengthsMatch = playerStrengths.filter(playerStrength => 
+      team.strengths.some(teamStrength => 
+        teamStrength.toLowerCase().includes(playerStrength.toLowerCase()) ||
+        playerStrength.toLowerCase().includes(teamStrength.toLowerCase())
+      )
+    );
+    
+    if (strengthsMatch.length > 0) {
+      tacticalFit += strengthsMatch.length * 5;
+    }
+    
+    // Overall compatibility
+    const compatibilityScore = Math.round((positionFit * 0.6) + (tacticalFit * 0.4));
+    
+    // Role description based on team and position
+    const roleDescription = generateRoleDescription(team, playerPosition);
+    
+    results.push({
       team,
       compatibilityScore,
       positionFit,
       tacticalFit,
-      strengthsMatch,
-      roleDescription
-    };
-  });
+      roleDescription,
+      strengthsMatch
+    });
+  }
   
-  // Sort by compatibility score
+  // Sort by compatibility score (highest first)
   return results.sort((a, b) => b.compatibilityScore - a.compatibilityScore);
 };
+
+// Generate a role description based on team and position
+const generateRoleDescription = (team: SaudiLeagueTeam, playerPosition: string): string => {
+  const descriptions: {[key: string]: {[key: string]: string}} = {
+    'al-hilal': {
+      'Forward': 'يُتوقع منك تسجيل الأهداف والمشاركة في بناء الهجمات. التركيز على الحركة داخل منطقة الجزاء والاستفادة من التمريرات العرضية.',
+      'Midfielder': 'دورك الأساسي هو التحكم في إيقاع اللعب والمساهمة في الاستحواذ. مطلوب منك تقديم تمريرات دقيقة وخلق الفرص للمهاجمين.',
+      'Defender': 'ستكون مسؤولاً عن بناء الهجمات من الخلف مع الحفاظ على تنظيم دفاعي متماسك. مطلوب منك الالتزام التكتيكي العالي.',
+      'Goalkeeper': 'مطلوب منك المشاركة في بناء الهجمات وبدء الاستحواذ، بالإضافة إلى مهاراتك التقليدية في حماية المرمى.'
+    },
+    'al-nassr': {
+      'Forward': 'دورك الأساسي هو استغلال المساحات خلف دفاعات الخصم والتمركز المناسب لإنهاء الهجمات المرتدة.',
+      'Midfielder': 'مطلوب منك تغطية مساحات واسعة والمشاركة في الدفاع والهجوم. التركيز على التمريرات السريعة والمباشرة.',
+      'Defender': 'ستحتاج إلى سرعة جيدة للتعامل مع المساحات الكبيرة خلفك. مطلوب منك الصلابة في المواجهات الفردية.',
+      'Goalkeeper': 'دورك مهم في بدء الهجمات المرتدة بتوزيعات سريعة ودقيقة. مطلوب منك الحذر من الخروج المتكرر.'
+    },
+    'al-ahli': {
+      'Forward': 'يُتوقع منك العمل كجزء من ثنائي هجومي مع التركيز على التواجد داخل منطقة الجزاء واستغلال الكرات العرضية.',
+      'Midfielder': 'دورك الأساسي هو العمل الجماعي والتغطية الدفاعية مع المشاركة في بناء الهجمات بشكل منظم.',
+      'Defender': 'مطلوب منك الالتزام التكتيكي العالي والتنظيم الدفاعي المتماسك. التركيز على التمركز الصحيح.',
+      'Goalkeeper': 'دورك مهم في قيادة الخط الدفاعي وتنظيمه. مطلوب منك التواصل المستمر مع المدافعين.'
+    }
+  };
+  
+  return descriptions[team.id]?.[playerPosition] || 
+    'ستكون جزءًا مهمًا من تشكيلة الفريق، مع دور يتناسب مع مهاراتك وقدراتك الفنية والبدنية.';
+};
+
+const teamTacticsService = {
+  getSaudiLeagueTeams,
+  analyzeTeamCompatibility
+};
+
+export default teamTacticsService;
