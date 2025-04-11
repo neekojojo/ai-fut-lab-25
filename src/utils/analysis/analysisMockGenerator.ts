@@ -1,7 +1,7 @@
 import { PlayerAnalysis, ProfessionalPlayer } from '@/types/playerAnalysis';
 import determineEarnedBadges from './badgeService';
 import { generateInjuryRiskAssessment } from './injuryRiskAnalysis';
-import { InjuryRiskData } from '@/types/badges';
+import { InjuryRiskData } from '@/types/injuries';
 
 export const generateMockPlayerAnalysis = (
   id = `analysis-${Date.now()}`,

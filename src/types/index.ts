@@ -7,10 +7,10 @@ export * from './userProfile';
 export * from './training';
 
 // Export badge types - explicitly re-export to avoid ambiguity
-export { Badge, BadgeItem } from './badges';
+export { type Badge, type BadgeItem } from './badges';
 
 // Export injury types
-export { InjuryRiskArea, InjuryRiskData } from './injuries';
+export { type InjuryRiskArea, type InjuryRiskData } from './injuries';
 
 export * from './progress';
 export * from './files';
