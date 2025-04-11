@@ -1,7 +1,7 @@
 
 // Re-export from the refactored service for backward compatibility
 import { GoogleAutoMLService } from './services/GoogleAutoMLServiceClass';
-export { PlayerPerformancePredictionRequest, PlayerPerformancePrediction } from './types/googleAutoML';
+export type { PlayerPerformancePredictionRequest, PlayerPerformancePrediction } from './types/googleAutoML';
 
 // Export a singleton instance - this maintains the same API as before
 export const googleAutoMLService = new GoogleAutoMLService();
