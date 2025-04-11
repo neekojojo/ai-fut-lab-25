@@ -1,16 +1,7 @@
 
-import StatsTabContent from './StatsTabContent';
-import MovementTabContent from './MovementTabContent';
-import InsightsTabContent from './InsightsTabContent';
-import SimilarPlayersTabContent from './SimilarPlayersTabContent';
-import TrainingTabContent from './TrainingTabContent';
-import ClubsTabContent from './ClubsTabContent';
-
-export {
-  StatsTabContent,
-  MovementTabContent,
-  InsightsTabContent,
-  SimilarPlayersTabContent,
-  TrainingTabContent,
-  ClubsTabContent
-};
+export { default as StatsTabContent } from './StatsTabContent';
+export { default as MovementTabContent } from './MovementTabContent';
+export { default as InsightsTabContent } from './InsightsTabContent';
+export { default as SimilarPlayersTabContent } from './SimilarPlayersTabContent';
+export { default as TrainingTabContent } from './TrainingTabContent';
+export { default as ClubsTabContent } from './ClubsTabContent';

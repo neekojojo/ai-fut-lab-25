@@ -1,173 +1,71 @@
-import { PlayerAnalysis } from "@/types/playerAnalysis";
-import { InjuryRiskArea, InjuryRiskData } from "@/types/badges";
 
-// Calculate injury risk based on player stats and performance
-export const calculateInjuryRisk = (
-  analysis: PlayerAnalysis
-): InjuryRiskData => {
-  // Calculate overall injury risk score (0-100)
-  // Higher values = higher risk
-  const getStatsValue = (key: string) => {
-    return analysis.stats?.[key] || 75;
+import { PlayerAnalysis } from '@/types/playerAnalysis';
+
+/**
+ * Generates an injury risk assessment based on player position and physical attributes
+ * @param position The player's position
+ * @param physicalScore The player's physical score
+ */
+export const generateInjuryRiskAssessment = (position: string, physicalScore: number) => {
+  // Higher physical score means lower overall risk
+  const overallRisk = Math.max(30, 100 - physicalScore);
+  
+  // Different positions have different risk areas
+  const areasByPosition: Record<string, { name: string, baseRisk: number, recommendation: string }[]> = {
+    'Forward': [
+      { name: 'Hamstring', baseRisk: 75, recommendation: 'Increase hamstring strengthening exercises' },
+      { name: 'Ankle', baseRisk: 65, recommendation: 'Practice landing technique and balance exercises' },
+      { name: 'Knee', baseRisk: 60, recommendation: 'Focus on proper acceleration and deceleration mechanics' }
+    ],
+    'Midfielder': [
+      { name: 'Groin', baseRisk: 70, recommendation: 'Implement adductor strengthening routine' },
+      { name: 'Calf', baseRisk: 65, recommendation: 'Increase calf flexibility and strength training' },
+      { name: 'Knee', baseRisk: 60, recommendation: 'Improve change of direction technique' }
+    ],
+    'Defender': [
+      { name: 'Knee', baseRisk: 75, recommendation: 'Add lateral movement strengthening exercises' },
+      { name: 'Ankle', baseRisk: 70, recommendation: 'Implement proper tackling technique training' },
+      { name: 'Shoulder', baseRisk: 55, recommendation: 'Include upper body resistance training' }
+    ],
+    'Goalkeeper': [
+      { name: 'Shoulder', baseRisk: 80, recommendation: 'Focus on rotator cuff strengthening' },
+      { name: 'Wrist', baseRisk: 70, recommendation: 'Implement wrist stability exercises' },
+      { name: 'Lower Back', baseRisk: 65, recommendation: 'Add core strengthening to training routine' }
+    ]
   };
   
-  // Base the calculation on various physical stats
-  const staminaScore = getStatsValue('stamina');
-  const strengthScore = getStatsValue('strength');
-  const balanceScore = getStatsValue('balance');
-  const agilityScore = getStatsValue('agility');
+  // Default to midfielder if position not found
+  const areas = areasByPosition[position] || areasByPosition['Midfielder'];
   
-  // Calculate overall injury risk (inverse relationship with physical stats)
-  const overallRisk = Math.round(
-    100 - ((staminaScore + strengthScore + balanceScore + agilityScore) / 4) * 0.8
-  );
+  // Adjust risk based on physical score
+  const adjustedAreas = areas.map(area => {
+    const adjustmentFactor = (100 - physicalScore) / 100;
+    const risk = Math.max(20, Math.min(95, Math.round(area.baseRisk * adjustmentFactor)));
+    return {
+      name: area.name,
+      risk,
+      recommendation: area.recommendation
+    };
+  });
   
-  // Define specific risk areas
-  const areas: InjuryRiskArea[] = [
-    {
-      name: "الركبة",
-      risk: Math.round(100 - balanceScore * 0.9),
-      recommendation: "تمارين تقوية عضلات الفخذ والتوازن لحماية الركبة"
-    },
-    {
-      name: "الكاحل",
-      risk: Math.round(100 - agilityScore * 0.85),
-      recommendation: "تمارين مرونة وتوازن لتقوية مفصل الكاحل"
-    },
-    {
-      name: "العضلات الخلفية",
-      risk: Math.round(100 - staminaScore * 0.8),
-      recommendation: "تمارين إطالة منتظمة وتقوية العضلات الخلفية"
-    },
-    {
-      name: "الظهر السفلي",
-      risk: Math.round(100 - strengthScore * 0.75),
-      recommendation: "تمارين ثبات الجذع وتقوية عضلات البطن"
-    }
+  // General recommendations based on overall risk
+  const generalRecommendations = [
+    'Maintain proper hydration throughout training and matches',
+    'Ensure adequate recovery between intense training sessions',
+    'Follow personalized warm-up and cool-down routines'
   ];
   
-  // Sort areas by risk (highest first)
-  areas.sort((a, b) => b.risk - a.risk);
-  
-  // Generate injury prevention recommendations
-  const recommendations = [
-    "الالتزام بالإحماء الشامل قبل التدريبات والمباريات",
-    "الاهتمام بفترات الراحة والاستشفاء بين التدريبات",
-    "متابعة برنامج تغذية مناسب لتعزيز قوة العضلات والعظام",
-    ...areas.map(area => area.recommendation)
-  ];
-  
-  // Simulated injury history
-  const history = [
-    {
-      type: "إصابة الكاحل",
-      date: "2022-08-15",
-      duration: "3 أسابيع"
-    },
-    {
-      type: "شد عضلي",
-      date: "2023-02-20",
-      duration: "10 أيام"
-    }
-  ];
+  // Add specific recommendations based on risk level
+  if (overallRisk > 70) {
+    generalRecommendations.push('Consider reduced training load during congested fixture periods');
+    generalRecommendations.push('Implement additional recovery modalities like contrast therapy');
+  } else if (overallRisk > 50) {
+    generalRecommendations.push('Monitor training load carefully with weekly assessments');
+  }
   
   return {
     overall: overallRisk,
-    areas,
-    recommendations,
-    history
+    areas: adjustedAreas,
+    recommendations: generalRecommendations
   };
 };
-
-// Generate a basic injury risk assessment based on position and physical score
-export const generateInjuryRiskAssessment = (position: string, physicalScore: number): InjuryRiskData => {
-  // Base risk on position (goalkeepers have lower overall risk, forwards have higher)
-  let baseRisk: number;
-  
-  switch (position.toLowerCase()) {
-    case 'goalkeeper':
-    case 'حارس مرمى':
-      baseRisk = 55;
-      break;
-    case 'defender':
-    case 'مدافع':
-      baseRisk = 65;
-      break;
-    case 'midfielder':
-    case 'وسط':
-      baseRisk = 70;
-      break;
-    case 'forward':
-    case 'مهاجم':
-      baseRisk = 75;
-      break;
-    default:
-      baseRisk = 70;
-  }
-  
-  // Adjust for physical score (higher score = lower risk)
-  const overallRisk = Math.max(30, Math.min(95, baseRisk - (physicalScore * 0.3)));
-  
-  // Define position-specific risk areas
-  const areas: InjuryRiskArea[] = [];
-  
-  if (position.toLowerCase().includes('goal') || position.toLowerCase().includes('حارس')) {
-    areas.push(
-      {
-        name: "الكتف",
-        risk: Math.round(baseRisk + 5),
-        recommendation: "تمارين تقوية عضلات الكتف والتمدد المنتظم"
-      },
-      {
-        name: "رسغ اليد",
-        risk: Math.round(baseRisk + 10),
-        recommendation: "تمارين تقوية عضلات الرسغ واليد"
-      }
-    );
-  }
-  
-  // Common injury areas for all positions
-  areas.push(
-    {
-      name: "الركبة",
-      risk: Math.round(overallRisk - 5),
-      recommendation: "تمارين تقوية عضلات الفخذ والتوازن لحماية الركبة"
-    },
-    {
-      name: "الكاحل",
-      risk: Math.round(overallRisk + 2),
-      recommendation: "تمارين مرونة وتوازن لتقوية مفصل الكاحل"
-    },
-    {
-      name: "العضلات الخلفية",
-      risk: Math.round(overallRisk),
-      recommendation: "تمارين إطالة منتظمة وتقوية العضلات الخلفية"
-    },
-    {
-      name: "الظهر السفلي",
-      risk: Math.round(overallRisk - 10),
-      recommendation: "تمارين ثبات الجذع وتقوية عضلات البطن"
-    }
-  );
-  
-  // Sort areas by risk (highest first)
-  areas.sort((a, b) => b.risk - a.risk);
-  
-  // Generate injury prevention recommendations
-  const recommendations = [
-    "الالتزام بالإحماء الشامل قبل التدريبات والمباريات",
-    "الاهتمام بفترات الراحة والاستشفاء بين التدريبات",
-    "متابعة برنامج تغذية مناسب لتعزيز قوة العضلات والعظام",
-    ...areas.map(area => area.recommendation)
-  ];
-  
-  return {
-    overall: overallRisk,
-    areas,
-    recommendations,
-    history: []
-  };
-};
-
-// Export default for backward compatibility
-export default { calculateInjuryRisk, generateInjuryRiskAssessment };

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ProfessionalPlayer } from '@/utils/ml/playerMLService';
+import { ProfessionalPlayer } from '@/types/playerAnalysis';
 import {
   StatsTabContent,
   MovementTabContent,

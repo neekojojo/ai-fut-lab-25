@@ -3,97 +3,35 @@ import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import ChartContainer from '@/utils/ui/chartContainer';
-
-interface MarketValuePoint {
-  month: string;
-  value: number;
-}
+import { 
+  generateMarketValueForecast, 
+  formatCurrency,
+  getMarketValueFactors
+} from '@/utils/market/marketValuePredictor';
+import { PlayerAnalysis } from '@/types/playerAnalysis';
+import { AlertCircle, TrendingUp, TrendingDown } from 'lucide-react';
 
 interface MarketValueForecastProps {
-  playerName: string;
-  position: string;
-  currentValue: number; // القيمة الحالية بالدولار
-  age: number;
-  potential: number; // مؤشر الإمكانات من 0-100
+  playerAnalysis: PlayerAnalysis;
 }
 
-const MarketValueForecast: React.FC<MarketValueForecastProps> = ({ 
-  playerName, 
-  position, 
-  currentValue,
-  age,
-  potential
-}) => {
-  // إنشاء بيانات توقع القيمة السوقية على مدار سنتين (24 شهر)
-  const generateForecastData = (): MarketValuePoint[] => {
-    const data: MarketValuePoint[] = [];
-    const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 
-                    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-    
-    // عوامل التأثير على نمو القيمة
-    const growthFactors = {
-      // كلما كان اللاعب أصغر سنًا، كان معدل النمو أعلى
-      ageFactor: age < 23 ? 1.5 : age < 27 ? 1.2 : age < 30 ? 1.0 : 0.8,
-      
-      // تأثير الإمكانات على النمو
-      potentialFactor: potential / 100 + 0.5,
-      
-      // تأثير المركز (مثال: المهاجمون عادة أغلى)
-      positionFactor: position.includes('مهاجم') ? 1.3 : 
-                     position.includes('وسط') ? 1.2 : 
-                     position.includes('حارس') ? 0.9 : 1.0
-    };
-    
-    // معدل النمو الشهري المركب
-    const monthlyGrowthRate = 0.01 * growthFactors.ageFactor * growthFactors.potentialFactor * growthFactors.positionFactor;
-    
-    // يضيف بيانات لكل شهر في السنتين القادمتين
-    let currentVal = currentValue;
-    const currentDate = new Date();
-    let currentMonth = currentDate.getMonth();
-    let currentYear = currentDate.getFullYear();
-    
-    for (let i = 0; i < 24; i++) {
-      // نمو متموج مع بعض التقلبات الواقعية
-      const randomFactor = 0.97 + Math.random() * 0.06; // تقلب بين -3% و +3%
-      currentVal = currentVal * (1 + monthlyGrowthRate) * randomFactor;
-      
-      data.push({
-        month: `${months[currentMonth]} ${currentYear}`,
-        value: Math.round(currentVal / 1000) * 1000 // تقريب إلى أقرب 1000
-      });
-      
-      currentMonth++;
-      if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-      }
-    }
-    
-    return data;
-  };
-
-  const forecastData = generateForecastData();
+const MarketValueForecast: React.FC<MarketValueForecastProps> = ({ playerAnalysis }) => {
+  // Generate market value forecast
+  const { 
+    currentValue, 
+    forecastData, 
+    growthPercentage 
+  } = generateMarketValueForecast(playerAnalysis);
   
-  // تنسيق القيمة المالية بالدولار
-  const formatCurrency = (value: number) => {
-    if (value >= 1000000) {
-      return `$${(value / 1000000).toFixed(1)}M`;
-    } else if (value >= 1000) {
-      return `$${(value / 1000).toFixed(0)}K`;
-    }
-    return `$${value}`;
-  };
-  
-  // حساب نسبة النمو المتوقعة
-  const growthPercentage = ((forecastData[forecastData.length - 1].value - currentValue) / currentValue) * 100;
+  // Get factors affecting market value
+  const valueFactors = getMarketValueFactors(playerAnalysis);
   
   return (
     <Card className="overflow-hidden">
       <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
         <CardTitle>توقع القيمة السوقية</CardTitle>
         <CardDescription>
-          توقع تطور القيمة السوقية للاعب <span className="font-bold">{playerName}</span> خلال السنتين القادمتين
+          توقع تطور القيمة السوقية للاعب <span className="font-bold">{playerAnalysis.playerName}</span> خلال السنتين القادمتين
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-6">
@@ -142,6 +80,46 @@ const MarketValueForecast: React.FC<MarketValueForecastProps> = ({
             </LineChart>
           </ResponsiveContainer>
         </ChartContainer>
+        
+        <div className="mt-6">
+          <h3 className="text-sm font-semibold mb-3">العوامل المؤثرة على القيمة السوقية:</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {valueFactors.map((factor, index) => (
+              <div 
+                key={index} 
+                className={`flex items-start p-3 rounded-md border ${
+                  factor.impact === 'positive' ? 'border-green-200 bg-green-50' : 
+                  factor.impact === 'negative' ? 'border-red-200 bg-red-50' : 
+                  'border-gray-200 bg-gray-50'
+                }`}
+              >
+                <span className="mr-2 mt-0.5">
+                  {factor.impact === 'positive' ? (
+                    <TrendingUp className="h-4 w-4 text-green-600" />
+                  ) : factor.impact === 'negative' ? (
+                    <TrendingDown className="h-4 w-4 text-red-600" />
+                  ) : (
+                    <AlertCircle className="h-4 w-4 text-gray-600" />
+                  )}
+                </span>
+                <div>
+                  <p className="font-medium text-sm">{factor.factor}</p>
+                  <p className="text-xs text-muted-foreground">{factor.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        <div className="mt-6 p-4 bg-blue-50 rounded-md border border-blue-200">
+          <h3 className="text-sm font-semibold mb-2">توصيات لزيادة القيمة السوقية:</h3>
+          <ul className="text-xs space-y-1 list-disc list-inside text-muted-foreground">
+            <li>التركيز على تحسين المهارات الأساسية المرتبطة بالمركز</li>
+            <li>زيادة التواجد في المباريات الرسمية لاكتساب الخبرة</li>
+            <li>التدريب على المهارات المميزة التي تجذب انتباه الكشافين</li>
+            <li>الحفاظ على اللياقة البدنية وتجنب الإصابات</li>
+          </ul>
+        </div>
       </CardContent>
     </Card>
   );

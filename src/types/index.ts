@@ -8,7 +8,7 @@ export * from './training';
 // Export badges without causing naming conflicts
 export { Badge, BadgeItem } from './badges';
 // Export injury risk types with explicit names to avoid ambiguity
-export { 
+export type { 
   InjuryRiskArea as InjuryRiskAreaType,
   InjuryRiskData as InjuryRiskDataType
 } from './badges';

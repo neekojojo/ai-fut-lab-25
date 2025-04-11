@@ -1,4 +1,3 @@
-
 import type { PlayerAnalysis } from "@/components/AnalysisReport.d";
 import { ANALYSIS_STAGES } from "./constants";
 import { generateEnhancedAnalysis } from "./analysisMockGenerator";
@@ -8,6 +7,7 @@ import { apiProxyService } from "@/services/apiProxyService";
 import { createDeterministicSeed, generateVideoHash } from "./videoUtils";
 import { ProgressTracker, ProgressCallback, DETAILED_STAGES } from "./progressTracker";
 import { performAnalysis } from "./analysisProcessor";
+import { createEnhancedAnalysis } from "./analysisEnhancer";
 
 // Type definition for the return value of analyzeFootballVideo
 export interface FootballVideoAnalysisResult {
