@@ -15,14 +15,17 @@ import {
 } from 'recharts';
 
 interface TrainingTabContentProps {
-  recommendations: any;
+  recommendations: any[];
 }
 
 const TrainingTabContent: React.FC<TrainingTabContentProps> = ({ recommendations }) => {
+  // Ensure recommendations is an array
+  const validRecommendations = Array.isArray(recommendations) ? recommendations : [];
+  
   // Prepare data for the improvement potential chart
-  const improvementData = recommendations.map((rec: any) => ({
+  const improvementData = validRecommendations.map((rec: any) => ({
     area: rec.title?.split(' ')[0] || 'مجال', // Get just the first word for better display
-    potential: rec.expectedImprovement,
+    potential: rec.expectedImprovement || 0,
     sessions: rec.frequency || 0,
   }));
   
@@ -67,43 +70,58 @@ const TrainingTabContent: React.FC<TrainingTabContentProps> = ({ recommendations
       </div>
       
       <div className="space-y-4">
-        {recommendations.map((rec: any, index: number) => (
+        {validRecommendations.map((rec: any, index: number) => (
           <Card key={index}>
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle>{rec.title}</CardTitle>
+                  <CardTitle>{rec.title || 'توصية تدريبية'}</CardTitle>
                   <CardDescription>
-                    {rec.intensity}, {rec.frequency} × أسبوعياً, {rec.duration} دقيقة
+                    {rec.intensity || 'متوسط'}, {rec.frequency || 2} × أسبوعياً, {rec.duration || 30} دقيقة
                   </CardDescription>
                 </div>
                 <Badge variant="outline" className="text-lg">
-                  {rec.expectedImprovement}%
+                  {rec.expectedImprovement || 10}%
                 </Badge>
               </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {rec.exercises.map((exercise: any, i: number) => (
+                {/* Add null check for exercises property */}
+                {rec.exercises && Array.isArray(rec.exercises) ? rec.exercises.map((exercise: any, i: number) => (
                   <div key={i} className="border-l-2 border-primary/50 pl-4 py-1">
-                    <h4 className="font-bold text-lg">{exercise.name}</h4>
-                    <p className="text-muted-foreground">{exercise.description}</p>
+                    <h4 className="font-bold text-lg">{exercise.name || 'تمرين'}</h4>
+                    <p className="text-muted-foreground">{exercise.description || 'وصف التمرين'}</p>
                     <Badge className="mt-2" variant={exercise.difficulty === "advanced" ? "destructive" : exercise.difficulty === "intermediate" ? "outline" : "secondary"}>
                       {exercise.difficulty === "advanced" ? "متقدم" : 
                        exercise.difficulty === "intermediate" ? "متوسط" : "مبتدئ"}
                     </Badge>
                   </div>
-                ))}
+                )) : (
+                  <div className="text-muted-foreground text-center py-2">
+                    لا توجد تمارين محددة لهذه التوصية
+                  </div>
+                )}
               </div>
             </CardContent>
             <CardFooter>
               <div className="flex justify-between items-center w-full">
                 <span className="text-sm text-muted-foreground">التحسين المتوقع</span>
-                <span className="font-bold text-xl">{rec.expectedImprovement}%</span>
+                <span className="font-bold text-xl">{rec.expectedImprovement || 10}%</span>
               </div>
             </CardFooter>
           </Card>
         ))}
+        
+        {validRecommendations.length === 0 && (
+          <Card>
+            <CardContent className="py-8">
+              <div className="text-center">
+                <p className="text-muted-foreground">لا توجد توصيات تدريبية متاحة حالياً</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

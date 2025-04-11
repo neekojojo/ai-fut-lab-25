@@ -156,7 +156,8 @@ export const TrainingRecommendations: React.FC<TrainingRecommendationsProps> = (
             </CardHeader>
             <CardContent>
               <ul className="space-y-2 text-sm">
-                {rec.exercises?.map((ex, i) => (
+                {/* Add null check for exercises array */}
+                {rec.exercises && Array.isArray(rec.exercises) ? rec.exercises.map((ex, i) => (
                   <li key={i} className="border-l-2 border-primary pl-3 py-1">
                     <div className="font-medium">{ex.name}</div>
                     <div className="text-xs text-muted-foreground">{ex.description}</div>
@@ -171,7 +172,11 @@ export const TrainingRecommendations: React.FC<TrainingRecommendationsProps> = (
                       </span>
                     </div>
                   </li>
-                ))}
+                )) : (
+                  <li className="text-xs text-muted-foreground text-center py-2">
+                    No specific exercises available
+                  </li>
+                )}
               </ul>
               <div className="mt-4 flex justify-between items-center">
                 <span className="text-xs text-muted-foreground">Expected improvement</span>

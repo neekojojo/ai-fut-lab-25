@@ -14,7 +14,7 @@ interface AnalysisContentProps {
   activeTab: string;
   playerStats: any;
   mockAnalysis: { analysis: any };
-  trainingRecommendations: any;
+  trainingRecommendations: any[];
   playerComparison: ProfessionalPlayer[];
   onViewAdvanced: () => void;
 }
@@ -27,6 +27,9 @@ const AnalysisContent: React.FC<AnalysisContentProps> = ({
   playerComparison,
   onViewAdvanced 
 }) => {
+  // Ensure trainingRecommendations is an array
+  const safeTrainingRecommendations = Array.isArray(trainingRecommendations) ? trainingRecommendations : [];
+  
   const renderTabContent = () => {
     switch (activeTab) {
       case 'stats':
@@ -42,7 +45,7 @@ const AnalysisContent: React.FC<AnalysisContentProps> = ({
         return <SimilarPlayersTabContent playerComparison={playerComparison} />;
       
       case 'training':
-        return <TrainingTabContent recommendations={trainingRecommendations} />;
+        return <TrainingTabContent recommendations={safeTrainingRecommendations} />;
       
       case 'clubs':
         return <ClubsTabContent playerAnalysis={mockAnalysis.analysis} />;
