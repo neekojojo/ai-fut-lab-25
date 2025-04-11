@@ -29,6 +29,7 @@ const AnalysisTabNav: React.FC<AnalysisTabNavProps> = ({ activeTab, setActiveTab
               : 'text-muted-foreground hover:text-foreground hover:bg-accent/10'}
           `}
           onClick={() => setActiveTab(tab.id)}
+          aria-selected={activeTab === tab.id}
         >
           {tab.icon}
           <span>{tab.label}</span>
