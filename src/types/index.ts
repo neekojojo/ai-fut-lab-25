@@ -6,7 +6,7 @@ export * from './playerAnalysis';
 export * from './userProfile';
 export * from './training';
 // Export badges without causing naming conflicts
-export { Badge, BadgeItem } from './badges';
+export type { Badge, BadgeItem } from './badges';
 // Export injury risk types with explicit named exports for proper TypeScript isolatedModules mode
 export type { 
   InjuryRiskArea as InjuryRiskAreaType,
