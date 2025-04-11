@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import VideoUpload from '@/components/VideoUpload';
 import ModelSelectionCard from '@/components/ModelSelectionCard';
+import AppHeader from '@/components/layout/AppHeader';
 import type { FileWithPreview } from '@/types/files';
 
 const HomePage = () => {
@@ -56,6 +57,8 @@ const HomePage = () => {
   
   return (
     <div className="min-h-screen p-4 md:p-8 bg-gradient-to-b from-slate-950 to-slate-900 text-white">
+      <AppHeader title="FootballAI Analyzer" showBackButton={false} />
+      
       <div className="max-w-4xl mx-auto space-y-8">
         <header className="text-center py-8">
           <h1 className="text-3xl font-bold mb-2 text-primary-foreground">
@@ -79,7 +82,7 @@ const HomePage = () => {
           
           {!videoFile ? (
             <>
-              <h3 className="text-xl font-bold text-center mb-4">اختر نموذج التحليل</h3>
+              <h3 className="text-xl font-bold text-center mb-4">ارفع فيديو للتحليل</h3>
               <VideoUpload onFileSelected={handleFileSelected} />
             </>
           ) : (

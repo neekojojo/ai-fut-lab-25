@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileVideo, Brain, Medal, AreaChart, TimerReset, Target } from 'lucide-react';

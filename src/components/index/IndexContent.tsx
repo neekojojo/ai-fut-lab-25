@@ -60,7 +60,7 @@ const IndexContent: React.FC = () => {
           <h3 className="text-lg font-semibold mt-4">كيفية العمل</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
             <li>التقاط الفيديو وتقسيمه إلى إطارات</li>
-            <li>تحديد مواقع اللاعبين ���ي كل إطار</li>
+            <li>تحديد مواقع اللاعبين �����ي كل إطار</li>
             <li>تصنيف اللاعبين حسب الفريق</li>
             <li>إنشاء نظام تتبع فريد لكل لاعب</li>
           </ul>
@@ -115,7 +115,7 @@ const IndexContent: React.FC = () => {
           
           <h3 className="text-lg font-semibold mt-4">مخرجات التحليل</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
-            <li>تق����ر شامل ��ن أداء ال��اعب الفني والبدني</li>
+            <li>تق�����ر شامل ��ن أداء ال��اعب الفني والبدني</li>
             <li>تحديد نقاط القوة ومجالات التحسين</li>
             <li>مؤشرات اللياقة البدنية والتعب</li>
             <li>أنماط اللعب المفضلة للاعب</li>
@@ -220,7 +220,7 @@ const IndexContent: React.FC = () => {
           <h3 className="text-lg font-semibold mt-4">المؤشرات المتابعة</h3>
           <ul className="list-disc list-inside space-y-2 pr-4">
             <li>التطور في المهارات الفنية المستهدفة</li>
-            <li>تحسن الأداء البدني و���لفسيولوجي</li>
+            <li>تحسن الأداء ا��بدني و���لفسيولوجي</li>
             <li>التقدم في الجوانب التكتيكية والذهنية</li>
             <li>مؤشرات الأداء خلال المباريات الرسمية</li>
           </ul>
@@ -318,7 +318,7 @@ const IndexContent: React.FC = () => {
     if (!showPeopleDetection) {
       toast({
         title: "تم فتح أداة اكتشاف اللاعبين",
-        description: "يمكنك الآن تحليل الفيديو باستخدام خوارزميات متعددة",
+        description: "يمكنك الآن ت��ليل الفيديو باستخدام خوارزميات متعددة",
       });
     }
   };
