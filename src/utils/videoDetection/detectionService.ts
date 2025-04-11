@@ -235,5 +235,5 @@ export const detectPeopleInVideo = async (
   }
 };
 
-// كشف الأشخاص باستخدام TensorFlow.js
+// كشف الأشخاص باستخدام TensorFlow.js (alias)
 export const detectWithTensorflow = detectPeopleInVideo;

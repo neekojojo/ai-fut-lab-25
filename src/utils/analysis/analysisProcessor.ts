@@ -4,8 +4,6 @@ import { createEnhancedAnalysis } from "./analysisEnhancer";
 import { PlayerAnalysis } from "@/types/playerAnalysis";
 import { analyzePlayerEyeMovement } from "@/utils/videoDetection";
 
-// إصلاح الخطأ المتعلق بالمعاملات
-
 export const performAnalysis = async (
   videoFile: File,
   baselineAnalysis: PlayerAnalysis,
