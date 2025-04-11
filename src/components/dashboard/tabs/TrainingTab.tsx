@@ -154,6 +154,9 @@ const TrainingTab: React.FC<TrainingTabProps> = ({ trainingVideos }) => {
             </CardHeader>
             <CardContent>
               <TrainingPlanGenerator analysis={{
+                id: "temp-analysis-001",
+                date: new Date().toISOString().split('T')[0],
+                score: 75,
                 playerName: "أحمد محمد",
                 position: "وسط",
                 timestamp: new Date().toISOString(),
