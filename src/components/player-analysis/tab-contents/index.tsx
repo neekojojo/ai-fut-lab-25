@@ -1,5 +1,4 @@
 
-import React from 'react';
 import StatsTabContent from './StatsTabContent';
 import MovementTabContent from './MovementTabContent';
 import InsightsTabContent from './InsightsTabContent';

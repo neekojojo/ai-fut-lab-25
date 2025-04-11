@@ -1,6 +1,6 @@
 import { PlayerAnalysis, ProfessionalPlayer } from '@/types/playerAnalysis';
 import determineEarnedBadges from './badgeService';
-import { calculateInjuryRisk, generateInjuryRiskAssessment } from './injuryRiskAnalysis';
+import { generateInjuryRiskAssessment } from './injuryRiskAnalysis';
 import { InjuryRiskData } from '@/types/badges';
 
 export const generateMockPlayerAnalysis = (
@@ -146,17 +146,22 @@ export const generateMockPlayerAnalysis = (
   const injuryRisk: InjuryRiskData = generateInjuryRiskAssessment(position, stats.physical);
   
   // Generate professional player comparison
-  const proComparison: ProfessionalPlayer = {
-    id: 'pro-1',
+  const proComparison = {
     name: position === 'مهاجم' ? 'كريم بنزيما' : 'كيفين دي بروين',
     team: position === 'مهاجم' ? 'الاتحاد السعودي' : 'مانشستر سيتي',
     position: position === 'مهاجم' ? 'forward' : 'midfielder',
     match: 78,
     similarity: 72,
     strengths: ['تمركز ممتاز', 'رؤية ميدانية', 'تمرير دقيق'],
-    nationality: position === 'مهاجم' ? 'فرنسي' : 'بلجيكي',
-    age: position === 'مهاجم' ? 35 : 32,
-    playingStyle: position === 'مهاجم' ? 'المهاجم الكلاسيكي' : 'صانع اللعب'
+    skills: {
+      ballControl: 85,
+      passing: 88,
+      shooting: 80,
+      positioning: 87,
+      teamwork: 83,
+      leadership: 82,
+      decisionMaking: 86
+    }
   };
   
   // Generate movement data for heatmap visualization
@@ -246,6 +251,15 @@ export const generateMockPlayerAnalysis = (
   };
   
   return mockAnalysis;
+};
+
+// Let's export a function that can be used as generateEnhancedAnalysis
+export const generateEnhancedAnalysis = (seed: number): PlayerAnalysis => {
+  const id = `analysis-${seed}`;
+  const playerName = ['محمد صلاح', 'عبدالله السعيد', 'فهد المولد'][seed % 3];
+  const position = ['مهاجم', 'وسط', 'مدافع'][seed % 3];
+  
+  return generateMockPlayerAnalysis(id, playerName, position);
 };
 
 export default generateMockPlayerAnalysis;
