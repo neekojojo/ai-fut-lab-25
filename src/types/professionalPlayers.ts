@@ -7,6 +7,9 @@ export const professionalPlayers = [
     position: "Forward",
     match: 78,
     similarity: 78,
+    nationality: "French",
+    age: 35,
+    playingStyle: "Complete Forward",
     strengths: ["Finishing", "Link-up play", "Positioning", "Game intelligence"],
     skills: {
       finishing: 92,
@@ -23,6 +26,9 @@ export const professionalPlayers = [
     position: "Forward",
     match: 74,
     similarity: 74,
+    nationality: "Portuguese",
+    age: 39,
+    playingStyle: "Goal Poacher",
     strengths: ["Scoring", "Aerial ability", "Physical prowess", "Shooting power"],
     skills: {
       finishing: 94,
@@ -39,6 +45,9 @@ export const professionalPlayers = [
     position: "Midfielder",
     match: 81,
     similarity: 81,
+    nationality: "Serbian",
+    age: 29,
+    playingStyle: "Box-to-Box Midfielder",
     strengths: ["Passing", "Physical presence", "Aerial duels", "Box-to-box movement"],
     skills: {
       passing: 88,
@@ -55,6 +64,9 @@ export const professionalPlayers = [
     position: "Midfielder",
     match: 77,
     similarity: 77,
+    nationality: "Croatian",
+    age: 31,
+    playingStyle: "Deep-Lying Playmaker",
     strengths: ["Vision", "Ball control", "Tactical awareness", "Distribution"],
     skills: {
       passing: 89,
@@ -71,6 +83,9 @@ export const professionalPlayers = [
     position: "Defender",
     match: 80,
     similarity: 80,
+    nationality: "Senegalese",
+    age: 32,
+    playingStyle: "Ball-Playing Defender",
     strengths: ["Tackling", "Strength", "Leadership", "Aerial ability"],
     skills: {
       tackling: 89,
@@ -87,6 +102,9 @@ export const professionalPlayers = [
     position: "Defender",
     match: 76,
     similarity: 76,
+    nationality: "Spanish",
+    age: 30,
+    playingStyle: "Ball-Playing Defender",
     strengths: ["Passing", "Positioning", "Building from the back", "Technical ability"],
     skills: {
       tackling: 85,
@@ -103,6 +121,9 @@ export const professionalPlayers = [
     position: "Goalkeeper",
     match: 82,
     similarity: 82,
+    nationality: "Senegalese",
+    age: 32,
+    playingStyle: "Shot-Stopper",
     strengths: ["Reflexes", "Commanding presence", "Aerial ability", "Shot stopping"],
     skills: {
       reflexes: 89,
@@ -119,6 +140,9 @@ export const professionalPlayers = [
     position: "Goalkeeper",
     match: 75,
     similarity: 75,
+    nationality: "Colombian",
+    age: 35,
+    playingStyle: "Sweeper Keeper",
     strengths: ["Shot stopping", "Distribution", "Agility", "Quick reactions"],
     skills: {
       reflexes: 87,

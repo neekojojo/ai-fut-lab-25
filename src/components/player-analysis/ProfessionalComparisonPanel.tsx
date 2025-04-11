@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Check } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { professionalPlayers } from '@/types/training';
+import { professionalPlayers } from '@/types/professionalPlayers';
 
 const ProfessionalComparisonPanel: React.FC = () => {
   const [selectedPlayer, setSelectedPlayer] = useState("Kevin De Bruyne");

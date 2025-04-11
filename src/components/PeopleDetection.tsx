@@ -1,12 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import VideoUpload from './VideoUpload';
-import { detectPeopleInVideo } from '@/utils/videoDetection';
-import { analyzePlayerPerformance } from '@/utils/videoDetection';
+import { detectPeopleInVideo, analyzePlayerPerformance } from '@/utils/videoDetection';
 import type { FileWithPreview } from '@/types/files';
 
 const PeopleDetection: React.FC = () => {
@@ -48,7 +46,6 @@ const PeopleDetection: React.FC = () => {
         description: `جاري تحليل الفيديو باستخدام ${detectionMethod === 'tensorflow' ? 'TensorFlow' : detectionMethod === 'yolo' ? 'YOLOv8' : 'OpenPose'}`,
       });
       
-      // Advanced performance analysis instead of basic detection
       const analysisResult = await analyzePlayerPerformance(
         videoFile,
         undefined,
