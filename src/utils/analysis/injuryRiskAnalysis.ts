@@ -1,48 +1,81 @@
 
-import type { PlayerAnalysis } from "@/components/AnalysisReport.d";
+import { PlayerAnalysis } from "@/components/AnalysisReport.d";
+import { InjuryRiskArea, InjuryRiskData } from "@/types/badges";
 
-// Function to generate injury risk assessment
-export const generateInjuryRiskAssessment = (position: string, physicalScore: number): PlayerAnalysis["injuryRisk"] => {
-  // Calculate overall risk (lower physical score = higher risk)
-  const overallRisk = Math.max(10, 100 - physicalScore - Math.random() * 20);
+// Calculate injury risk based on player stats and performance
+export const calculateInjuryRisk = (
+  analysis: PlayerAnalysis
+): InjuryRiskData => {
+  // Calculate overall injury risk score (0-100)
+  // Higher values = higher risk
+  const getStatsValue = (key: string) => {
+    return analysis.stats?.[key] || 75;
+  };
   
-  // Position-specific injury areas
-  const forwardAreas = [
-    { name: "Hamstrings", risk: Math.random() * 40 + 30, recommendation: "Focus on hamstring flexibility and strength exercises" },
-    { name: "Ankles", risk: Math.random() * 30 + 20, recommendation: "Incorporate balance training to strengthen ankle stability" },
-    { name: "Knees", risk: Math.random() * 30 + 20, recommendation: "Add knee stabilization exercises to your routine" }
+  // Base the calculation on various physical stats
+  const staminaScore = getStatsValue('stamina');
+  const strengthScore = getStatsValue('strength');
+  const balanceScore = getStatsValue('balance');
+  const agilityScore = getStatsValue('agility');
+  
+  // Calculate overall injury risk (inverse relationship with physical stats)
+  const overallRisk = Math.round(
+    100 - ((staminaScore + strengthScore + balanceScore + agilityScore) / 4) * 0.8
+  );
+  
+  // Define specific risk areas
+  const areas: InjuryRiskArea[] = [
+    {
+      name: "الركبة",
+      risk: Math.round(100 - balanceScore * 0.9),
+      recommendation: "تمارين تقوية عضلات الفخذ والتوازن لحماية الركبة"
+    },
+    {
+      name: "الكاحل",
+      risk: Math.round(100 - agilityScore * 0.85),
+      recommendation: "تمارين مرونة وتوازن لتقوية مفصل الكاحل"
+    },
+    {
+      name: "العضلات الخلفية",
+      risk: Math.round(100 - staminaScore * 0.8),
+      recommendation: "تمارين إطالة منتظمة وتقوية العضلات الخلفية"
+    },
+    {
+      name: "الظهر السفلي",
+      risk: Math.round(100 - strengthScore * 0.75),
+      recommendation: "تمارين ثبات الجذع وتقوية عضلات البطن"
+    }
   ];
-  
-  const midfielderAreas = [
-    { name: "Calves", risk: Math.random() * 40 + 30, recommendation: "Regular calf stretching and strengthening" },
-    { name: "Groin", risk: Math.random() * 30 + 20, recommendation: "Include adductor stretches and strength training" },
-    { name: "Lower back", risk: Math.random() * 30 + 20, recommendation: "Core stability exercises to protect lower back" }
-  ];
-  
-  const defenderAreas = [
-    { name: "Knees", risk: Math.random() * 40 + 30, recommendation: "Focus on landing mechanics and knee stability exercises" },
-    { name: "Shoulders", risk: Math.random() * 30 + 20, recommendation: "Incorporate upper body and rotator cuff strength work" },
-    { name: "Ankles", risk: Math.random() * 30 + 20, recommendation: "Regular proprioception training for ankle stability" }
-  ];
-  
-  const goalkeeperAreas = [
-    { name: "Shoulders", risk: Math.random() * 40 + 30, recommendation: "Rotator cuff strengthening and mobility exercises" },
-    { name: "Wrists", risk: Math.random() * 30 + 20, recommendation: "Wrist strengthening and flexibility exercises" },
-    { name: "Lower back", risk: Math.random() * 30 + 20, recommendation: "Core stability to protect the lower back during dives" }
-  ];
-  
-  // Select appropriate areas based on position
-  let areas;
-  if (position === "Forward") areas = forwardAreas;
-  else if (position === "Midfielder") areas = midfielderAreas;
-  else if (position === "Defender") areas = defenderAreas;
-  else areas = goalkeeperAreas;
   
   // Sort areas by risk (highest first)
   areas.sort((a, b) => b.risk - a.risk);
   
+  // Generate injury prevention recommendations
+  const recommendations = [
+    "الالتزام بالإحماء الشامل قبل التدريبات والمباريات",
+    "الاهتمام بفترات الراحة والاستشفاء بين التدريبات",
+    "متابعة برنامج تغذية مناسب لتعزيز قوة العضلات والعظام",
+    ...areas.map(area => area.recommendation)
+  ];
+  
+  // Simulated injury history
+  const history = [
+    {
+      type: "إصابة الكاحل",
+      date: "2022-08-15",
+      duration: "3 أسابيع"
+    },
+    {
+      type: "شد عضلي",
+      date: "2023-02-20",
+      duration: "10 أيام"
+    }
+  ];
+  
   return {
     overall: overallRisk,
-    areas
+    areas,
+    recommendations,
+    history
   };
 };

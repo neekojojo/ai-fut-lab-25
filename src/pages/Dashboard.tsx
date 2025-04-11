@@ -1,12 +1,10 @@
 
 import React, { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
-import Container from '@/components/ui/container';
+import { Helmet } from 'react-helmet';
+import { Container } from "@/components/ui/container";
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserCircle, Medal, Dumbbell, BarChart2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { UserProfile } from '@/types/userProfile';
-import { TrainingVideo } from '@/types/training';
 
 // Import tab components
 import OverviewTab from '@/components/dashboard/tabs/OverviewTab';
@@ -14,6 +12,9 @@ import ProfileTab from '@/components/dashboard/tabs/ProfileTab';
 import BadgesTab from '@/components/dashboard/tabs/BadgesTab';
 import TrainingTab from '@/components/dashboard/tabs/TrainingTab';
 import AnalysesTab from '@/components/dashboard/tabs/AnalysesTab';
+import { Badge } from '@/types/badges';
+import { UserProfile } from '@/types/userProfile';
+import { TrainingVideo } from '@/types/training';
 
 // Mock data
 const mockUserProfile: UserProfile = {
@@ -96,7 +97,14 @@ const mockTrainingVideos: TrainingVideo[] = [
     videoUrl: 'https://example.com/videos/speed.mp4',
     level: 'متقدم',
     difficulty: 3,
-    targetAreas: ['سرعة', 'خفة', 'قوة انفجارية']
+    category: 'سرعة',
+    skill: 'بدنية',
+    rating: 4.5,
+    targetAreas: [
+      'سرعة',
+      'خفة',
+      'قوة انفجارية'
+    ]
   },
   {
     id: 'video-2',
@@ -107,7 +115,14 @@ const mockTrainingVideos: TrainingVideo[] = [
     videoUrl: 'https://example.com/videos/passing.mp4',
     level: 'متوسط',
     difficulty: 2,
-    targetAreas: ['تمرير', 'تحكم بالكرة', 'رؤية']
+    category: 'مهارة',
+    skill: 'تمرير',
+    rating: 4.2,
+    targetAreas: [
+      'تمرير',
+      'تحكم بالكرة',
+      'رؤية'
+    ]
   },
   {
     id: 'video-3',
@@ -118,7 +133,14 @@ const mockTrainingVideos: TrainingVideo[] = [
     videoUrl: 'https://example.com/videos/tactical.mp4',
     level: 'متقدم',
     difficulty: 4,
-    targetAreas: ['تكتيك', 'وعي ميداني', 'اتخاذ قرار']
+    category: 'تكتيك',
+    skill: 'ذكاء',
+    rating: 4.8,
+    targetAreas: [
+      'تكتيك',
+      'وعي ميداني',
+      'اتخاذ قرار'
+    ]
   },
   {
     id: 'video-4',
@@ -129,15 +151,27 @@ const mockTrainingVideos: TrainingVideo[] = [
     videoUrl: 'https://example.com/videos/strength.mp4',
     level: 'متوسط',
     difficulty: 3,
-    targetAreas: ['قوة', 'تحمل', 'توازن']
+    category: 'قوة',
+    skill: 'لياقة',
+    rating: 4.0,
+    targetAreas: [
+      'قوة',
+      'تحمل',
+      'توازن'
+    ]
   }
 ];
 
-const Dashboard: React.FC = () => {
+const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [userProfile] = useState<UserProfile>(mockUserProfile);
-  const [trainingVideos] = useState<TrainingVideo[]>(mockTrainingVideos);
+  const [userProfile] = useState(mockUserProfile);
+  const [trainingVideos] = useState(mockTrainingVideos);
   const [analyses] = useState(userProfile.analyses);
+
+  const handleSignOut = () => {
+    console.log("User signed out");
+    // Implementation of sign out logic
+  };
 
   return (
     <>
@@ -148,35 +182,53 @@ const Dashboard: React.FC = () => {
       <Container className="py-8">
         <Card className="border-none shadow-md bg-gradient-to-br from-gray-50 to-white dark:from-gray-900/50 dark:to-black/50">
           <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-transparent">
-            <CardTitle className="text-2xl font-bold">
-              لوحة التحكم
-            </CardTitle>
+            <CardTitle className="text-2xl font-bold">لوحة التحكم</CardTitle>
             <CardDescription>
               مرحبًا {userProfile.name}! استعرض تقدمك وتحليلاتك وخطط تدريبك.
             </CardDescription>
           </CardHeader>
+          
           <CardContent className="p-0">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <Tabs 
+              value={activeTab} 
+              onValueChange={setActiveTab}
+              className="w-full"
+            >
               <div className="border-b">
                 <div className="px-4">
                   <TabsList className="justify-start h-14 bg-transparent p-0 w-full overflow-x-auto no-scrollbar">
-                    <TabsTrigger value="overview" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-6 h-14">
+                    <TabsTrigger 
+                      value="overview"
+                      className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-6 h-14"
+                    >
                       <BarChart2 className="w-4 h-4 mr-2" />
                       <span>نظرة عامة</span>
                     </TabsTrigger>
-                    <TabsTrigger value="profile" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-6 h-14">
+                    <TabsTrigger 
+                      value="profile"
+                      className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-6 h-14"
+                    >
                       <UserCircle className="w-4 h-4 mr-2" />
                       <span>الملف الشخصي</span>
                     </TabsTrigger>
-                    <TabsTrigger value="badges" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-6 h-14">
+                    <TabsTrigger 
+                      value="badges"
+                      className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-6 h-14"
+                    >
                       <Medal className="w-4 h-4 mr-2" />
                       <span>الشارات والإنجازات</span>
                     </TabsTrigger>
-                    <TabsTrigger value="training" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-6 h-14">
+                    <TabsTrigger 
+                      value="training"
+                      className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-6 h-14"
+                    >
                       <Dumbbell className="w-4 h-4 mr-2" />
                       <span>خطة التدريب</span>
                     </TabsTrigger>
-                    <TabsTrigger value="analyses" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-6 h-14">
+                    <TabsTrigger 
+                      value="analyses"
+                      className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-6 h-14"
+                    >
                       <BarChart2 className="w-4 h-4 mr-2" />
                       <span>التحليلات</span>
                     </TabsTrigger>
@@ -186,7 +238,7 @@ const Dashboard: React.FC = () => {
               
               <div className="p-4">
                 <OverviewTab userProfile={userProfile} />
-                <ProfileTab userProfile={userProfile} />
+                <ProfileTab userProfile={userProfile} onSignOut={handleSignOut} />
                 <BadgesTab badges={userProfile.badges} />
                 <TrainingTab trainingVideos={trainingVideos} />
                 <AnalysesTab analyses={analyses} />

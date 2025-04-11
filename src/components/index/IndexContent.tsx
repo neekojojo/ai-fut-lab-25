@@ -246,7 +246,7 @@ const IndexContent: React.FC = () => {
     }
   };
 
-  const handleFileSelected = (file: FileWithPreview | null) => {
+  const handleFileSelected = async (file: FileWithPreview | null) => {
     setVideoFile(file);
     if (file) {
       setAnalysisStarted(true);
@@ -329,6 +329,15 @@ const IndexContent: React.FC = () => {
 
   const handleCloseStageArticle = () => {
     setOpenStageArticle(null);
+  };
+
+  const handleStartAnalysis = () => {
+    if (videoFile) {
+      toast({
+        title: "بدء التحليل",
+        description: "جاري تحليل الفيديو باستخدام النموذج المختار",
+      });
+    }
   };
 
   if (showPeopleDetection) {
