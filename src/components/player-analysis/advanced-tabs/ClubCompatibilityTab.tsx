@@ -1,121 +1,147 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Building, Shield, Trophy, Star } from 'lucide-react';
 
 interface ClubCompatibilityTabProps {
   analysis: any;
 }
 
 const ClubCompatibilityTab: React.FC<ClubCompatibilityTabProps> = ({ analysis }) => {
-  // Sample club compatibility data (in a real app, this would come from the analysis)
-  const clubs = [
-    {
-      id: 1,
-      name: "الهلال",
-      logo: "https://upload.wikimedia.org/wikipedia/en/a/a5/Al_Hilal_FC_logo.svg",
-      formation: "4-3-3",
-      playingStyle: "استحواذ هجومي",
-      compatibilityScore: 87,
-      positionFit: 92,
-      tacticalFit: 85,
-      roleDescription: "لاعب وسط إبداعي يركز على التمريرات المفتاحية وبناء الهجمات",
-      strengthsMatch: ["الرؤية الميدانية", "التمرير الدقيق", "التحكم بالكرة"]
-    },
-    {
-      id: 2,
-      name: "النصر",
-      logo: "https://upload.wikimedia.org/wikipedia/en/c/c4/Al-Nassr.png",
-      formation: "4-2-3-1",
-      playingStyle: "هجوم سريع",
-      compatibilityScore: 79,
-      positionFit: 84,
-      tacticalFit: 75,
-      roleDescription: "صانع ألعاب يركز على التمريرات الحاسمة والهجمات المرتدة",
-      strengthsMatch: ["السرعة", "المراوغة", "اتخاذ القرار"]
-    },
-    {
-      id: 3,
-      name: "الاتحاد",
-      logo: "https://upload.wikimedia.org/wikipedia/en/9/97/Ittihad_FC.png",
-      formation: "3-5-2",
-      playingStyle: "ضغط عالٍ",
-      compatibilityScore: 73,
-      positionFit: 78,
-      tacticalFit: 70,
-      roleDescription: "لاعب وسط ديناميكي مسؤول عن الربط بين الدفاع والهجوم",
-      strengthsMatch: ["التحكم بالكرة", "الرؤية الميدانية"]
-    }
+  // Sample club compatibility data
+  const clubCompatibility = [
+    { club: 'الهلال', compatibility: 87, logo: '🔵', style: 'هجومي متوازن' },
+    { club: 'النصر', compatibility: 82, logo: '🟡', style: 'هجومي سريع' },
+    { club: 'الأهلي', compatibility: 78, logo: '🔴', style: 'متوازن تكتيكي' },
+    { club: 'الاتحاد', compatibility: 75, logo: '⚫', style: 'ضغط عالٍ' },
+    { club: 'الشباب', compatibility: 72, logo: '⚪', style: 'استحواذ ودفاع منظم' }
   ];
   
-  const playerPosition = analysis?.position || "وسط";
-  const playerStrengths = analysis?.strengths || ["تحكم بالكرة", "السرعة", "الرؤية الميدانية"];
+  const playingStyles = [
+    { style: 'هجومي', compatibility: 85 },
+    { style: 'دفاعي', compatibility: 65 },
+    { style: 'استحواذ', compatibility: 78 },
+    { style: 'ضغط عالٍ', compatibility: 72 },
+    { style: 'هجمات مرتدة', compatibility: 80 }
+  ];
+  
+  const positions = [
+    { position: 'وسط هجومي', compatibility: 90 },
+    { position: 'جناح', compatibility: 82 },
+    { position: 'وسط متقدم', compatibility: 85 },
+    { position: 'مهاجم ثاني', compatibility: 75 },
+    { position: 'وسط دفاعي', compatibility: 60 }
+  ];
   
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>توافق اللاعب مع الأندية</CardTitle>
-          <CardDescription>تحليل مدى توافق أداء اللاعب مع أندية الدوري السعودي</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-8">
-            {clubs.map((club) => (
-              <div key={club.id} className="border rounded-lg p-4 bg-card">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-md overflow-hidden">
-                      <img 
-                        src={club.logo} 
-                        alt={club.name} 
-                        className="w-full h-full object-contain" 
-                      />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg">{club.name}</h3>
-                      <p className="text-sm text-muted-foreground">{club.formation} • {club.playingStyle}</p>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <span className="text-2xl font-bold">{club.compatibilityScore}%</span>
-                    <p className="text-xs text-muted-foreground">توافق</p>
-                  </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Building className="h-5 w-5 text-indigo-500" />
+              <span>توافق الأندية</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {clubCompatibility.map((club, index) => (
+              <div key={index} className="space-y-1">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">{club.logo} {club.club}</span>
+                  <span className="text-sm">{club.compatibility}%</span>
                 </div>
-                
-                <div className="space-y-3 mb-4">
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>التوافق مع المركز</span>
-                    <span className="font-medium">{club.positionFit}%</span>
-                  </div>
-                  <Progress value={club.positionFit} className="h-2" />
-                  
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>التوافق التكتيكي</span>
-                    <span className="font-medium">{club.tacticalFit}%</span>
-                  </div>
-                  <Progress value={club.tacticalFit} className="h-2" />
+                <div className="flex items-center gap-2">
+                  <Progress value={club.compatibility} className="h-2 flex-1" />
+                  <span className="text-xs text-muted-foreground">{club.style}</span>
                 </div>
-                
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium mb-2">دور اللاعب المتوقع</h4>
-                  <p className="text-sm leading-relaxed">{club.roleDescription}</p>
-                </div>
-                
-                {club.strengthsMatch.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-medium mb-2">نقاط القوة المتوافقة</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {club.strengthsMatch.map((strength, idx) => (
-                        <Badge key={idx} variant="outline" className="bg-green-50 text-green-900 dark:bg-green-900/20 dark:text-green-400">
-                          {strength}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             ))}
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-blue-500" />
+              <span>توافق أساليب اللعب</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {playingStyles.map((style, index) => (
+              <div key={index} className="space-y-1">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">{style.style}</span>
+                  <span className="text-sm">{style.compatibility}%</span>
+                </div>
+                <Progress value={style.compatibility} className="h-2" />
+              </div>
+            ))}
+            
+            <div className="pt-4 mt-4 border-t">
+              <div className="text-sm font-medium mb-2">التحليل العام لأسلوب اللعب</div>
+              <p className="text-sm text-muted-foreground">
+                يتكيف اللاعب بشكل أفضل مع الأسلوب الهجومي وأسلوب الهجمات المرتدة، مع قدرة جيدة على التأقلم مع أسلوب الاستحواذ.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Trophy className="h-5 w-5 text-amber-500" />
+            <span>التوافق مع المراكز</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              {positions.map((pos, index) => (
+                <div key={index} className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">{pos.position}</span>
+                    <span className="text-sm">{pos.compatibility}%</span>
+                  </div>
+                  <Progress 
+                    value={pos.compatibility} 
+                    className={`h-2 ${pos.compatibility > 85 ? 'bg-green-200' : ''}`}
+                  />
+                </div>
+              ))}
+            </div>
+            
+            <div className="space-y-4">
+              <div className="p-4 bg-primary/5 rounded-lg border border-primary/10">
+                <h3 className="font-medium flex items-center gap-2 mb-2">
+                  <Star className="h-5 w-5 text-yellow-500" />
+                  <span>المركز الأمثل</span>
+                </h3>
+                <div className="text-2xl font-bold mb-1">وسط هجومي</div>
+                <p className="text-sm text-muted-foreground">
+                  يتناسب اللاعب بشكل مثالي مع مركز الوسط الهجومي، حيث يمكنه استغلال مهاراته في المراوغة والتمرير والرؤية الميدانية.
+                </p>
+              </div>
+              
+              <div className="p-4 bg-primary/5 rounded-lg border border-primary/10">
+                <h3 className="font-medium mb-2">التوصيات</h3>
+                <ul className="space-y-1 text-sm">
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-primary"></div>
+                    <span>الأندية التي تلعب بأسلوب هجومي هي الأنسب</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-primary"></div>
+                    <span>يمكن أن يلعب في أكثر من مركز في الثلث الهجومي</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-primary"></div>
+                    <span>تجنب الأندية التي تعتمد على الأسلوب الدفاعي</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

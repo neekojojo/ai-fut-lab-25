@@ -7,6 +7,7 @@ import { ArrowLeft, BarChart3, Dumbbell, LineChart, Target, Users } from 'lucide
 import MovementAnalysisTab from './advanced-tabs/MovementAnalysisTab';
 import TechnicalAnalysisTab from './advanced-tabs/TechnicalAnalysisTab';
 import ClubCompatibilityTab from './advanced-tabs/ClubCompatibilityTab';
+import PerformanceReportsPanel from './PerformanceReportsPanel';
 
 interface AdvancedAnalysisViewProps {
   analysis: any;
@@ -26,7 +27,7 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
       </div>
       
       <Tabs defaultValue="movement" className="w-full">
-        <TabsList className="grid grid-cols-3 mb-6">
+        <TabsList className="grid grid-cols-4 mb-6">
           <TabsTrigger value="movement" className="flex items-center gap-2">
             <LineChart className="h-4 w-4" />
             <span>تحليل الحركة</span>
@@ -38,6 +39,10 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
           <TabsTrigger value="clubs" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             <span>توافق الأندية</span>
+          </TabsTrigger>
+          <TabsTrigger value="reports" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            <span>التقارير الشاملة</span>
           </TabsTrigger>
         </TabsList>
         
@@ -51,6 +56,10 @@ const AdvancedAnalysisView: React.FC<AdvancedAnalysisViewProps> = ({ analysis, o
         
         <TabsContent value="clubs" className="space-y-6">
           <ClubCompatibilityTab analysis={analysis} />
+        </TabsContent>
+        
+        <TabsContent value="reports" className="space-y-6">
+          <PerformanceReportsPanel analysis={analysis} />
         </TabsContent>
       </Tabs>
     </div>

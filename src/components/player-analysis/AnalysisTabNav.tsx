@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BarChart4, Running, Sparkles, Users2, Dumbbell, Building } from 'lucide-react';
 
 interface AnalysisTabNavProps {
   activeTab: string;
@@ -8,30 +8,32 @@ interface AnalysisTabNavProps {
 }
 
 const AnalysisTabNav: React.FC<AnalysisTabNavProps> = ({ activeTab, setActiveTab }) => {
+  const tabs = [
+    { id: 'stats', label: 'الإحصائيات', icon: <BarChart4 className="h-4 w-4" /> },
+    { id: 'movement', label: 'الحركة', icon: <Running className="h-4 w-4" /> },
+    { id: 'insights', label: 'التحليلات', icon: <Sparkles className="h-4 w-4" /> },
+    { id: 'similar-players', label: 'لاعبون مشابهون', icon: <Users2 className="h-4 w-4" /> },
+    { id: 'training', label: 'التدريب', icon: <Dumbbell className="h-4 w-4" /> },
+    { id: 'clubs', label: 'الأندية', icon: <Building className="h-4 w-4" /> }
+  ];
+  
   return (
-    <div className="border-b">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full justify-start overflow-x-auto flex-nowrap py-0">
-          <TabsTrigger value="movement" className="py-3 px-4">
-            الحركة
-          </TabsTrigger>
-          <TabsTrigger value="stats" className="py-3 px-4">
-            الإحصائيات
-          </TabsTrigger>
-          <TabsTrigger value="insights" className="py-3 px-4">
-            النصائح
-          </TabsTrigger>
-          <TabsTrigger value="similar-players" className="py-3 px-4">
-            لاعبين مماثلين
-          </TabsTrigger>
-          <TabsTrigger value="training" className="py-3 px-4">
-            التدريب
-          </TabsTrigger>
-          <TabsTrigger value="clubs" className="py-3 px-4">
-            التوافق مع الأندية
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+    <div className="flex flex-nowrap overflow-x-auto scrollbar-hide border-b">
+      {tabs.map((tab) => (
+        <button
+          key={tab.id}
+          className={`
+            flex items-center gap-1.5 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors
+            ${activeTab === tab.id 
+              ? 'border-b-2 border-primary text-primary' 
+              : 'text-muted-foreground hover:text-foreground hover:bg-accent/10'}
+          `}
+          onClick={() => setActiveTab(tab.id)}
+        >
+          {tab.icon}
+          <span>{tab.label}</span>
+        </button>
+      ))}
     </div>
   );
 };

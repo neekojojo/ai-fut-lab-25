@@ -9,6 +9,7 @@ import {
   TrainingTabContent,
   ClubsTabContent
 } from './tab-contents';
+import PerformanceReportsPanel from './PerformanceReportsPanel';
 
 interface AnalysisContentProps {
   activeTab: string;
@@ -33,7 +34,14 @@ const AnalysisContent: React.FC<AnalysisContentProps> = ({
   const renderTabContent = () => {
     switch (activeTab) {
       case 'stats':
-        return <StatsTabContent playerStats={playerStats} analysis={mockAnalysis.analysis} />;
+        return (
+          <>
+            <StatsTabContent playerStats={playerStats} analysis={mockAnalysis.analysis} />
+            <div className="mt-6">
+              <PerformanceReportsPanel analysis={mockAnalysis.analysis} />
+            </div>
+          </>
+        );
       
       case 'movement':
         return <MovementTabContent analysis={mockAnalysis.analysis} onViewAdvanced={onViewAdvanced} />;

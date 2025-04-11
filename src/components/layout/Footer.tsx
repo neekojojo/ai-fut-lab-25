@@ -6,7 +6,7 @@ const Footer: React.FC = () => {
   return (
     <footer className="mt-auto pt-10 pb-6 px-6 border-t bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2">
             <Link to="/" className="flex items-center gap-2">
               <svg
@@ -34,14 +34,8 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               <li><Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">الرئيسية</Link></li>
               <li><Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">لوحة التحكم</Link></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-medium mb-3">تواصل معنا</h3>
-            <ul className="space-y-2">
-              <li className="text-muted-foreground">البريد الإلكتروني: info@footballai.com</li>
-              <li className="text-muted-foreground">الهاتف: +966 123 456 789</li>
+              <li><Link to="/player-analysis" className="text-muted-foreground hover:text-foreground transition-colors">تحليل اللاعبين</Link></li>
+              <li><Link to="/training-plan" className="text-muted-foreground hover:text-foreground transition-colors">خطط التدريب</Link></li>
             </ul>
           </div>
         </div>
