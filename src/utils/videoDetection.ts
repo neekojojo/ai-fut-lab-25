@@ -3,7 +3,7 @@
 // Note: We will create mock implementations since the actual implementations don't exist
 import { extractVideoFrames } from './videoDetection/frameExtraction';
 import { calculateDistanceAndSpeed, calculateBalanceScore, calculateMovementEfficiency } from './videoDetection/calculationUtils';
-import { detectPeopleInVideo } from './videoDetection/detectionService';
+import { detectPeopleInVideo as detectionService } from './videoDetection/detectionService';
 import { PlayerPosition } from './videoDetection/types';
 
 // Mock implementations for the missing exports
@@ -69,21 +69,13 @@ export const processKaggleData = async (dataFile: File) => {
 
 export const detectPeopleUsingYolo = async (videoFile: File) => {
   console.log("Detecting people using YOLO model:", videoFile.name);
-  return await detectPeopleInVideo(videoFile);
-};
-
-/**
- * Detects people in video using YOLO model
- */
-export const detectPeopleInVideo = async (videoFile: File) => {
-  console.log("Detecting people in video using YOLO...");
-  return await detectPeopleUsingYolo(videoFile);
+  return await detectionService(videoFile);
 };
 
 /**
  * Analyze player eye movement from video
  */
-export const analyzePlayerEyeMovement = async (videoFile: any) => {
+export const analyzePlayerEyeMovement = async (videoFile: File) => {
   // Mock implementation
   await new Promise(resolve => setTimeout(resolve, 1500));
   
@@ -122,7 +114,7 @@ export const analyzePlayerPerformance = async (
   }
   
   // Mock detection result
-  const detection = await detectPeopleInVideo(videoFile);
+  const detection = await detectionService(videoFile);
   
   // Mock eye tracking result
   const eyeTracking = await analyzePlayerEyeMovement(videoFile);
@@ -145,6 +137,3 @@ export const analyzePlayerPerformance = async (
     }
   };
 };
-
-// Re-export functions from videoDetection.ts
-export * from '../videoDetection';
