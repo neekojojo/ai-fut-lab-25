@@ -113,11 +113,7 @@ export interface PlayerAnalysis {
   }[];
   
   // Professional comparison
-  proComparison?: {
-    name: string;
-    similarity: number;
-    skills: {[key: string]: number};
-  };
+  proComparison?: ProfessionalPlayer;
   
   // Injury risk assessment
   injuryRisk?: {
