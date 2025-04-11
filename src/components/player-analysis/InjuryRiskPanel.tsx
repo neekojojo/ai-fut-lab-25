@@ -1,92 +1,114 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, Circle } from 'lucide-react';
+import { ShieldAlert, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
-import { InjuryRiskData } from '@/types/injuries';
+
+interface InjuryRiskArea {
+  name: string;
+  risk: number;
+  recommendation: string;
+}
+
+interface InjuryRiskData {
+  overall: number;
+  areas: InjuryRiskArea[];
+  recommendations: string[];
+}
 
 interface InjuryRiskPanelProps {
   injuryRisk: InjuryRiskData;
 }
 
 const InjuryRiskPanel: React.FC<InjuryRiskPanelProps> = ({ injuryRisk }) => {
-  const formatRiskPercentage = (value: number) => {
-    return value.toFixed(1) + '%';
-  };
-
-  // تحديد لون مؤشر الخطر حسب النسبة
-  const getRiskColor = (risk: number) => {
-    if (risk < 20) return 'text-green-500';
-    if (risk < 40) return 'text-amber-500';
+  const getRiskColorClass = (risk: number) => {
+    if (risk < 40) return 'text-green-500';
+    if (risk < 70) return 'text-amber-500';
     return 'text-red-500';
   };
 
-  // تحديد لون شريط التقدم حسب نسبة الخطر
-  const getProgressColor = (risk: number) => {
-    if (risk < 20) return 'bg-green-500';
-    if (risk < 40) return 'bg-amber-500';
+  const getRiskProgressColorClass = (risk: number) => {
+    if (risk < 40) return 'bg-green-500';
+    if (risk < 70) return 'bg-amber-500';
     return 'bg-red-500';
+  };
+
+  const getRiskLabel = (risk: number) => {
+    if (risk < 40) return 'منخفض';
+    if (risk < 70) return 'متوسط';
+    return 'مرتفع';
   };
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        <div className="flex items-center space-x-2 rtl:space-x-reverse">
-          <AlertTriangle className="h-5 w-5 text-amber-500" />
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <div className="space-y-1">
           <CardTitle>تقييم مخاطر الإصابة</CardTitle>
+          <CardDescription>تحليل احتمالات الإصابة وكيفية الوقاية منها</CardDescription>
         </div>
-        <CardDescription>تحليل احتمالية إصابات محتملة بناءً على نمط الحركة</CardDescription>
+        <ShieldAlert className={`h-5 w-5 ${getRiskColorClass(injuryRisk.overall)}`} />
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
           <div>
-            <h3 className="text-lg font-medium mb-2">مستوى الخطر العام</h3>
-            <div className="flex items-baseline mb-1">
-              <span className={`text-2xl font-bold ${getRiskColor(injuryRisk.overall)}`}>
-                {formatRiskPercentage(injuryRisk.overall)}
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-sm font-medium">المخاطر الإجمالية</span>
+              <span className={`text-sm font-medium ${getRiskColorClass(injuryRisk.overall)}`}>
+                {getRiskLabel(injuryRisk.overall)}
               </span>
-              <span className="text-sm text-muted-foreground ml-2 rtl:mr-2 rtl:ml-0">نسبة خطر</span>
             </div>
-            <p className="text-sm text-muted-foreground mb-2">
-              بناءً على أنماط الحركة والخصائص البدنية
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-medium mb-4">تحليل مناطق الخطر</h3>
-            <div className="space-y-4">
-              {injuryRisk.areas.map((area, index) => (
-                <div key={index} className="space-y-1">
-                  <div className="flex justify-between mb-1">
-                    <span>{area.name}</span>
-                    <span className={`font-medium ${getRiskColor(area.risk)}`}>
-                      {formatRiskPercentage(area.risk)}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div 
-                      className={`${getProgressColor(area.risk)} h-2 rounded-full`} 
-                      style={{ width: `${area.risk}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">{area.recommendation}</p>
-                </div>
-              ))}
+            <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
+              <div 
+                className={`h-full rounded-full ${getRiskProgressColorClass(injuryRisk.overall)}`} 
+                style={{ width: `${injuryRisk.overall}%` }}
+              ></div>
             </div>
           </div>
 
-          <div>
-            <h3 className="text-lg font-medium mb-4">توصيات للوقاية</h3>
+          <div className="pt-2">
+            <h3 className="text-base font-medium mb-3">المناطق الأكثر عرضة للإصابة</h3>
             <div className="space-y-3">
               {injuryRisk.areas.map((area, index) => (
-                <div key={index} className="border p-3 rounded-lg bg-card">
-                  <div className="flex items-center mb-2">
-                    <Circle className="h-3 w-3 fill-amber-500 text-amber-500 mr-2 rtl:ml-2 rtl:mr-0" />
-                    <span className="font-medium">{area.name}</span>
+                <div key={index} className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <AlertTriangle className={`h-4 w-4 mr-2 ${getRiskColorClass(area.risk)}`} />
+                      <span className="text-sm font-medium">{area.name}</span>
+                    </div>
+                    <span className={`text-xs ${getRiskColorClass(area.risk)}`}>
+                      {area.risk}%
+                    </span>
                   </div>
-                  <p className="text-sm">{area.recommendation}</p>
+                  <Progress value={area.risk} className={`h-1.5 ${getRiskProgressColorClass(area.risk)}`} />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {area.recommendation}
+                  </p>
                 </div>
               ))}
+            </div>
+          </div>
+
+          <div className="pt-2 border-t">
+            <h3 className="text-base font-medium mb-3">التوصيات الوقائية</h3>
+            <div className="space-y-2">
+              {injuryRisk.recommendations.map((recommendation, index) => (
+                <div key={index} className="flex items-start">
+                  <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 mr-2" />
+                  <p className="text-sm">{recommendation}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="pt-2 border-t">
+            <div className="flex items-start p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md mt-2">
+              <Info className="h-5 w-5 text-blue-500 mt-0.5 mr-2" />
+              <div>
+                <h4 className="text-sm font-medium text-blue-800 dark:text-blue-300">ملاحظة هامة</h4>
+                <p className="text-xs text-blue-700 dark:text-blue-400 mt-1">
+                  هذا التقييم يستند إلى بيانات الأداء والنماذج الإحصائية. يرجى استشارة الطاقم الطبي للحصول على تقييم شامل.
+                </p>
+              </div>
             </div>
           </div>
         </div>

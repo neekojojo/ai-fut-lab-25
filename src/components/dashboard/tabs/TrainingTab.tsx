@@ -3,11 +3,12 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TabsContent } from "@/components/ui/tabs";
-import { VideoIcon, Book, Dumbbell, Calendar, Target } from 'lucide-react';
+import { VideoIcon, Book, Dumbbell, Calendar, Target, TrendingUp, Activity, CheckCircle } from 'lucide-react';
 import { TrainingVideo } from '@/types/training';
 import { TrainingPlanGenerator } from '@/components/advanced-analysis/TrainingPlanGenerator';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DevelopmentPlanList from '@/components/DevelopmentPlanList';
+import { Progress } from '@/components/ui/progress';
 
 interface TrainingTabProps {
   trainingVideos: TrainingVideo[];
@@ -28,11 +29,20 @@ const TrainingTab: React.FC<TrainingTabProps> = ({ trainingVideos }) => {
     ],
     approvedBy: "المدرب أحمد خالد"
   };
+  
+  // Training progress data
+  const trainingProgress = [
+    { skill: "تمرير", progress: 75, goal: 90 },
+    { skill: "تسديد", progress: 65, goal: 85 },
+    { skill: "سرعة", progress: 80, goal: 95 },
+    { skill: "قوة بدنية", progress: 70, goal: 80 },
+    { skill: "تكتيك", progress: 85, goal: 90 }
+  ];
 
   return (
     <TabsContent value="training" className="space-y-6">
       <Tabs value={trainingTab} onValueChange={setTrainingTab}>
-        <TabsList className="grid grid-cols-3 w-full max-w-md mb-6">
+        <TabsList className="grid grid-cols-4 w-full max-w-xl mb-6">
           <TabsTrigger value="videos">
             <VideoIcon className="w-4 h-4 mr-2" />
             <span>مقاطع تدريبية</span>
@@ -40,6 +50,10 @@ const TrainingTab: React.FC<TrainingTabProps> = ({ trainingVideos }) => {
           <TabsTrigger value="plans">
             <Book className="w-4 h-4 mr-2" />
             <span>خطط التدريب</span>
+          </TabsTrigger>
+          <TabsTrigger value="progress">
+            <TrendingUp className="w-4 h-4 mr-2" />
+            <span>التقدم</span>
           </TabsTrigger>
           <TabsTrigger value="create">
             <Dumbbell className="w-4 h-4 mr-2" />
@@ -144,6 +158,60 @@ const TrainingTab: React.FC<TrainingTabProps> = ({ trainingVideos }) => {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+        
+        <TabsContent value="progress" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>تقدم التدريب</CardTitle>
+              <CardDescription>قياس مستوى تقدمك في المهارات المختلفة</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {trainingProgress.map((item, index) => (
+                  <div key={index} className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <Activity className="h-4 w-4 mr-2 text-primary" />
+                        <span className="font-medium">{item.skill}</span>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {item.progress}% من {item.goal}%
+                      </div>
+                    </div>
+                    <div className="relative pt-1">
+                      <Progress value={item.progress} className="h-2" />
+                      <div 
+                        className="absolute h-4 w-0.5 bg-amber-500 transform -translate-y-1" 
+                        style={{ left: `${item.goal}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+                
+                <div className="pt-4 border-t mt-6">
+                  <h3 className="font-semibold mb-4">الإنجازات المحققة</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                      { title: 'تمرير 10 كرات صحيحة متتالية', completed: true },
+                      { title: 'تسديد 5 أهداف من خارج منطقة الجزاء', completed: true },
+                      { title: 'إكمال تدريبات اللياقة لمدة أسبوع', completed: true },
+                      { title: 'تحليل 3 مباريات كاملة', completed: false }
+                    ].map((achievement, idx) => (
+                      <div key={idx} className="flex items-start gap-2">
+                        <div className={`mt-0.5 ${achievement.completed ? 'text-green-500' : 'text-gray-300'}`}>
+                          <CheckCircle className="h-5 w-5" />
+                        </div>
+                        <span className={achievement.completed ? 'font-medium' : 'text-muted-foreground'}>
+                          {achievement.title}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="create">
