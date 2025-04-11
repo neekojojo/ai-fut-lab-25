@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Container } from "@/components/ui/container";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -17,7 +16,6 @@ import { UserProfile } from '@/types/userProfile';
 import { TrainingVideo } from '@/types/training';
 import { useAuth } from '@/components/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
 
 // Mock data
 const mockUserProfile: UserProfile = {
