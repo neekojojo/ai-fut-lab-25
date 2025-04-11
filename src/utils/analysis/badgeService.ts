@@ -136,5 +136,5 @@ const determineEarnedBadges = (analysis: Partial<PlayerAnalysis>): Badge[] => {
   return badges;
 };
 
-// Export the function once, removing the duplicate export
+// Export the function as default
 export default determineEarnedBadges;
