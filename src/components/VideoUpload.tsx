@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import type { FileWithPreview } from '@/types/files';
 
 interface VideoUploadProps {
-  onFileSelected: (file: FileWithPreview) => void;
+  onFileSelected: (file: FileWithPreview | null) => void;
   selectedFile?: FileWithPreview | null;
 }
 
@@ -70,7 +70,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onFileSelected, selectedFile 
       URL.revokeObjectURL(videoFile.preview);
     }
     setVideoFile(null);
-    onFileSelected(null as any);
+    onFileSelected(null);
   };
   
   return (

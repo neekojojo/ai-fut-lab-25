@@ -2,6 +2,7 @@
 import React from 'react';
 import VideoUpload from '@/components/VideoUpload';
 import { FeaturesGrid } from '@/components/landing/FeaturesGrid';
+import type { FileWithPreview } from '@/types/files';
 
 interface HeroSectionProps {
   onVideoUpload: (file: File) => Promise<void>;
@@ -12,6 +13,12 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   onVideoUpload, 
   onTogglePeopleDetection 
 }) => {
+  const handleFileSelected = (file: FileWithPreview | null) => {
+    if (file) {
+      onVideoUpload(file);
+    }
+  };
+
   return (
     <div className="space-y-12">
       <div className="max-w-3xl mx-auto text-center space-y-4 animate-fade-in">
@@ -27,7 +34,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
       </div>
       
       <div className="flex flex-col md:flex-row gap-4 justify-center">
-        <VideoUpload onUpload={onVideoUpload} />
+        <VideoUpload onFileSelected={handleFileSelected} />
         
         <button 
           onClick={onTogglePeopleDetection}

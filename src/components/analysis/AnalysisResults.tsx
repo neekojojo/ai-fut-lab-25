@@ -30,7 +30,10 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
         </div>
       </div>
       
-      <PlayerAnalysisView videoFile={null as any} onResetAnalysis={onResetAnalysis} />
+      <PlayerAnalysisView 
+        videoFile={null} 
+        onResetAnalysis={onResetAnalysis} 
+      />
     </div>
   );
 };
