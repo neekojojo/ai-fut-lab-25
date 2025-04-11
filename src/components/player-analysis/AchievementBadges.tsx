@@ -1,113 +1,89 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/types/badges';
-import { Award, Star, Trophy, Zap } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Award, Eye, Zap, Target, Activity, Brain, Map } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-interface AchievementBadgesProps {
-  playerName?: string;
-  badges?: Badge[];
+interface BadgeProps {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  icon: string;
+  color: string;
 }
 
-const AchievementBadges: React.FC<AchievementBadgesProps> = ({ playerName = 'اللاعب', badges = [] }) => {
-  // إذا لم يتم توفير شارات، نستخدم شارات افتراضية
-  const defaultBadges: Badge[] = [
-    { 
-      name: 'تقنية متميزة', 
-      description: 'أظهر مستوى عالٍ من المهارة التقنية', 
-      level: 'gold' 
-    },
-    { 
-      name: 'سرعة فائقة', 
-      description: 'سجل قيم سرعة عالية خلال التحليل', 
-      level: 'silver' 
-    },
-    { 
-      name: 'تحليل أول', 
-      description: 'أكمل التحليل الأول بنجاح', 
-      level: 'bronze' 
-    },
-  ];
-  
-  const displayBadges = badges.length > 0 ? badges : defaultBadges;
-  
-  // تحديد أيقونة مناسبة لكل مستوى
-  const getBadgeIcon = (level: 'bronze' | 'silver' | 'gold') => {
-    switch (level) {
-      case 'gold':
-        return <Trophy className="h-6 w-6 text-yellow-500" />;
-      case 'silver':
-        return <Award className="h-6 w-6 text-slate-400" />;
-      case 'bronze':
-        return <Star className="h-6 w-6 text-amber-600" />;
-      default:
-        return <Zap className="h-6 w-6 text-blue-500" />;
-    }
-  };
-  
-  // تحديد لون خلفية لكل مستوى
-  const getBadgeBackground = (level: 'bronze' | 'silver' | 'gold') => {
-    switch (level) {
-      case 'gold':
-        return 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800/30';
-      case 'silver':
-        return 'bg-slate-50 dark:bg-slate-900/20 border-slate-200 dark:border-slate-800/30';
-      case 'bronze':
-        return 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800/30';
-      default:
-        return 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/30';
-    }
-  };
+interface AchievementBadgesProps {
+  playerName: string;
+  badges: BadgeProps[];
+}
 
+const AchievementBadges: React.FC<AchievementBadgesProps> = ({ playerName, badges }) => {
+  // Function to render the appropriate icon
+  const renderIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'zap': return <Zap className="h-5 w-5" />;
+      case 'target': return <Target className="h-5 w-5" />;
+      case 'eye': return <Eye className="h-5 w-5" />;
+      case 'activity': return <Activity className="h-5 w-5" />;
+      case 'brain': return <Brain className="h-5 w-5" />;
+      case 'map': return <Map className="h-5 w-5" />;
+      case 'award':
+      default: return <Award className="h-5 w-5" />;
+    }
+  };
+  
+  // Function to get badge color class
+  const getBadgeColorClass = (color: string) => {
+    switch (color) {
+      case 'blue': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
+      case 'purple': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
+      case 'red': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
+      case 'yellow': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+      case 'green': return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+      case 'indigo': return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300';
+      case 'cyan': return 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300';
+      case 'orange': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
+      case 'gold': return 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+    }
+  };
+  
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg font-medium">الجوائز والشارات</CardTitle>
+        <CardTitle>الشارات والإنجازات</CardTitle>
+        <CardDescription>الشارات التي حققها {playerName || "اللاعب"} بناء على أدائه</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground mb-4">
-          شارات تم الحصول عليها بناءً على نتائج تحليل أداء {playerName}
-        </p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {displayBadges.map((badge, index) => (
-            <div 
-              key={index} 
-              className={`border rounded-lg p-4 flex flex-col items-center text-center transition-all hover:shadow-md ${getBadgeBackground(badge.level)}`}
-            >
-              <div className="w-12 h-12 rounded-full flex items-center justify-center mb-2 bg-white dark:bg-gray-800 shadow-sm">
-                {getBadgeIcon(badge.level)}
-              </div>
-              <h3 className="font-semibold mb-1">{badge.name}</h3>
-              <p className="text-xs text-muted-foreground">{badge.description}</p>
-              <div className={`mt-2 text-xs px-2 py-1 rounded-full 
-                ${badge.level === 'gold' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' : 
-                badge.level === 'silver' ? 'bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-300' : 
-                'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'}`
-              }>
-                {badge.level === 'gold' ? 'ذهبية' : badge.level === 'silver' ? 'فضية' : 'برونزية'}
-              </div>
-              {badge.earnedAt && (
-                <p className="text-xs text-muted-foreground mt-2 rtl:direction-rtl">
-                  تم الحصول عليها {new Date(badge.earnedAt).toLocaleDateString('ar-SA')}
-                </p>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/10">
-          <h4 className="font-medium mb-2 flex items-center">
-            <Trophy className="h-4 w-4 text-primary mr-2 rtl:ml-2 rtl:mr-0" />
-            كيف تحصل على شارات أكثر؟
-          </h4>
-          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-            <li>إجراء المزيد من تحليلات الأداء</li>
-            <li>تحسين المهارات التقنية والبدنية</li>
-            <li>متابعة خطة التدريب الموصى بها</li>
-            <li>تحقيق أهداف الأداء المحددة</li>
-          </ul>
-        </div>
+        {badges.length > 0 ? (
+          <div className="flex flex-wrap gap-3">
+            <TooltipProvider>
+              {badges.map((badge) => (
+                <Tooltip key={badge.id}>
+                  <TooltipTrigger asChild>
+                    <div className="flex flex-col items-center">
+                      <div className={`flex items-center justify-center w-12 h-12 rounded-full ${getBadgeColorClass(badge.color)}`}>
+                        {renderIcon(badge.icon)}
+                      </div>
+                      <span className="text-xs mt-1 font-medium text-center">{badge.name}</span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{badge.description}</p>
+                  </TooltipContent>
+                </Tooltip>
+              ))}
+            </TooltipProvider>
+          </div>
+        ) : (
+          <div className="text-center py-6 text-muted-foreground">
+            <Award className="h-12 w-12 mx-auto mb-3 opacity-30" />
+            <p>لم يحقق اللاعب أي شارات حتى الآن</p>
+            <p className="text-sm mt-2">اللاعبون الذين يحققون مستويات متميزة في مهارات محددة يكسبون شارات خاصة</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

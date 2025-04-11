@@ -1,145 +1,120 @@
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import Header from '@/components/Header';
-import AdvancedPlayerDashboard from '@/components/advanced-analysis/AdvancedPlayerDashboard';
-import { PlayerAnalysis } from '@/types/playerAnalysis';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import AdvancedAnalysisView from '@/components/player-analysis/AdvancedAnalysisView';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Loader2 } from 'lucide-react';
-import { fetchPlayerAnalysisById, fetchPlayerAnalyses } from '@/services/playerAnalysisService';
-import { getMockAnalysis } from '@/components/player-analysis/mockData';
-import { InjuryRiskArea } from '@/types/injuries';
+
+// Placeholder function to get analysis data
+const getAnalysisById = async (id: string) => {
+  // In a real app, this would fetch from an API
+  // For demo purposes, let's return mock data
+  return {
+    id,
+    playerName: "محمد عبد الله",
+    position: "وسط",
+    age: 19,
+    performanceScore: 82,
+    talentScore: 88,
+    technicalMetrics: {
+      passing: 82,
+      shooting: 75,
+      dribbling: 86,
+      ballControl: 84,
+      vision: 78,
+      positioning: 80,
+      decision: 76,
+      composure: 72
+    },
+    physicalMetrics: {
+      speed: 78,
+      acceleration: 82,
+      stamina: 75,
+      agility: 73,
+      balance: 68,
+      strength: 65,
+      jumping: 70
+    },
+    movementMetrics: {
+      averageSpeed: 12.5,
+      topSpeed: 28.4,
+      averageAcceleration: 2.8,
+      totalDistance: 1250,
+      sprintCount: 8,
+      directionChanges: 24
+    },
+    strengths: [
+      "تحكم ممتاز بالكرة",
+      "مهارة المراوغة",
+      "الرؤية الميدانية"
+    ],
+    weaknesses: [
+      "التسديد من خارج منطقة الجزاء",
+      "الثبات الانفعالي تحت الضغط"
+    ]
+  };
+};
 
 const AdvancedAnalysis: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [analysis, setAnalysis] = useState<PlayerAnalysis | null>(null);
-  const [previousAnalyses, setPreviousAnalyses] = useState<PlayerAnalysis[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [analysis, setAnalysis] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    const fetchData = async () => {
+    const loadAnalysis = async () => {
       try {
-        setIsLoading(true);
-        console.log("Fetching advanced analysis data, id:", id);
-        
-        // If no ID provided, use mock data
-        if (!id) {
-          console.log("No ID provided, using mock data");
-          const mockData = getMockAnalysis();
-          // Transform mock data to ensure proper structure
-          const transformedMockAnalysis = transformAnalysisData(mockData.analysis);
-          setAnalysis(transformedMockAnalysis);
-          setPreviousAnalyses([]);
-          return;
+        if (id) {
+          const data = await getAnalysisById(id);
+          setAnalysis(data);
         }
-        
-        // Try to fetch analysis by ID
-        try {
-          const currentAnalysis = await fetchPlayerAnalysisById(id);
-          if (currentAnalysis) {
-            console.log("Analysis found:", currentAnalysis);
-            
-            // Transform injuryRisk.areas if it's not an array
-            const transformedAnalysis = transformAnalysisData(currentAnalysis);
-            
-            setAnalysis(transformedAnalysis);
-            
-            // Try to fetch previous analyses
-            try {
-              const allAnalyses = await fetchPlayerAnalyses();
-              const previousPlayerAnalyses = allAnalyses
-                .filter((a: any) => a.id !== id && a.playerId === currentAnalysis.playerId)
-                .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-                .map(transformAnalysisData);
-              
-              setPreviousAnalyses(previousPlayerAnalyses);
-            } catch (e) {
-              console.warn("Could not fetch previous analyses:", e);
-              setPreviousAnalyses([]);
-            }
-          }
-        } catch (e) {
-          console.warn("Could not fetch analysis by ID:", e);
-          // Use mock data as fallback
-          console.log("Using mock data as fallback");
-          const mockData = getMockAnalysis();
-          // Transform mock data to ensure proper structure
-          const transformedMockAnalysis = transformAnalysisData(mockData.analysis);
-          setAnalysis(transformedMockAnalysis);
-          setPreviousAnalyses([]);
-        }
+      } catch (error) {
+        console.error("Error loading analysis:", error);
+        toast({
+          title: "خطأ في التحميل",
+          description: "تعذر تحميل بيانات التحليل",
+          variant: "destructive",
+        });
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
     
-    fetchData();
+    loadAnalysis();
   }, [id, toast]);
   
-  // Transform the analysis data to ensure injuryRisk.areas is an array
-  const transformAnalysisData = (data: any): PlayerAnalysis => {
-    // Make a deep copy to avoid mutating the original
-    const transformed = { ...data };
-    
-    // If injuryRisk exists but areas is not an array, transform it
-    if (transformed.injuryRisk && transformed.injuryRisk.areas && !Array.isArray(transformed.injuryRisk.areas)) {
-      const areasObj = transformed.injuryRisk.areas;
-      const areasArray: InjuryRiskArea[] = Object.entries(areasObj).map(([name, risk]) => ({
-        name,
-        risk: risk as number,
-        recommendation: `Focus on ${name} strengthening and recovery exercises`
-      }));
-      
-      transformed.injuryRisk = {
-        ...transformed.injuryRisk,
-        areas: areasArray
-      };
-    }
-    
-    return transformed as PlayerAnalysis;
+  const handleBack = () => {
+    navigate('/dashboard');
   };
   
-  const handleBack = () => {
-    console.log("Navigating back");
-    navigate(-1);
-  };
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="mt-4 text-lg">جاري تحميل بيانات التحليل...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!analysis) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center py-12">
+          <h1 className="text-2xl font-bold mb-2">التحليل غير موجود</h1>
+          <p className="text-muted-foreground mb-6">لم نتمكن من العثور على التحليل المطلوب</p>
+          <Button onClick={handleBack}>العودة للصفحة الرئيسية</Button>
+        </div>
+      </div>
+    );
+  }
   
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="flex-1 container mx-auto py-8 px-4 md:px-6">
-        <div className="mb-6">
-          <Button variant="ghost" onClick={handleBack} className="mb-4">
-            <ArrowLeft className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
-            العودة
-          </Button>
-          
-          <h1 className="text-3xl font-bold">التحليل المتقدم</h1>
-          <p className="text-muted-foreground">تحليل مفصل لأداء اللاعب ومقارنات متقدمة</p>
-        </div>
-        
-        {isLoading ? (
-          <div className="flex items-center justify-center h-[50vh]">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="mr-2 rtl:ml-2 rtl:mr-0">جاري تحميل التحليل...</span>
-          </div>
-        ) : analysis ? (
-          <AdvancedPlayerDashboard 
-            analysis={analysis} 
-            previousAnalyses={previousAnalyses} 
-          />
-        ) : (
-          <div className="flex flex-col items-center justify-center h-[50vh] text-center">
-            <h2 className="text-2xl font-bold text-red-500 mb-2">تعذر تحميل التحليل</h2>
-            <p className="text-muted-foreground mb-4">تعذر العثور على بيانات التحليل المطلوبة</p>
-            <Button onClick={handleBack}>العودة للصفحة السابقة</Button>
-          </div>
-        )}
-      </main>
+    <div className="container mx-auto px-4 py-8">
+      <AdvancedAnalysisView analysis={analysis} onBack={handleBack} />
     </div>
   );
 };

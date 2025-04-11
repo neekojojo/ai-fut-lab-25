@@ -1,45 +1,54 @@
 
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from './ui/button';
-import { useAuth } from './auth/AuthContext';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ModeToggle } from '@/components/ui/mode-toggle';
+import { FileVideo, Home, LineChart, UserCircle } from 'lucide-react';
 
-const Header: React.FC = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLoginClick = () => {
-    navigate('/sign-in');
-  };
-
-  const handleDashboardClick = () => {
-    navigate('/dashboard');
-  };
-
+const Header = () => {
   return (
-    <header className="py-4 border-b border-border bg-background/80 backdrop-blur-lg sticky top-0 z-50">
-      <div className="container mx-auto px-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Link to="/" className="text-xl font-bold">
-            FUT LAB
+    <header className="py-4 px-6 flex items-center justify-between border-b bg-background/80 backdrop-blur-sm">
+      <div className="flex items-center">
+        <Link to="/" className="flex items-center gap-2">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-6 w-6 text-primary"
+          >
+            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+            <path d="M2 17l10 5 10-5" />
+            <path d="M2 12l10 5 10-5" />
+          </svg>
+          <span className="text-xl font-bold">FootballAI Analyzer</span>
+        </Link>
+      </div>
+      
+      <nav className="hidden md:flex items-center gap-1">
+        <Button variant="ghost" asChild>
+          <Link to="/" className="flex items-center gap-2">
+            <Home className="h-4 w-4" />
+            <span>الرئيسية</span>
           </Link>
-        </div>
-        
-        <nav className="flex items-center gap-x-4">
-          <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-            الرئيسية
+        </Button>
+        <Button variant="ghost" asChild>
+          <Link to="/dashboard" className="flex items-center gap-2">
+            <LineChart className="h-4 w-4" />
+            <span>لوحة التحكم</span>
           </Link>
-          
-          {user ? (
-            <Button variant="outline" size="sm" onClick={handleDashboardClick}>
-              لوحة التحكم
-            </Button>
-          ) : (
-            <Button variant="default" size="sm" onClick={handleLoginClick}>
-              تسجيل الدخول
-            </Button>
-          )}
-        </nav>
+        </Button>
+      </nav>
+      
+      <div className="flex items-center gap-2">
+        <ModeToggle />
+        <Button variant="outline" size="icon" asChild>
+          <Link to="/dashboard">
+            <UserCircle className="h-5 w-5" />
+          </Link>
+        </Button>
       </div>
     </header>
   );

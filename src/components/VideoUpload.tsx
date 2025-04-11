@@ -1,190 +1,127 @@
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import React, { useState, useCallback } from 'react';
+import { useDropzone } from 'react-dropzone';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+import { Card } from '@/components/ui/card';
+import { FileVideo, Upload, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { X, Upload, Video, AlertCircle } from 'lucide-react';
+import type { FileWithPreview } from '@/types/files';
 
 interface VideoUploadProps {
-  onUpload: (file: File) => void;
-  selectedFile?: File | null;
-  previewUrl?: string | null;
+  onFileSelected: (file: FileWithPreview) => void;
+  selectedFile?: FileWithPreview | null;
 }
 
-const VideoUpload: React.FC<VideoUploadProps> = ({ 
-  onUpload, 
-  selectedFile: externalSelectedFile = null, 
-  previewUrl: externalPreviewUrl = null 
-}) => {
-  const [isDragging, setIsDragging] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(externalSelectedFile);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(externalPreviewUrl);
-  const [error, setError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+const VideoUpload: React.FC<VideoUploadProps> = ({ onFileSelected, selectedFile }) => {
+  const [videoFile, setVideoFile] = useState<FileWithPreview | null>(selectedFile || null);
   const { toast } = useToast();
-
-  useEffect(() => {
-    return () => {
-      // Clean up any preview URLs when component unmounts
-      if (previewUrl && !externalPreviewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl, externalPreviewUrl]);
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(false);
-    
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const file = e.dataTransfer.files[0];
-      processFile(file);
+  
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (acceptedFiles.length === 0) {
+      return;
     }
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      processFile(file);
-    }
-  };
-
-  const processFile = (file: File) => {
-    setError(null);
     
-    // Check if file is a video
+    const file = acceptedFiles[0];
+    
+    // Check if it's a video file
     if (!file.type.startsWith('video/')) {
-      setError('يرجى تحميل ملف فيديو');
       toast({
+        title: "نوع الملف غير مدعوم",
+        description: "الرجاء رفع ملف فيديو فقط",
         variant: "destructive",
-        title: "خطأ في التحميل",
-        description: "يرجى تحميل ملف فيديو صالح",
       });
       return;
     }
-
-    setSelectedFile(file);
     
-    // Create preview URL
-    if (previewUrl && !externalPreviewUrl) {
-      URL.revokeObjectURL(previewUrl);
+    // Check file size (max 100MB)
+    if (file.size > 100 * 1024 * 1024) {
+      toast({
+        title: "حجم الملف كبير جداً",
+        description: "الحد الأقصى لحجم الملف هو 100 ميجابايت",
+        variant: "destructive",
+      });
+      return;
     }
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
     
-    // Pass the file to parent immediately - no upload simulation
-    onUpload(file);
-  };
-
-  const handleRemoveFile = () => {
-    if (previewUrl && !externalPreviewUrl) {
-      URL.revokeObjectURL(previewUrl);
-    }
-    setSelectedFile(null);
-    setPreviewUrl(null);
-    setError(null);
+    // Create a preview URL
+    const previewFile = Object.assign(file, {
+      preview: URL.createObjectURL(file)
+    }) as FileWithPreview;
     
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+    setVideoFile(previewFile);
+    onFileSelected(previewFile);
+    
+    toast({
+      title: "تم رفع الفيديو بنجاح",
+      description: `تم رفع ${file.name} بنجاح`,
+    });
+  }, [onFileSelected, toast]);
+  
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'video/*': ['.mp4', '.mov', '.avi', '.webm']
+    },
+    maxFiles: 1
+  });
+  
+  const removeVideo = () => {
+    if (videoFile) {
+      URL.revokeObjectURL(videoFile.preview);
     }
+    setVideoFile(null);
+    onFileSelected(null as any);
   };
-
-  const handleUploadClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
+  
   return (
-    <Card className="w-full max-w-3xl mx-auto overflow-hidden animate-scale-in">
-      <CardContent className="p-4">
-        <div 
-          className={`upload-zone flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-lg transition-all ${
-            isDragging ? 'border-primary bg-primary/5' : error ? 'border-destructive bg-destructive/5' : 'border-border hover:border-primary/50 hover:bg-secondary/50'
+    <div className="space-y-4">
+      {!videoFile ? (
+        <div
+          {...getRootProps()}
+          className={`border-2 border-dashed rounded-lg p-8 text-center hover:bg-accent/50 transition-colors cursor-pointer ${
+            isDragActive ? 'border-primary bg-primary/5' : 'border-border'
           }`}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
         >
-          {error && (
-            <div className="w-full mb-4 p-3 bg-destructive/10 text-destructive rounded-md flex items-center">
-              <AlertCircle className="h-5 w-5 mr-2" />
-              <p>{error}</p>
-            </div>
-          )}
-          
-          {!previewUrl ? (
-            <div className="text-center py-10 space-y-4">
-              <div className="w-16 h-16 mx-auto rounded-full bg-secondary flex items-center justify-center">
-                <Video className="w-8 h-8 text-primary" />
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-lg font-medium">قم بتحميل فيديو كرة القدم الخاص بك</h3>
-                <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                  اسحب وأفلت ملف الفيديو هنا، أو انقر لاختيار ملف. نحن ندعم تنسيقات MP4 وMOV وAVI.
+          <input {...getInputProps()} />
+          <div className="flex flex-col items-center justify-center gap-2">
+            <Upload className="h-10 w-10 text-muted-foreground mb-2" />
+            <p className="text-lg font-medium">أسحب وأفلت فيديو هنا، أو اضغط للتصفح</p>
+            <p className="text-sm text-muted-foreground">
+              MP4, MOV, AVI, WEBM حتى 100 ميجابايت
+            </p>
+          </div>
+        </div>
+      ) : (
+        <Card className="overflow-hidden">
+          <div className="relative aspect-video">
+            <video
+              src={videoFile.preview}
+              className="w-full h-full object-contain bg-black"
+              controls
+            />
+            <Button
+              size="icon"
+              variant="destructive"
+              className="absolute top-2 right-2"
+              onClick={removeVideo}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="p-4">
+            <div className="flex items-start gap-3">
+              <FileVideo className="h-8 w-8 text-primary" />
+              <div className="overflow-hidden">
+                <p className="font-medium truncate">{videoFile.name}</p>
+                <p className="text-sm text-muted-foreground">
+                  {(videoFile.size / (1024 * 1024)).toFixed(2)} MB
                 </p>
               </div>
-              <Button
-                type="button"
-                onClick={handleUploadClick}
-                className="mt-4 gap-2"
-              >
-                <Upload className="w-4 h-4" />
-                <span>اختر فيديو</span>
-              </Button>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileSelect}
-                accept="video/*"
-                className="hidden"
-              />
-              <p className="text-xs text-muted-foreground pt-4">
-                يمكنك تحميل ملفات فيديو بأي حجم
-              </p>
             </div>
-          ) : (
-            <div className="w-full space-y-4 py-2">
-              <div className="relative w-full aspect-video rounded-md overflow-hidden bg-black">
-                <video
-                  src={previewUrl}
-                  controls
-                  className="w-full h-full object-contain"
-                />
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  className="absolute top-2 right-2 h-8 w-8"
-                  onClick={handleRemoveFile}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="text-sm">
-                  <p className="font-medium line-clamp-1">{selectedFile?.name}</p>
-                  <p className="text-muted-foreground">
-                    {(selectedFile?.size && (selectedFile.size / (1024 * 1024)).toFixed(2)) || 0} MB
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+          </div>
+        </Card>
+      )}
+    </div>
   );
 };
 

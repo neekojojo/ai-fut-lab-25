@@ -1,290 +1,190 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import Header from '@/components/Header';
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UserProfile, TrainingVideo } from '@/components/AnalysisReport.d';
-import OverviewTab from '@/components/dashboard/tabs/OverviewTab';
-import AnalysesTab from '@/components/dashboard/tabs/AnalysesTab';
-import TrainingTab from '@/components/dashboard/tabs/TrainingTab';
-import BadgesTab from '@/components/dashboard/tabs/BadgesTab';
-import ProfileTab from '@/components/dashboard/tabs/ProfileTab';
-import { useAuth } from '@/components/auth/AuthContext';
-import { fetchPlayerAnalyses } from '@/services/playerAnalysisService';
-import { useToast } from '@/components/ui/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 
-const mockTrainingVideos: TrainingVideo[] = [
-  {
-    id: "1",
-    title: "Advanced Passing Techniques",
-    description: "Learn the most effective passing techniques used by professionals",
-    videoUrl: "#",
-    thumbnailUrl: "https://via.placeholder.com/300x200",
-    duration: 15,
-    category: "passing",
-    difficulty: "advanced",
-    targetAreas: ["passing", "technique"],
-    skill: "passing",
-    rating: 4.5,
-    views: 1240
-  },
-  {
-    id: "2",
-    title: "Shooting Drills for Strikers",
-    description: "Improve your goal-scoring ability with these shooting drills",
-    videoUrl: "#",
-    thumbnailUrl: "https://via.placeholder.com/300x200",
-    duration: 20,
-    category: "shooting",
-    difficulty: "intermediate",
-    targetAreas: ["shooting", "finishing"],
-    skill: "shooting",
-    rating: 4.8,
-    views: 2340
-  },
-  {
-    id: "3",
-    title: "Dribbling Masterclass",
-    description: "Learn to dribble past defenders like professional players",
-    videoUrl: "#",
-    thumbnailUrl: "https://via.placeholder.com/300x200",
-    duration: 18,
-    category: "dribbling",
-    difficulty: "intermediate",
-    targetAreas: ["dribbling", "control"],
-    skill: "dribbling",
-    rating: 4.6,
-    views: 1890
-  }
-];
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { FileVideo, LineChart, BarChart, Activity, Medal, Target } from 'lucide-react';
+import Header from '@/components/Header';
+import Footer from '@/components/layout/Footer';
+import OverviewTab from '@/components/dashboard/tabs/OverviewTab';
+import VideoUpload from '@/components/VideoUpload';
+import ModelSelection from '@/components/analysis/ModelSelection';
+import { useToast } from '@/hooks/use-toast';
+import { getPlayerStats, getMockAnalysis } from '@/components/player-analysis/mockData';
+import type { FileWithPreview } from '@/types/files';
 
 const Dashboard: React.FC = () => {
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [trainingVideos, setTrainingVideos] = useState<TrainingVideo[]>([]);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [isLoadingAnalyses, setIsLoadingAnalyses] = useState(false);
-  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { user, loading, signOut } = useAuth();
+  const [activeTab, setActiveTab] = useState('overview');
+  const [videoFile, setVideoFile] = useState<FileWithPreview | null>(null);
+  const [showModelSelection, setShowModelSelection] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<'google-automl' | 'kaggle-datasets' | null>(null);
   const { toast } = useToast();
-
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const tabParam = searchParams.get('tab');
-    if (tabParam && ['overview', 'analyses', 'training', 'badges', 'profile'].includes(tabParam)) {
-      setActiveTab(tabParam);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (!loading) {
-      if (user) {
-        fetchUserProfileData();
-        setTrainingVideos(mockTrainingVideos);
-        
-        fetchUserAnalyses();
-      } else {
-        navigate('/sign-in', { replace: true });
-      }
-    }
-  }, [user, navigate, loading]);
-
-  useEffect(() => {
-    if (!user) return;
+  const navigate = useNavigate();
+  
+  // Mock user profile data
+  const userProfile = {
+    name: 'عبدالله محمد',
+    level: 'محترف',
+    position: 'وسط',
+    performanceScore: 82,
+    improvementRate: 12,
+    analyses: [
+      { id: '1', date: '2025-04-08', score: 78 },
+      { id: '2', date: '2025-04-01', score: 75 },
+      { id: '3', date: '2025-03-25', score: 72 }
+    ]
+  };
+  
+  // Mock training videos
+  const trainingVideos = [
+    { id: '1', title: 'تدريبات تحسين تمرير الكرة', duration: '15:20', level: 'متقدم' },
+    { id: '2', title: 'تمارين السرعة والتسارع', duration: '12:45', level: 'متوسط' },
+    { id: '3', title: 'تدريبات الدقة في التسديد', duration: '18:30', level: 'متقدم' }
+  ];
+  
+  const handleFileSelected = (file: FileWithPreview) => {
+    setVideoFile(file);
+    setShowModelSelection(true);
     
-    const subscription = supabase
-      .channel('profile-updates')
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'profiles',
-        filter: `id=eq.${user.id}`,
-      }, () => {
-        fetchUserProfileData();
-      })
-      .subscribe();
-      
-    return () => {
-      supabase.removeChannel(subscription);
-    };
-  }, [user]);
-
-  const fetchUserProfileData = async () => {
-    if (!user) return;
+    toast({
+      title: "تم رفع الفيديو بنجاح",
+      description: "يمكنك الآن اختيار نموذج التحليل المناسب",
+    });
+  };
+  
+  const handleSelectModel = (model: 'google-automl' | 'kaggle-datasets') => {
+    setSelectedModel(model);
     
-    setIsLoadingProfile(true);
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-        
-      if (error) throw error;
-      
-      const preferredFoot = data.preferred_foot as 'Left' | 'Right' | 'Both' | undefined;
-      
-      const initialProfile: UserProfile = {
-        id: user.id,
-        email: user.email || '',
-        name: data.full_name || user.user_metadata?.full_name || 'User',
-        avatarUrl: data.avatar_url || null,
-        bio: data.bio || '',
-        age: data.age,
-        country: data.country,
-        city: data.city,
-        height: data.height,
-        weight: data.weight,
-        preferredFoot: preferredFoot,
-        position: data.position,
-        analyses: [],
-        badges: [
-          {
-            name: "First Analysis",
-            description: "Completed your first player analysis",
-            level: "bronze",
-            earnedAt: new Date()
-          },
-          {
-            name: "Technique Master",
-            description: "Achieved high technical score in analysis",
-            level: "silver",
-            earnedAt: new Date()
-          }
-        ],
-        trainingProgress: {
-          videosWatched: 3,
-          skillsImproved: ["passing", "ball control"],
-          nextRecommendation: "Work on shooting accuracy"
-        }
-      };
-      
-      setUserProfile(initialProfile);
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      toast({
-        variant: "destructive",
-        title: "خطأ في تحميل الملف الشخصي",
-        description: "تعذر تحميل بيانات ملفك الشخصي. يرجى المحاولة مرة أخرى.",
-      });
-      
-      if (user) {
-        const defaultProfile: UserProfile = {
-          id: user.id,
-          email: user.email || '',
-          name: user.user_metadata?.full_name || 'User',
-          avatarUrl: null,
-          bio: '',
-          analyses: [],
-          badges: [],
-          trainingProgress: {
-            videosWatched: 0,
-            skillsImproved: [],
-            nextRecommendation: ""
-          }
-        };
-        
-        setUserProfile(defaultProfile);
-      }
-    } finally {
-      setIsLoadingProfile(false);
-    }
+    toast({
+      title: "تم اختيار النموذج",
+      description: `تم اختيار نموذج ${model === 'google-automl' ? 'Google AutoML' : 'Kaggle Datasets'}`,
+    });
   };
-
-  const fetchUserAnalyses = async () => {
-    if (!user) return;
+  
+  const handleAnalyzeWithAI = () => {
+    toast({
+      title: "جاري تحليل الفيديو",
+      description: "سيتم تحويلك إلى صفحة التحليل",
+    });
     
-    setIsLoadingAnalyses(true);
-    try {
-      const analyses = await fetchPlayerAnalyses();
-      console.log('Fetched analyses:', analyses);
-      
-      setUserProfile(prevProfile => {
-        if (prevProfile) {
-          return {
-            ...prevProfile,
-            analyses: analyses
-          };
-        }
-        return prevProfile;
-      });
-    } catch (error) {
-      console.error('Error fetching analyses:', error);
-      toast({
-        title: "خطأ في تحميل التحليلات",
-        description: "تعذر تحميل التحليلات السابقة الخاصة بك. يرجى المحاولة مرة أخرى.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoadingAnalyses(false);
-    }
+    // Redirect to homepage (will show analysis progress)
+    navigate('/');
   };
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/sign-in', { replace: true });
-  };
-
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-    navigate(`/dashboard?tab=${value}`, { replace: true });
-  };
-
-  if (loading || !userProfile || isLoadingProfile) {
-    return <div className="flex justify-center items-center min-h-screen">جاري التحميل...</div>;
-  }
-
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      <main className="flex-1 container mx-auto py-8 px-4 md:px-6">
+      <main className="flex-1 container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold">لوحة التحكم</h1>
-            <p className="text-muted-foreground">أهلاً بك مجدداً، {userProfile.name}</p>
+            <p className="text-muted-foreground">مرحباً بك في منصة تحليل كرة القدم بالذكاء الاصطناعي</p>
           </div>
-          <Button onClick={() => navigate('/')}>تحليل جديد</Button>
+          <Button className="flex items-center gap-2" onClick={() => navigate('/')}>
+            <FileVideo className="h-4 w-4" />
+            <span>تحليل فيديو جديد</span>
+          </Button>
         </div>
         
-        <Tabs defaultValue={activeTab} className="space-y-6" onValueChange={handleTabChange}>
-          <TabsList className="grid grid-cols-4 md:grid-cols-5 lg:w-[600px]">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">التقييم العام</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-end justify-between">
+                <div className="flex items-center">
+                  <Medal className="h-5 w-5 text-primary mr-2" />
+                  <div className="text-2xl font-bold">{userProfile.performanceScore}/100</div>
+                </div>
+                <div className="text-sm text-green-600 dark:text-green-400">+{userProfile.improvementRate}%</div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">المهارات الفنية</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-end justify-between">
+                <div className="flex items-center">
+                  <LineChart className="h-5 w-5 text-blue-500 mr-2" />
+                  <div className="text-2xl font-bold">84</div>
+                </div>
+                <div className="text-sm text-green-600 dark:text-green-400">+6%</div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">القدرات البدنية</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-end justify-between">
+                <div className="flex items-center">
+                  <Activity className="h-5 w-5 text-green-500 mr-2" />
+                  <div className="text-2xl font-bold">78</div>
+                </div>
+                <div className="text-sm text-green-600 dark:text-green-400">+8%</div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">الذكاء التكتيكي</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-end justify-between">
+                <div className="flex items-center">
+                  <Target className="h-5 w-5 text-purple-500 mr-2" />
+                  <div className="text-2xl font-bold">80</div>
+                </div>
+                <div className="text-sm text-green-600 dark:text-green-400">+4%</div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="mb-8">
             <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
-            <TabsTrigger value="analyses">التحليلات</TabsTrigger>
-            <TabsTrigger value="training">التدريب</TabsTrigger>
-            <TabsTrigger value="badges">الشارات</TabsTrigger>
-            <TabsTrigger value="profile">الملف الشخصي</TabsTrigger>
+            <TabsTrigger value="upload">تحليل فيديو جديد</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview">
-            <OverviewTab 
-              userProfile={userProfile} 
-              trainingVideos={trainingVideos} 
-            />
+            <OverviewTab userProfile={userProfile} trainingVideos={trainingVideos} />
           </TabsContent>
           
-          <TabsContent value="analyses">
-            <AnalysesTab 
-              analyses={userProfile.analyses} 
-              isLoading={isLoadingAnalyses} 
-            />
-          </TabsContent>
-          
-          <TabsContent value="training">
-            <TrainingTab trainingVideos={trainingVideos} />
-          </TabsContent>
-          
-          <TabsContent value="badges">
-            <BadgesTab userProfile={userProfile} />
-          </TabsContent>
-          
-          <TabsContent value="profile">
-            <ProfileTab userProfile={userProfile} onSignOut={handleSignOut} />
+          <TabsContent value="upload">
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>رفع فيديو للتحليل</CardTitle>
+                  <CardDescription>قم برفع فيديو لأداء اللاعب لتحليله باستخدام الذكاء الاصطناعي</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <VideoUpload onFileSelected={handleFileSelected} selectedFile={videoFile} />
+                </CardContent>
+              </Card>
+              
+              {showModelSelection && (
+                <ModelSelection 
+                  videoFile={videoFile!} 
+                  onSelectModel={handleSelectModel} 
+                  onAnalyzeWithAI={handleAnalyzeWithAI} 
+                />
+              )}
+            </div>
           </TabsContent>
         </Tabs>
       </main>
+      
+      <Footer />
     </div>
   );
 };

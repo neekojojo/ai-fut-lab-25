@@ -1,309 +1,295 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { detectPeopleInVideo } from '@/utils/videoDetection';
-import { useToast } from '@/components/ui/use-toast';
-import type { DetectionResult } from '@/utils/videoDetection/types';
-import VideoUpload from '@/components/VideoUpload';
-import PlayerMovementVisualization from '@/components/PlayerMovementVisualization';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, AlertTriangle } from 'lucide-react';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
+import { useToast } from '@/hooks/use-toast';
+import VideoUpload from './VideoUpload';
+import { detectPeopleInVideo } from '@/utils/videoDetection';
+import { analyzePlayerPerformance } from '@/utils/videoDetection';
+import type { FileWithPreview } from '@/types/files';
 
-const PeopleDetection = () => {
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [result, setResult] = useState<DetectionResult | null>(null);
-  const [videoSrc, setVideoSrc] = useState<string | null>(null);
-  const [videoFile, setVideoFile] = useState<File | null>(null);
+const PeopleDetection: React.FC = () => {
+  const [videoFile, setVideoFile] = useState<FileWithPreview | null>(null);
   const [detectionMethod, setDetectionMethod] = useState<'tensorflow' | 'yolo' | 'openpose'>('tensorflow');
   const [yoloModelSize, setYoloModelSize] = useState<'n' | 's' | 'm' | 'l' | 'x'>('m');
-  const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [result, setResult] = useState<any>(null);
   const { toast } = useToast();
-
-  const handleFileSelect = async (file: File) => {
-    if (!file.type.startsWith('video/')) {
+  
+  const handleFileSelected = (file: FileWithPreview) => {
+    setVideoFile(file);
+    setResult(null);
+    
+    toast({
+      title: "تم رفع الفيديو بنجاح",
+      description: "اختر طريقة اكتشاف اللاعبين ثم اضغط على تحليل الفيديو",
+    });
+  };
+  
+  const handleDetect = async () => {
+    if (!videoFile) {
       toast({
+        title: "لم يتم اختيار فيديو",
+        description: "الرجاء تحميل ملف فيديو للمتابعة",
         variant: "destructive",
-        title: "نوع ملف غير صالح",
-        description: "يرجى تحميل ملف فيديو",
       });
       return;
     }
     
-    const objectUrl = URL.createObjectURL(file);
-    setVideoSrc(objectUrl);
-    setVideoFile(file);
-  };
-  
-  const analyzeVideo = async () => {
-    if (!videoFile) return;
-    
-    setIsAnalyzing(true);
+    setIsProcessing(true);
+    setProgress(0);
     setResult(null);
-    setAnalysisProgress(0);
     
     try {
-      const detectionResult = await detectPeopleInVideo(
-        videoFile, 
-        detectionMethod, 
-        yoloModelSize,
-        (progress) => setAnalysisProgress(progress)
+      toast({
+        title: "بدأ التحليل",
+        description: `جاري تحليل الفيديو باستخدام ${detectionMethod === 'tensorflow' ? 'TensorFlow' : detectionMethod === 'yolo' ? 'YOLOv8' : 'OpenPose'}`,
+      });
+      
+      // Advanced performance analysis instead of basic detection
+      const analysisResult = await analyzePlayerPerformance(
+        videoFile,
+        undefined,
+        (progress: number) => {
+          setProgress(progress);
+        }
       );
       
-      setResult(detectionResult);
+      setResult(analysisResult);
       
       toast({
         title: "اكتمل التحليل",
-        description: `تم اكتشاف ${detectionResult.count} شخص في المتوسط في الفيديو`,
+        description: "تم تحليل الفيديو بنجاح",
       });
     } catch (error) {
-      console.error('Error analyzing video:', error);
+      console.error("Error detecting people in video:", error);
       toast({
+        title: "خطأ في التحليل",
+        description: "حدث خطأ أثناء تحليل الفيديو",
         variant: "destructive",
-        title: "فشل التحليل",
-        description: `حدث خطأ أثناء تحليل الفيديو: ${error instanceof Error ? error.message : 'خطأ غير معروف'}`,
       });
     } finally {
-      setIsAnalyzing(false);
+      setIsProcessing(false);
     }
   };
   
-  const handleReset = () => {
-    setResult(null);
-    setVideoSrc(null);
-    setVideoFile(null);
-    setAnalysisProgress(0);
-  };
-
-  return (
-    <div className="w-full max-w-5xl mx-auto space-y-6">
-      <Card>
+  const renderResultCard = () => {
+    if (!result) return null;
+    
+    return (
+      <Card className="mt-6">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>تحليل اللاعبين</CardTitle>
-            
-            {result && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleReset}
-                className="flex items-center gap-1"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                <span>إعادة ضبط</span>
-              </Button>
-            )}
-          </div>
+          <CardTitle>نتائج التحليل</CardTitle>
+          <CardDescription>نتائج تحليل الفيديو باستخدام {detectionMethod === 'tensorflow' ? 'TensorFlow' : detectionMethod === 'yolo' ? 'YOLOv8' : 'OpenPose'}</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          {!videoFile ? (
-            <VideoUpload onUpload={handleFileSelect} />
-          ) : !result ? (
-            <div className="space-y-4">
-              <div className="mt-4">
-                <video 
-                  src={videoSrc!} 
-                  controls 
-                  className="w-full rounded-lg"
-                  style={{ maxHeight: '400px' }}
-                />
-              </div>
-              
-              <div className="p-4 border rounded-lg bg-secondary/20 space-y-4">
-                <h3 className="text-lg font-medium">إعدادات التحليل</h3>
-                
-                <RadioGroup 
-                  value={detectionMethod} 
-                  onValueChange={(value) => setDetectionMethod(value as 'tensorflow' | 'yolo' | 'openpose')}
-                  className="flex flex-col space-y-2"
-                >
-                  <div className="flex items-center space-x-2 space-x-reverse">
-                    <RadioGroupItem value="tensorflow" id="tensorflow" />
-                    <Label htmlFor="tensorflow" className="mr-2">TensorFlow (التحليل القياسي)</Label>
-                  </div>
-                  <div className="flex items-center space-x-2 space-x-reverse">
-                    <RadioGroupItem value="yolo" id="yolo" />
-                    <Label htmlFor="yolo" className="mr-2">YOLOv8 (تحليل متقدم)</Label>
-                  </div>
-                  <div className="flex items-center space-x-2 space-x-reverse">
-                    <RadioGroupItem value="openpose" id="openpose" />
-                    <Label htmlFor="openpose" className="mr-2">OpenPose (تحليل هيكل الجسم بدقة)</Label>
-                  </div>
-                </RadioGroup>
-                
-                {detectionMethod === 'yolo' && (
-                  <div className="ml-6 mt-2">
-                    <Label htmlFor="yolo-size" className="block mb-2">حجم نموذج YOLOv8:</Label>
-                    <Select 
-                      value={yoloModelSize} 
-                      onValueChange={(value) => setYoloModelSize(value as 'n' | 's' | 'm' | 'l' | 'x')}
-                    >
-                      <SelectTrigger id="yolo-size" className="w-[200px]">
-                        <SelectValue placeholder="اختر حجم النموذج" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="n">YOLOv8n (صغير، سريع)</SelectItem>
-                        <SelectItem value="s">YOLOv8s (صغير متوسط)</SelectItem>
-                        <SelectItem value="m">YOLOv8m (متوسط، موصى به)</SelectItem>
-                        <SelectItem value="l">YOLOv8l (كبير، دقيق)</SelectItem>
-                        <SelectItem value="x">YOLOv8x (كبير جدًا، الأكثر دقة)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      النماذج الأكبر تكون أكثر دقة ولكنها تستغرق وقتًا أطول في المعالجة
-                    </p>
-                  </div>
-                )}
-                
-                {detectionMethod === 'openpose' && (
-                  <div className="ml-6 mt-2">
-                    <p className="text-sm text-muted-foreground">
-                      OpenPose يقوم بتحليل هيكل الجسم بدقة عالية مع تتبع 25 نقطة مفصلية
-                    </p>
-                    <div className="flex items-center mt-2 p-2 bg-blue-50 dark:bg-blue-950 rounded text-sm text-blue-700 dark:text-blue-300">
-                      <AlertTriangle className="h-4 w-4 mr-2" />
-                      <span>يستغرق هذا النموذج وقتًا أطول لتحليل الفيديو مع نتائج أكثر تفصيلاً</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-              
-              <div className="flex justify-center mt-4">
-                <Button 
-                  onClick={analyzeVideo} 
-                  disabled={isAnalyzing}
-                  size="lg"
-                  className="px-6"
-                >
-                  {isAnalyzing 
-                    ? `جاري التحليل... ${analysisProgress}%` 
-                    : 'تحليل الفيديو'}
-                </Button>
-              </div>
-              
-              {isAnalyzing && (
-                <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
-                  <div 
-                    className="bg-primary h-full transition-all duration-300 ease-in-out"
-                    style={{ width: `${analysisProgress}%` }}
-                  ></div>
-                </div>
-              )}
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h3 className="text-lg font-medium mb-2">معلومات عامة</h3>
+              <ul className="space-y-2">
+                <li><strong>عدد اللاعبين:</strong> {result.detection.count}</li>
+                <li><strong>دقة الاكتشاف:</strong> {Math.round(result.detection.confidence * 100)}%</li>
+                <li><strong>عدد الإطارات المحللة:</strong> {result.detection.frameResults?.length || 0}</li>
+              </ul>
             </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <video 
-                    src={videoSrc!} 
-                    controls 
-                    className="w-full rounded-lg"
-                    style={{ maxHeight: '300px' }}
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4 h-fit">
-                  {/* تحديث: تحسين وضوح الإحصائيات مع خلفية بيضاء ونص أسود */}
-                  <div className="bg-white p-4 rounded-lg border-2 border-primary/30 shadow-md">
-                    <div className="text-sm text-gray-500 font-medium">متوسط عدد اللاعبين</div>
-                    <div className="text-2xl font-bold text-black">{result.count}</div>
-                  </div>
-                  <div className="bg-white p-4 rounded-lg border-2 border-primary/30 shadow-md">
-                    <div className="text-sm text-gray-500 font-medium">الثقة</div>
-                    <div className="text-2xl font-bold text-black">{(result.confidence * 100).toFixed(0)}%</div>
-                  </div>
-                  <div className="bg-white p-4 rounded-lg border-2 border-primary/30 shadow-md">
-                    <div className="text-sm text-gray-500 font-medium">إجمالي الإطارات</div>
-                    <div className="text-2xl font-bold text-black">{result.frameResults.length}</div>
-                  </div>
-                  <div className="bg-white p-4 rounded-lg border-2 border-primary/30 shadow-md">
-                    <div className="text-sm text-gray-500 font-medium">المدة (ثانية)</div>
-                    <div className="text-2xl font-bold text-black">
-                      {(result.frameResults[result.frameResults.length - 1]?.timestamp / 1000).toFixed(1)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {result.playerPositions && result.playerPositions.length > 0 && (
-                <PlayerMovementVisualization playerPositions={result.playerPositions} />
-              )}
-              
-              <Tabs defaultValue="frameAnalysis" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="frameAnalysis">تحليل الإطارات</TabsTrigger>
-                  <TabsTrigger value="detectionInfo">معلومات الكشف</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="frameAnalysis" className="mt-4">
-                  <div className="bg-white p-4 rounded-lg border border-primary/20 shadow-md">
-                    <h3 className="text-sm font-medium mb-2 text-black">تحليل الإطارات</h3>
-                    <div className="h-48 overflow-y-auto">
-                      <Table>
-                        <TableHeader className="bg-gray-100">
-                          <TableRow>
-                            <TableHead className="text-right text-black font-bold">الإطار</TableHead>
-                            <TableHead className="text-right text-black font-bold">الأشخاص</TableHead>
-                            <TableHead className="text-right text-black font-bold">الوقت (ميلي ثانية)</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody className="bg-white">
-                          {result.frameResults.map((frame) => (
-                            <TableRow key={frame.frameNumber} className="hover:bg-gray-50">
-                              <TableCell className="text-right text-black font-medium">{frame.frameNumber}</TableCell>
-                              <TableCell className="text-right text-black font-medium">{frame.detections}</TableCell>
-                              <TableCell className="text-right text-black font-medium">{frame.timestamp}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="detectionInfo" className="mt-4">
-                  <div className="bg-white p-4 rounded-lg border border-primary/20 shadow-md">
-                    <h3 className="text-sm font-medium mb-4 text-black border-b pb-2">معلومات الكشف</h3>
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span className="text-sm text-gray-600 font-medium">طريقة الكشف:</span>
-                        <span className="text-sm font-bold bg-gray-100 px-3 py-1 rounded-full text-black">
-                          {detectionMethod === 'tensorflow' ? 'TensorFlow' : 
-                           detectionMethod === 'yolo' ? 'YOLOv8' : 'OpenPose'}
-                        </span>
-                      </div>
-                      {detectionMethod === 'yolo' && (
-                        <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                          <span className="text-sm text-gray-600 font-medium">حجم نموذج YOLO:</span>
-                          <span className="text-sm font-bold bg-gray-100 px-3 py-1 rounded-full text-black">
-                            YOLOv8{yoloModelSize}
-                          </span>
-                        </div>
-                      )}
-                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span className="text-sm text-gray-600 font-medium">عدد مواقع اللاعبين:</span>
-                        <span className="text-sm font-bold bg-gray-100 px-3 py-1 rounded-full text-black">
-                          {result.playerPositions?.length || 0}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span className="text-sm text-gray-600 font-medium">متوسط ثقة الكشف:</span>
-                        <span className="text-sm font-bold bg-gray-100 px-3 py-1 rounded-full text-black">
-                          {(result.confidence * 100).toFixed(1)}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
+            
+            <div>
+              <h3 className="text-lg font-medium mb-2">تحليل الحركة</h3>
+              <ul className="space-y-2">
+                <li><strong>متوسط السرعة:</strong> {result.movementAnalysis?.averageSpeed?.toFixed(2)} كم/ساعة</li>
+                <li><strong>المسافة المقطوعة:</strong> {result.movementAnalysis?.totalDistance?.toFixed(2)} متر</li>
+                <li><strong>أقصى تسارع:</strong> {result.movementAnalysis?.maxAcceleration?.toFixed(2)} م/ث²</li>
+              </ul>
             </div>
-          )}
+          </div>
+          
+          <div>
+            <h3 className="text-lg font-medium mb-2">تحليل العين</h3>
+            <ul className="space-y-2">
+              <li><strong>وعي الميدان:</strong> {result.eyeTracking?.fieldAwarenessScore?.toFixed(2)}/100</li>
+              <li><strong>سرعة اتخاذ القرار:</strong> {result.eyeTracking?.decisionSpeed?.toFixed(2)}/100</li>
+              <li><strong>الاستباق:</strong> {result.eyeTracking?.anticipationScore?.toFixed(2)}/100</li>
+            </ul>
+          </div>
+          
+          <div>
+            <h3 className="text-lg font-medium mb-2">المقاييس الفنية</h3>
+            <ul className="space-y-2">
+              <li><strong>الدقة التقنية:</strong> {result.performanceMetrics?.technicalAccuracy?.toFixed(2)}/100</li>
+              <li><strong>الفعالية:</strong> {result.performanceMetrics?.efficiency?.toFixed(2)}/100</li>
+              <li><strong>الذكاء التكتيكي:</strong> {result.performanceMetrics?.tacticalAwareness?.toFixed(2)}/100</li>
+            </ul>
+          </div>
         </CardContent>
       </Card>
+    );
+  };
+  
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>أداة اكتشاف اللاعبين</CardTitle>
+          <CardDescription>رفع فيديو لاكتشاف اللاعبين وتحليل حركتهم</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <VideoUpload onFileSelected={handleFileSelected} selectedFile={videoFile} />
+        </CardContent>
+      </Card>
+      
+      <Tabs defaultValue="detection-settings">
+        <TabsList>
+          <TabsTrigger value="detection-settings">إعدادات الاكتشاف</TabsTrigger>
+          <TabsTrigger value="model-info">معلومات النماذج</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="detection-settings">
+          <Card>
+            <CardHeader>
+              <CardTitle>إعدادات تحليل الفيديو</CardTitle>
+              <CardDescription>اختر طريقة اكتشاف اللاعبين والإعدادات ذات الصلة</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <label className="text-sm font-medium mb-2 block">طريقة الاكتشاف</label>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <Button
+                    variant={detectionMethod === 'tensorflow' ? 'default' : 'outline'}
+                    onClick={() => setDetectionMethod('tensorflow')}
+                    className="justify-start"
+                  >
+                    TensorFlow
+                  </Button>
+                  <Button
+                    variant={detectionMethod === 'yolo' ? 'default' : 'outline'}
+                    onClick={() => setDetectionMethod('yolo')}
+                    className="justify-start"
+                  >
+                    YOLOv8
+                  </Button>
+                  <Button
+                    variant={detectionMethod === 'openpose' ? 'default' : 'outline'}
+                    onClick={() => setDetectionMethod('openpose')}
+                    className="justify-start"
+                  >
+                    OpenPose
+                  </Button>
+                </div>
+              </div>
+              
+              {detectionMethod === 'yolo' && (
+                <div>
+                  <label className="text-sm font-medium mb-2 block">حجم نموذج YOLO</label>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                    <Button
+                      variant={yoloModelSize === 'n' ? 'default' : 'outline'}
+                      onClick={() => setYoloModelSize('n')}
+                      className="justify-start"
+                    >
+                      Nano
+                    </Button>
+                    <Button
+                      variant={yoloModelSize === 's' ? 'default' : 'outline'}
+                      onClick={() => setYoloModelSize('s')}
+                      className="justify-start"
+                    >
+                      Small
+                    </Button>
+                    <Button
+                      variant={yoloModelSize === 'm' ? 'default' : 'outline'}
+                      onClick={() => setYoloModelSize('m')}
+                      className="justify-start"
+                    >
+                      Medium
+                    </Button>
+                    <Button
+                      variant={yoloModelSize === 'l' ? 'default' : 'outline'}
+                      onClick={() => setYoloModelSize('l')}
+                      className="justify-start"
+                    >
+                      Large
+                    </Button>
+                    <Button
+                      variant={yoloModelSize === 'x' ? 'default' : 'outline'}
+                      onClick={() => setYoloModelSize('x')}
+                      className="justify-start"
+                    >
+                      XLarge
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              <Button 
+                onClick={handleDetect} 
+                disabled={isProcessing || !videoFile}
+                className="w-full"
+              >
+                {isProcessing ? 'جاري التحليل...' : 'تحليل الفيديو'}
+              </Button>
+              
+              {isProcessing && (
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>التقدم</span>
+                    <span>{progress}%</span>
+                  </div>
+                  <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary transition-all duration-300"
+                      style={{ width: `${progress}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="model-info">
+          <Card>
+            <CardHeader>
+              <CardTitle>معلومات النماذج المستخدمة</CardTitle>
+              <CardDescription>نبذة عن نماذج الذكاء الاصطناعي المستخدمة في اكتشاف اللاعبين</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium mb-2">TensorFlow</h3>
+                <p className="text-muted-foreground">
+                  مكتبة مفتوحة المصدر للذكاء الاصطناعي طورتها Google. تستخدم في هذا التطبيق نموذج MoveNet لتتبع وضعية الجسم.
+                </p>
+                <p className="text-muted-foreground mt-1">
+                  <strong>الميزات:</strong> سريع نسبياً، دقة متوسطة، استهلاك منخفض للذاكرة.
+                </p>
+              </div>
+              
+              <div>
+                <h3 className="text-lg font-medium mb-2">YOLOv8</h3>
+                <p className="text-muted-foreground">
+                  نموذج كشف الكائنات في الوقت الفعلي "You Only Look Once" في إصداره الثامن. يوفر توازناً ممتازاً بين السرعة والدقة.
+                </p>
+                <p className="text-muted-foreground mt-1">
+                  <strong>الميزات:</strong> دقة عالية، كشف متعدد الأشخاص، أحجام متعددة للنموذج بناءً على احتياجات الأداء.
+                </p>
+              </div>
+              
+              <div>
+                <h3 className="text-lg font-medium mb-2">OpenPose</h3>
+                <p className="text-muted-foreground">
+                  مكتبة مفتوحة المصدر لتقدير وضع الجسم متعدد الأشخاص. متخصصة في تتبع المفاصل والهيكل العظمي.
+                </p>
+                <p className="text-muted-foreground mt-1">
+                  <strong>الميزات:</strong> دقة عالية جداً في تتبع الهيكل العظمي، كشف تفاصيل دقيقة، استهلاك عالٍ للموارد.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+      
+      {renderResultCard()}
     </div>
   );
 };
