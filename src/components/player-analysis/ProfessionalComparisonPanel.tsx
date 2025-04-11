@@ -132,7 +132,7 @@ const ProfessionalComparisonPanel: React.FC = () => {
             <p className="text-sm text-muted-foreground">
               {selectedProData ? (
                 <>
-                  {selectedProData.name} لاعب من {selectedProData.nationality} ({selectedProData.age} سنة) يلعب في {selectedProData.team}. أسلوب لعبه متميز في {selectedProData.playingStyle}.
+                  {selectedProData.name} لاعب {selectedProData.nationality || "محترف"} {selectedProData.age ? `(${selectedProData.age} سنة)` : ""} يلعب في {selectedProData.team}. {selectedProData.playingStyle ? `أسلوب لعبه متميز في ${selectedProData.playingStyle}.` : ""}
                 </>
               ) : (
                 'اختر لاعباً للحصول على معلومات إضافية'

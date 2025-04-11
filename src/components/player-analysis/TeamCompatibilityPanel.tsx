@@ -8,19 +8,32 @@ import { analyzeTeamCompatibility } from '@/services/teamTactics';
 const TeamCompatibilityPanel = ({ playerAnalysis }) => {
   // Convert player analysis data to the format needed for compatibility analysis
   const playerStats = {
+    // Physical and Movement metrics
     avgSpeed: playerAnalysis.movementMetrics?.averageSpeed || 70,
     maxSpeed: playerAnalysis.movementMetrics?.topSpeed || 85,
     avgAcceleration: playerAnalysis.movementMetrics?.acceleration || 65,
     distanceCovered: playerAnalysis.movementMetrics?.distanceCovered || 8500,
     balanceScore: playerAnalysis.technicalMetrics?.balance || 75,
+    
+    // Core stat categories
     technicalScore: playerAnalysis.technicalMetrics?.overall || 70,
     physicalScore: playerAnalysis.physicalMetrics?.overall || 68,
     movementEfficiency: playerAnalysis.movementMetrics?.efficiency || 72,
+    
+    // Technical skills
     passing: playerAnalysis.technicalMetrics?.passing || 65,
     ballControl: playerAnalysis.technicalMetrics?.ballControl || 68,
     vision: playerAnalysis.technicalMetrics?.vision || 62,
+    
+    // Physical attributes
     pace: playerAnalysis.physicalMetrics?.pace || 75,
-    stamina: playerAnalysis.physicalMetrics?.stamina || 70
+    stamina: playerAnalysis.physicalMetrics?.stamina || 70,
+    
+    // Additional required properties for ExtendedPlayerStats
+    physical: playerAnalysis.performance?.physical || 70,
+    positioning: playerAnalysis.stats?.positioning || 65,
+    anticipation: playerAnalysis.stats?.anticipation || 68,
+    decision: playerAnalysis.stats?.decision || 64
   };
   
   const playerPosition = playerAnalysis.position || "Midfielder";

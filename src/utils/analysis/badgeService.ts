@@ -13,7 +13,8 @@ export const determineEarnedBadges = (analysis: PlayerAnalysis): Badge[] => {
       description: 'Exceptional technical ability across all skills',
       icon: 'zap',
       color: 'blue',
-      type: 'technical'
+      type: 'technical',
+      level: 'gold'
     });
   }
   
@@ -25,7 +26,8 @@ export const determineEarnedBadges = (analysis: PlayerAnalysis): Badge[] => {
       description: 'Outstanding physical attributes and athleticism',
       icon: 'activity',
       color: 'red',
-      type: 'physical'
+      type: 'physical',
+      level: 'gold'
     });
   }
   
@@ -37,7 +39,8 @@ export const determineEarnedBadges = (analysis: PlayerAnalysis): Badge[] => {
       description: 'Superior tactical awareness and decision making',
       icon: 'brain',
       color: 'purple',
-      type: 'tactical'
+      type: 'tactical',
+      level: 'gold'
     });
   }
   
@@ -49,7 +52,8 @@ export const determineEarnedBadges = (analysis: PlayerAnalysis): Badge[] => {
       description: 'Exceptional mental fortitude and composure',
       icon: 'target',
       color: 'green',
-      type: 'mental'
+      type: 'mental',
+      level: 'gold'
     });
   }
   
@@ -61,7 +65,8 @@ export const determineEarnedBadges = (analysis: PlayerAnalysis): Badge[] => {
       description: 'Among the top performers in all categories',
       icon: 'award',
       color: 'gold',
-      type: 'performance'
+      type: 'performance',
+      level: 'diamond'
     });
   }
   
@@ -73,7 +78,8 @@ export const determineEarnedBadges = (analysis: PlayerAnalysis): Badge[] => {
       description: 'Exceptional ability to convert chances',
       icon: 'target',
       color: 'orange',
-      type: 'technical'
+      type: 'technical',
+      level: 'gold'
     });
   }
   
@@ -84,7 +90,8 @@ export const determineEarnedBadges = (analysis: PlayerAnalysis): Badge[] => {
       description: 'Superior passing ability and vision',
       icon: 'eye',
       color: 'cyan',
-      type: 'technical'
+      type: 'technical',
+      level: 'gold'
     });
   }
   
@@ -95,18 +102,20 @@ export const determineEarnedBadges = (analysis: PlayerAnalysis): Badge[] => {
       description: 'Exceptional defensive positioning and tackling',
       icon: 'shield',
       color: 'indigo',
-      type: 'defensive'
+      type: 'defensive',
+      level: 'gold'
     });
   }
   
-  if (analysis.position === 'Goalkeeper' && analysis.stats?.reflexes && analysis.stats.reflexes > 85) {
+  if (analysis.position === 'Goalkeeper' && analysis.stats?.passing && analysis.stats.passing > 85) {
     badges.push({
       id: 'shot-stopper',
       name: 'Shot Stopper',
       description: 'Remarkable goalkeeping abilities',
       icon: 'hand',
       color: 'yellow',
-      type: 'goalkeeping'
+      type: 'goalkeeping',
+      level: 'gold'
     });
   }
   

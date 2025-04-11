@@ -1,7 +1,7 @@
 
 // Re-export functions from the videoDetection module
 export { extractVideoFrames } from './videoDetection/frameExtraction';
-export { detectPlayersInVideo as detectPeopleInVideo } from './videoDetection/detectionService';
+export { detectPeopleInVideo } from './videoDetection/detectionService';
 
 // Function to analyze player eye movement
 export const analyzePlayerEyeMovement = async (videoFile: File, detectionResult?: any) => {

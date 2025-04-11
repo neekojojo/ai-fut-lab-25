@@ -11,7 +11,10 @@ const mapToPlayerAnalysis = (dbAnalysis: any): PlayerAnalysis => {
   
   return {
     id: dbAnalysis.id || '',
+    // Use userId for playerId field
     playerId: dbAnalysis.user_id || '',
+    date: new Date(dbAnalysis.created_at || Date.now()).toISOString().split('T')[0],
+    score: dbAnalysis.technical_score || 70,
     playerName: dbAnalysis.player_name,
     position: dbAnalysis.position || '',
     timestamp: dbAnalysis.created_at || new Date().toISOString(),
@@ -134,12 +137,18 @@ const createMockAnalysis = (id: string): PlayerAnalysis => {
   const baseValue = (talentScore * 10000) + (Math.random() * 50000);
   const marketValue = '$' + Math.floor(baseValue).toLocaleString();
   
+  const now = new Date();
+  const dateString = now.toISOString().split('T')[0];
+  const score = 70 + Math.floor(Math.random() * 20);
+  
   return {
     id: id,
     playerId: `player-${id}`,
+    date: dateString,
+    score: score,
     playerName: playerNames[randomIndex],
     position: positions[randomIndex],
-    timestamp: new Date().toISOString(),
+    timestamp: now.toISOString(),
     duration: 120,
     confidence: 0.85,
     videoUrl: "",
@@ -151,7 +160,7 @@ const createMockAnalysis = (id: string): PlayerAnalysis => {
     summary: "لاعب واعد يتمتع بمهارات فنية عالية وقدرات بدنية جيدة",
     advancedInsights: ["يظهر قدرات استثنائية في المراوغة", "يمكنه تحسين عملية اتخاذ القرار"],
     recommendations: ["تمارين لتحسين اللياقة البدنية", "تدريبات على التسديد البعيد", "تعزيز الثقة بالنفس"],
-    performanceScore: 82,
+    performanceScore: score,
     compatibilityScore: 85,
     performance: {
       technical: 80,

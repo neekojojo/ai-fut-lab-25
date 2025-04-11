@@ -1,11 +1,17 @@
-
 export interface ProfessionalPlayer {
+  id?: string;
   name: string;
   team: string;
   position: string;
   match: number;
   similarity: number;
   strengths: string[];
+  nationality?: string;
+  age?: number;
+  playingStyle?: string;
+  skills?: {
+    [key: string]: number;
+  };
 }
 
 export interface PlayerAnalysis {
@@ -25,6 +31,7 @@ export interface PlayerAnalysis {
   talentScore?: number;
   compatibilityScore?: number;
   performanceScore?: number;
+  playerId?: string; // Adding this to resolve property usage issues
   
   // Performance metrics
   performance?: {
@@ -66,6 +73,7 @@ export interface PlayerAnalysis {
     strength?: number;
     jumping?: number;
     heading?: number;
+    reflexes?: number; // Added reflexes for goalkeeper stats
   };
   
   // Player strengths and weaknesses
@@ -117,6 +125,7 @@ export interface PlayerAnalysis {
     areas: {
       name: string;
       risk: number;
+      recommendation: string;
     }[];
     recommendations: string[];
     history?: {
@@ -134,6 +143,7 @@ export interface PlayerAnalysis {
     icon: string;
     color: string;
     type: string;
+    level: string;
   }[];
   
   // Progress tracking
@@ -161,6 +171,7 @@ export interface PlayerAnalysis {
   preferredFoot?: string;
 }
 
+// Keeping AnalysisReport for backward compatibility
 export interface AnalysisReport {
   id: string;
   date: string;

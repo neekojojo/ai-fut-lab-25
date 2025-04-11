@@ -1,7 +1,7 @@
 import { analyzeFootballVideo } from '@/utils/analysis';
 import { savePlayerAnalysis } from '@/services/playerAnalysisService';
 import { User } from '@supabase/supabase-js';
-import type { PlayerAnalysis } from '@/components/AnalysisReport.d';
+import type { PlayerAnalysis } from '@/types/playerAnalysis';
 
 interface ToastFunctions {
   toast: (props: {
@@ -93,7 +93,7 @@ export const analyzeVideo = async (
       const totalElapsed = now - analysisStartTime;
       if (totalElapsed > (maxAnalysisTime * 0.7) && currentProgress < 95) {
         console.log("Analysis approaching timeout, accelerating progress");
-        currentProgress = Math.min(96, currentProgress + 7); // تسريع ��كبر للتقدم
+        currentProgress = Math.min(96, currentProgress + 7); // تسريع كبر للتقدم
         setProgress(currentProgress);
       }
       
@@ -189,15 +189,21 @@ export const analyzeVideo = async (
 
 // إنشاء تحليل افتراضي في حالة فشل التحليل الفعلي
 const createPlaceholderAnalysis = (): PlayerAnalysis => {
+  const id = 'placeholder-' + Date.now();
+  const date = new Date().toISOString().split('T')[0];
+  const score = 75;
+  
   return {
-    id: 'placeholder-' + Date.now(),
+    id: id,
     playerId: 'auto-generated',
+    date: date,
+    score: score,
     playerName: "John Doe",
     position: "Forward",
     timestamp: new Date().toISOString(),
     duration: 120,
     confidence: 0.7,
-    performanceScore: 75,
+    performanceScore: score,
     movements: [
       { timestamp: 0, x: 100, y: 100, speed: 5, acceleration: 1, direction: 45, isActive: true },
       { timestamp: 1, x: 110, y: 110, speed: 6, acceleration: 0.5, direction: 50, isActive: true },

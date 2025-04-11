@@ -1,330 +1,251 @@
+import { PlayerAnalysis, ProfessionalPlayer } from '@/types/playerAnalysis';
+import determineEarnedBadges from './badgeService';
+import { calculateInjuryRisk, generateInjuryRiskAssessment } from './injuryRiskAnalysis';
+import { InjuryRiskData } from '@/types/badges';
 
-import type { PlayerAnalysis } from "@/components/AnalysisReport.d";
-import { PROFESSIONAL_PLAYERS } from "./constants";
-import { generateInjuryRiskAssessment } from "./injuryRiskAnalysis";
-import { determineEarnedBadges } from "./badgeService";
-import { Badge } from "@/types/badges";
-import { ProgressData } from "@/types/progress";
-
-// Create a deterministic random generator using a seed
-const getSeededRandom = (seed: number): () => number => {
-  // Simple LCG (Linear Congruential Generator) implementation
-  let m = 2**31 - 1;
-  let a = 1103515245;
-  let c = 12345;
-  let state = seed;
-
-  return function() {
-    state = (a * state + c) % m;
-    return state / m;
-  };
-};
-
-// Generate mock analysis data with enhanced details
-export const generateEnhancedAnalysis = (seed: number = Date.now()): PlayerAnalysis => {
-  // Create a seeded random generator to ensure deterministic results
-  const random = getSeededRandom(seed);
+export const generateMockPlayerAnalysis = (
+  id = `analysis-${Date.now()}`,
+  playerName = 'محمد صلاح',
+  position = 'مهاجم'
+): PlayerAnalysis => {
+  // Generate a date in the last 30 days
+  const timestamp = new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000);
+  const dateString = timestamp.toISOString().split('T')[0];
   
-  const positions = ["Forward", "Midfielder", "Defender", "Goalkeeper"];
-  const positionIndex = Math.floor(random() * positions.length);
-  const position = positions[positionIndex];
+  // Generate random scores for performance
+  const technicalScore = Math.floor(65 + Math.random() * 25);
+  const physicalScore = Math.floor(65 + Math.random() * 25);
+  const tacticalScore = Math.floor(65 + Math.random() * 25);
+  const mentalScore = Math.floor(65 + Math.random() * 25);
   
-  // Detailed strengths based on position
-  const forwardStrengths = [
-    "Excellent finishing ability in one-on-one situations",
-    "Great movement off the ball to create space",
-    "Strong acceleration in the first 5 meters",
-    "Powerful shot with minimal backlift",
-    "Effective pressing from the front",
-    "Creative dribbling in tight spaces",
-    "Excellent aerial ability on attacking set pieces"
-  ];
-  
-  const midfielderStrengths = [
-    "Exceptional vision for through balls",
-    "Consistent passing accuracy over long distances",
-    "Effective at switching play to the opposite flank",
-    "Good spatial awareness in congested midfield areas",
-    "Strong at winning second balls",
-    "Intelligent positioning to receive passes between lines",
-    "Effective at delayed pressing to channel opponents"
-  ];
-  
-  const defenderStrengths = [
-    "Strong in aerial duels from defensive set pieces",
-    "Excellent timing in tackles",
-    "Good positional awareness to cut passing lanes",
-    "Strong communication and organization of defensive line",
-    "Effective at stepping out to intercept passes",
-    "Good recovery pace to deal with counter-attacks",
-    "Accurate long-range passing to initiate attacks"
-  ];
-  
-  const goalkeeperStrengths = [
-    "Quick reflexes for close-range shots",
-    "Excellent positioning to narrow shooting angles",
-    "Strong command of the penalty area",
-    "Good distribution with both hands and feet",
-    "Effective communication with the defense",
-    "Brave in one-on-one situations",
-    "Strong decision-making on when to leave the line"
-  ];
-  
-  // Select position-specific strengths
-  let positionStrengths;
-  if (position === "Forward") positionStrengths = forwardStrengths;
-  else if (position === "Midfielder") positionStrengths = midfielderStrengths;
-  else if (position === "Defender") positionStrengths = defenderStrengths;
-  else positionStrengths = goalkeeperStrengths;
-  
-  // Position-specific weaknesses
-  const forwardWeaknesses = [
-    "Sometimes wasteful with scoring opportunities",
-    "Needs to improve defensive work rate when team loses possession",
-    "Tendency to drift offside too frequently",
-    "Limited aerial ability when defending set pieces",
-    "Could improve link-up play with midfielders"
-  ];
-  
-  const midfielderWeaknesses = [
-    "Occasionally loses concentration during defensive transitions",
-    "Could improve decision-making in the final third",
-    "Needs to scan surroundings more frequently before receiving passes",
-    "Inconsistent in defensive duels",
-    "Stamina decreases noticeably in the final 15 minutes"
-  ];
-  
-  const defenderWeaknesses = [
-    "Occasionally gets dragged out of position",
-    "Needs to improve decision-making under pressure",
-    "Limited attacking contribution from set pieces",
-    "Sometimes struggles against highly technical dribblers",
-    "Could improve distribution under pressure"
-  ];
-  
-  const goalkeeperWeaknesses = [
-    "Sometimes hesitant when coming for crosses",
-    "Distribution under pressure needs improvement",
-    "Positioning for shots from distance could be better",
-    "Occasionally slow to get down for low shots",
-    "Command of penalty area inconsistent in crowded situations"
-  ];
-  
-  // Select position-specific weaknesses
-  let positionWeaknesses;
-  if (position === "Forward") positionWeaknesses = forwardWeaknesses;
-  else if (position === "Midfielder") positionWeaknesses = midfielderWeaknesses;
-  else if (position === "Defender") positionWeaknesses = defenderWeaknesses;
-  else positionWeaknesses = goalkeeperWeaknesses;
-  
-  // Position-specific recommendations
-  const forwardRecommendations = [
-    "Work on finishing drills from different angles and distances",
-    "Practice quick changes of direction with the ball",
-    "Develop awareness of defensive positioning when team loses possession",
-    "Improve timing of runs to avoid offside situations",
-    "Focus on link-up play in tight spaces"
-  ];
-  
-  const midfielderRecommendations = [
-    "Practice scanning before receiving passes with 'shoulder checks'",
-    "Work on quick transition from defense to attack",
-    "Develop set-piece delivery from different positions",
-    "Improve defensive positioning during opposition counter-attacks",
-    "Focus on high-intensity interval training to maintain stamina"
-  ];
-  
-  const defenderRecommendations = [
-    "Practice one-vs-one defensive situations with quick forwards",
-    "Work on building attacks from the back under pressure",
-    "Develop better communication with defensive partners",
-    "Improve timing of challenges in different situations",
-    "Focus on positional awareness during defensive transitions"
-  ];
-  
-  const goalkeeperRecommendations = [
-    "Practice claiming crosses in crowded penalty areas",
-    "Work on distribution under pressure",
-    "Develop quicker reactions for close-range shots",
-    "Improve communication with the defense for set pieces",
-    "Focus on positioning for shots from distance"
-  ];
-  
-  // Select position-specific recommendations
-  let positionRecommendations;
-  if (position === "Forward") positionRecommendations = forwardRecommendations;
-  else if (position === "Midfielder") positionRecommendations = midfielderRecommendations;
-  else if (position === "Defender") positionRecommendations = defenderRecommendations;
-  else positionRecommendations = goalkeeperRecommendations;
-  
-  // Position-specific detailed skills
-  const skillsByPosition = {
-    "Forward": {
-      finishing: Math.floor(random() * 30) + 60,
-      dribbling: Math.floor(random() * 30) + 60,
-      movement: Math.floor(random() * 30) + 60,
-      pace: Math.floor(random() * 30) + 60,
-      strength: Math.floor(random() * 30) + 60
-    },
-    "Midfielder": {
-      passing: Math.floor(random() * 30) + 60,
-      vision: Math.floor(random() * 30) + 60,
-      technique: Math.floor(random() * 30) + 60,
-      workRate: Math.floor(random() * 30) + 60,
-      positioning: Math.floor(random() * 30) + 60
-    },
-    "Defender": {
-      tackling: Math.floor(random() * 30) + 60,
-      marking: Math.floor(random() * 30) + 60,
-      aerial: Math.floor(random() * 30) + 60,
-      positioning: Math.floor(random() * 30) + 60,
-      strength: Math.floor(random() * 30) + 60
-    },
-    "Goalkeeper": {
-      reflexes: Math.floor(random() * 30) + 60,
-      handling: Math.floor(random() * 30) + 60,
-      positioning: Math.floor(random() * 30) + 60,
-      communication: Math.floor(random() * 30) + 60,
-      distribution: Math.floor(random() * 30) + 60
-    }
-  };
-  
-  // Randomize scores within reasonable ranges, but using our seeded random
-  const technicalScore = Math.floor(random() * 30) + 60; // 60-90
-  const physicalScore = Math.floor(random() * 30) + 60; // 60-90
-  const tacticalScore = Math.floor(random() * 30) + 60; // 60-90
-  const mentalScore = Math.floor(random() * 30) + 60; // 60-90
-  
-  // Calculate overall talent score based on the averages
-  const talentScore = Math.floor(
-    (technicalScore + physicalScore + tacticalScore + mentalScore) / 4
+  // Calculate overall performance score as weighted average
+  const performanceScore = Math.floor(
+    (technicalScore * 0.3) + 
+    (physicalScore * 0.25) + 
+    (tacticalScore * 0.25) + 
+    (mentalScore * 0.2)
   );
   
-  // Generate random market value between €500K and €50M
-  const marketValueBase = Math.floor(random() * 495) + 5; // 5-500
-  const marketValueUnit = marketValueBase >= 100 ? 'M' : 'K';
-  const marketValue = marketValueBase >= 100 
-    ? `€${(marketValueBase / 10).toFixed(1)}M` 
-    : `€${marketValueBase}0K`;
-  
-  // Find a comparable professional player
-  const proPlayerIndex = Math.floor(random() * PROFESSIONAL_PLAYERS.length);
-  const comparablePro = PROFESSIONAL_PLAYERS.find(player => player.position === position) || 
-                        PROFESSIONAL_PLAYERS[proPlayerIndex % PROFESSIONAL_PLAYERS.length];
-  
-  // Randomly select 3-5 strengths and 2-4 weaknesses using seeded random
-  const shuffleArray = <T>(array: T[]): T[] => {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
-      const j = Math.floor(random() * (i + 1));
-      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
+  // Generate random stats within reasonable ranges
+  const stats = {
+    pace: Math.floor(60 + Math.random() * 30),
+    shooting: Math.floor(60 + Math.random() * 30),
+    passing: Math.floor(60 + Math.random() * 30),
+    dribbling: Math.floor(60 + Math.random() * 30),
+    defending: Math.floor(50 + Math.random() * 30),
+    physical: Math.floor(60 + Math.random() * 30),
+    stamina: Math.floor(65 + Math.random() * 25),
+    acceleration: Math.floor(60 + Math.random() * 30),
+    agility: Math.floor(60 + Math.random() * 30),
+    balance: Math.floor(60 + Math.random() * 25),
+    ballControl: Math.floor(60 + Math.random() * 30),
+    decision: Math.floor(60 + Math.random() * 25),
+    anticipation: Math.floor(60 + Math.random() * 25),
+    positioning: Math.floor(60 + Math.random() * 25),
+    vision: Math.floor(60 + Math.random() * 25),
+    composure: Math.floor(60 + Math.random() * 25),
+    finishing: Math.floor(60 + Math.random() * 30),
+    shotPower: Math.floor(60 + Math.random() * 30),
+    longShots: Math.floor(60 + Math.random() * 25),
+    volleys: Math.floor(55 + Math.random() * 25),
+    penalties: Math.floor(60 + Math.random() * 30),
+    crossing: Math.floor(60 + Math.random() * 25),
+    freeKick: Math.floor(55 + Math.random() * 25),
+    shortPassing: Math.floor(60 + Math.random() * 30),
+    longPassing: Math.floor(60 + Math.random() * 25),
+    curve: Math.floor(55 + Math.random() * 25),
+    reactions: Math.floor(60 + Math.random() * 25),
+    strength: Math.floor(60 + Math.random() * 25),
+    jumping: Math.floor(60 + Math.random() * 25),
+    heading: Math.floor(60 + Math.random() * 25),
+    // Add reflexes for goalkeeper
+    reflexes: Math.floor(60 + Math.random() * 30)
   };
   
-  const shuffledStrengths = shuffleArray<string>(positionStrengths);
-  const shuffledWeaknesses = shuffleArray<string>(positionWeaknesses);
-  const shuffledRecommendations = shuffleArray<string>(positionRecommendations);
+  // Generate strengths based on highest stats
+  let strengths: string[] = [];
+  if (stats.pace > 80) strengths.push('سرعة عالية');
+  if (stats.shooting > 80) strengths.push('تسديد قوي');
+  if (stats.passing > 80) strengths.push('تمرير دقيق');
+  if (stats.dribbling > 80) strengths.push('مراوغة ممتازة');
+  if (stats.defending > 80) strengths.push('دفاع قوي');
+  if (stats.vision > 80) strengths.push('رؤية ممتازة للملعب');
+  if (stats.stamina > 80) strengths.push('لياقة بدنية عالية');
+  if (strengths.length < 3) {
+    const potentialStrengths = [
+      'قيادة فعالة',
+      'ذكاء تكتيكي',
+      'قدرة على التحمل',
+      'قوة بدنية',
+      'قوة في المواجهات الثنائية'
+    ];
+    while (strengths.length < 3) {
+      const randomStrength = potentialStrengths[Math.floor(Math.random() * potentialStrengths.length)];
+      if (!strengths.includes(randomStrength)) {
+        strengths.push(randomStrength);
+      }
+    }
+  }
   
-  const selectedStrengths = shuffledStrengths.slice(0, Math.floor(random() * 3) + 3);
-  const selectedWeaknesses = shuffledWeaknesses.slice(0, Math.floor(random() * 3) + 2);
-  const selectedRecommendations = shuffledRecommendations.slice(0, Math.floor(random() * 2) + 3);
+  // Generate weaknesses based on lowest stats
+  let weaknesses: string[] = [];
+  if (stats.pace < 70) weaknesses.push('نقص في السرعة');
+  if (stats.shooting < 70) weaknesses.push('ضعف في التسديد');
+  if (stats.passing < 70) weaknesses.push('تمرير غير دقيق');
+  if (stats.dribbling < 70) weaknesses.push('ضعف في المراوغة');
+  if (stats.defending < 70) weaknesses.push('دفاع ضعيف');
+  if (stats.stamina < 70) weaknesses.push('نقص في اللياقة البدنية');
+  if (weaknesses.length < 2) {
+    const potentialWeaknesses = [
+      'ضعف في الرأسيات',
+      'ضعف في التحكم بالكرة',
+      'ضعف في الكرات الثابتة',
+      'ضعف في اللعب الهوائي',
+      'ضعف في المراوغة'
+    ];
+    while (weaknesses.length < 2) {
+      const randomWeakness = potentialWeaknesses[Math.floor(Math.random() * potentialWeaknesses.length)];
+      if (!weaknesses.includes(randomWeakness)) {
+        weaknesses.push(randomWeakness);
+      }
+    }
+  }
   
-  // Generate deterministic ID based on seed
-  const id = `mock-analysis-${seed.toString(36).substring(0, 8)}`;
+  // Generate recommendations based on weaknesses
+  const recommendations = weaknesses.map(weakness => {
+    const weaknessToRecommendation: {[key: string]: string} = {
+      'نقص في السرعة': 'تمارين سرعة وخفة حركة متخصصة',
+      'ضعف في التسديد': 'تدريبات على التسديد من مختلف المسافات والزوايا',
+      'تمرير غير دقيق': 'تمارين تمرير متقدمة وتطوير الرؤية الميدانية',
+      'ضعف في المراوغة': 'تمارين مراوغة ومهارات فردية',
+      'دفاع ضعيف': 'تدريبات على التوقيت الصحيح للتدخلات الدفاعية',
+      'نقص في اللياقة البدنية': 'برنامج لتحسين التحمل واللياقة البدنية',
+      'ضعف في الرأسيات': 'تدريبات على التوقيت والقفز في الكرات الهوائية',
+      'ضعف في التحكم بالكرة': 'تمارين تحكم بالكرة والسيطرة على الكرات الصعبة',
+      'ضعف في الكرات الثابتة': 'تدريبات مكثفة على الركلات الحرة والركنيات',
+      'ضعف في اللعب الهوائي': 'تمارين خاصة لتحسين اللعب الهوائي والتوقيت'
+    };
+    
+    return weaknessToRecommendation[weakness] || 'تدريبات متخصصة لتحسين المستوى العام';
+  });
   
-  // Generate base analysis
-  const analysis: PlayerAnalysis = {
+  // Add general recommendations
+  recommendations.push('تحسين التغذية وروتين الراحة للاعبين');
+  recommendations.push('تدريبات منتظمة على المرونة والإطالة');
+  
+  // Calculate talent score based on performance
+  const talentScore = Math.min(99, Math.max(60, 
+    Math.floor(performanceScore + (-5 + Math.random() * 10))
+  ));
+  
+  // Calculate market value based on talent score with some randomness
+  const baseValue = (talentScore * 10000) + (Math.random() * 50000);
+  const marketValue = '$' + Math.floor(baseValue).toLocaleString();
+  
+  // Generate injury risk data
+  const injuryRisk: InjuryRiskData = generateInjuryRiskAssessment(position, stats.physical);
+  
+  // Generate professional player comparison
+  const proComparison: ProfessionalPlayer = {
+    id: 'pro-1',
+    name: position === 'مهاجم' ? 'كريم بنزيما' : 'كيفين دي بروين',
+    team: position === 'مهاجم' ? 'الاتحاد السعودي' : 'مانشستر سيتي',
+    position: position === 'مهاجم' ? 'forward' : 'midfielder',
+    match: 78,
+    similarity: 72,
+    strengths: ['تمركز ممتاز', 'رؤية ميدانية', 'تمرير دقيق'],
+    nationality: position === 'مهاجم' ? 'فرنسي' : 'بلجيكي',
+    age: position === 'مهاجم' ? 35 : 32,
+    playingStyle: position === 'مهاجم' ? 'المهاجم الكلاسيكي' : 'صانع اللعب'
+  };
+  
+  // Generate movement data for heatmap visualization
+  const movements = Array.from({ length: 50 }, (_, i) => ({
+    timestamp: i * 30,
+    x: 10 + Math.random() * 80,
+    y: 10 + Math.random() * 60,
+    speed: 2 + Math.random() * 8,
+    acceleration: -3 + Math.random() * 6,
+    direction: Math.random() * 360,
+    isActive: Math.random() > 0.1
+  }));
+  
+  // Generate heatmap data
+  const heatmap = Array.from({ length: 100 }, () => ({
+    x: Math.random() * 100,
+    y: Math.random() * 70,
+    value: Math.random()
+  }));
+  
+  // Generate badges based on performance
+  const mockAnalysis: PlayerAnalysis = {
     id,
-    playerName: "John Doe", // In a real app, we would detect or ask for the player's name
+    date: dateString,
+    score: performanceScore,
+    playerName,
     position,
-    timestamp: new Date().toISOString(),
-    duration: 120, // 2 minutes analysis
-    confidence: 0.85,
+    timestamp: timestamp.toISOString(),
+    duration: Math.floor(60 + Math.random() * 60),
+    confidence: 0.75 + Math.random() * 0.2,
+    videoUrl: '',
+    thumbnailUrl: '',
     marketValue,
     talentScore,
-    stats: {
-      pace: physicalScore,
-      shooting: technicalScore - 5,
-      passing: technicalScore + 5,
-      dribbling: technicalScore,
-      defending: tacticalScore,
-      physical: physicalScore,
-      stamina: physicalScore + 5,
-      acceleration: physicalScore - 5,
-      agility: physicalScore,
-      balance: physicalScore - 3,
-      ballControl: technicalScore + 2,
-      decision: mentalScore,
-      anticipation: mentalScore - 2,
-      positioning: tacticalScore + 2,
-      vision: mentalScore + 5,
-      composure: mentalScore
-    },
-    strengths: selectedStrengths,
-    weaknesses: selectedWeaknesses,
-    detailedSkills: skillsByPosition[position],
+    compatibilityScore: 70 + Math.floor(Math.random() * 20),
+    performanceScore,
+    stats,
+    strengths,
+    weaknesses,
+    recommendations,
+    summary: `لاعب ${performanceScore > 80 ? 'متميز' : 'واعد'} في مركز ${position} يتمتع بمهارات ${strengths.join(' و')}. يحتاج إلى تطوير ${weaknesses.join(' و')}.`,
+    advancedInsights: [
+      'يظهر حس تكتيكي ممتاز في المواقف الهجومية',
+      'قدرة جيدة على التحول السريع بين الدفاع والهجوم',
+      'يتخذ قرارات سليمة تحت الضغط'
+    ],
+    movements,
+    passes: [],
+    heatmap,
     performance: {
       technical: technicalScore,
       physical: physicalScore,
       tactical: tacticalScore,
       mental: mentalScore
     },
-    recommendations: selectedRecommendations,
-    compatibilityScore: Math.floor(random() * 30) + 65, // 65-95
-    proComparison: {
-      name: comparablePro.name,
-      similarity: Math.floor(random() * 30) + 40, // 40-70% similarity
-      // Fix: Convert string[] to {[key: string]: number} by creating an object
-      skills: Object.fromEntries(
-        comparablePro.skills.map((skill) => [
-          skill, 
-          60 + Math.floor(random() * 30) // Random score between 60-90 for each skill
-        ])
-      )
-    },
-    summary: "Player shows promising skills and attributes for their position.",
-    advancedInsights: ["Good movement off the ball", "Strong spatial awareness"],
-    movements: [],
-    passes: [],
-    heatmap: [],
-    performanceScore: talentScore
-  };
-  
-  // Add injury risk assessment
-  const injuryRisk = generateInjuryRiskAssessment(position, physicalScore);
-  
-  // Determine earned badges
-  const badges: Badge[] = determineEarnedBadges(analysis);
-  
-  // Create proper ProgressData structure
-  const progress: ProgressData = {
-    lastAnalysis: new Date(),
-    improvement: Math.floor(random() * 15) + 1, // 1-15% improvement
-    areas: [
-      {
-        skill: "Technical",
-        before: technicalScore - Math.floor(random() * 10),
-        after: technicalScore
-      },
-      {
-        skill: "Physical",
-        before: physicalScore - Math.floor(random() * 10),
-        after: physicalScore
-      },
-      {
-        skill: "Tactical",
-        before: tacticalScore - Math.floor(random() * 10),
-        after: tacticalScore
-      }
-    ]
-  };
-  
-  // Return the complete enhanced analysis
-  return {
-    ...analysis,
     injuryRisk,
-    badges,
-    progress
+    badges: determineEarnedBadges({
+      id,
+      date: dateString,
+      score: performanceScore,
+      position,
+      stats,
+      performance: {
+        technical: technicalScore,
+        physical: physicalScore,
+        tactical: tacticalScore,
+        mental: mentalScore
+      },
+      performanceScore
+    }),
+    proComparison,
+    detailedSkills: {
+      ballControl: stats.ballControl,
+      passing: stats.passing,
+      shooting: stats.shooting,
+      positioning: stats.positioning,
+      teamwork: 65 + Math.random() * 25,
+      leadership: 60 + Math.random() * 30,
+      decisionMaking: 65 + Math.random() * 25
+    },
+    age: 18 + Math.floor(Math.random() * 15),
+    country: 'المملكة العربية السعودية',
+    city: ['الرياض', 'جدة', 'الدمام'][Math.floor(Math.random() * 3)],
+    height: `${170 + Math.floor(Math.random() * 20)} سم`,
+    weight: `${65 + Math.floor(Math.random() * 20)} كغ`,
+    preferredFoot: Math.random() > 0.7 ? 'اليسرى' : 'اليمنى'
   };
+  
+  return mockAnalysis;
 };
+
+export default generateMockPlayerAnalysis;
