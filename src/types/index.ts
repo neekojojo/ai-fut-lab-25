@@ -9,8 +9,8 @@ export * from './training';
 export type { Badge, BadgeItem } from './badges';
 // Export injury risk types with explicit named exports for proper TypeScript isolatedModules mode
 export type { 
-  InjuryRiskArea as InjuryRiskAreaType,
-  InjuryRiskData as InjuryRiskDataType
+  InjuryRiskArea,
+  InjuryRiskData
 } from './badges';
 export * from './progress';
 export * from './injuries';

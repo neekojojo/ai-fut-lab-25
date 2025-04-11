@@ -58,7 +58,6 @@ export const generateMockPlayerAnalysis = (
     strength: Math.floor(60 + Math.random() * 25),
     jumping: Math.floor(60 + Math.random() * 25),
     heading: Math.floor(60 + Math.random() * 25),
-    // Add reflexes for goalkeeper
     reflexes: Math.floor(60 + Math.random() * 30)
   };
   
