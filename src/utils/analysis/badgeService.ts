@@ -1,6 +1,6 @@
 
-import { Badge } from '@/types/badges';
-import { PlayerAnalysis } from '@/types/playerAnalysis';
+import type { Badge } from '@/types/badges';
+import type { PlayerAnalysis } from '@/types/playerAnalysis';
 
 // Function to determine which badges a player has earned based on their analysis
 const determineEarnedBadges = (analysis: Partial<PlayerAnalysis>): Badge[] => {

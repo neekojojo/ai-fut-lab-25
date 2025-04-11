@@ -1,5 +1,5 @@
 
-import { InjuryRiskData } from '@/types/injuries';
+import type { InjuryRiskData } from '@/types/injuries';
 
 export const generateInjuryRiskAssessment = (position: string, physicalScore: number): InjuryRiskData => {
   // Base overall risk inversely related to physical score
